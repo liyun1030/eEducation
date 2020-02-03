@@ -15,6 +15,16 @@ import { roomStore } from '../stores/room';
 import { globalStore } from '../stores/global';
 import { t } from '../utils/i18n';
 
+const networkQualityIcon: {[key: string]: string} = {
+  'excellent': 'network-good',
+  'good': 'network-good',
+  'poor': 'network-normal',
+  'bad': 'network-normal',
+  'very bad': 'network-bad',
+  'down': 'network-bad',
+  'unknown': 'network-bad',
+}
+
 interface NavProps {
   delay: string
   network: string
@@ -60,7 +70,12 @@ export function Nav ({
       <div className="network-state">
         {platform === 'web' ? <span className="net-field">{t('nav.delay')}<span className="net-field-value">{delay}</span></span> : null}
         {/* <span className="net-field">Packet Loss Rate: <span className="net-field-value">{lossPacket}</span></span> */}
-        <span className="net-field">{t('nav.network')}<span className="net-field-value">{network}</span></span>
+        <span className="net-field" style={{display: 'inline-flex', justifyContent: 'center', alignItems: 'center'}}>
+          {t('nav.network')}
+          <span className={`net-field-value ${networkQualityIcon[network]}`} style={{marginLeft: '.2rem'}}>
+            {/* {network} */}
+          </span>
+        </span>
         {platform === 'electron' ? <span className="net-field">{t('nav.network')}<span className="net-field-value">{cpu}</span></span> : null}
       </div>
       <div className="menu">
