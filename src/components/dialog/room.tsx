@@ -85,7 +85,8 @@ const DialogContainer = () => {
   const onConfirm = (type: string) => {
     if (type === 'exitRoom') {
       globalStore.removeDialog();
-      history.push('/');
+      // history.goBack();
+      history.push(roomStore.state.homePage);
     }
     else if (type === 'apply') {
       Promise.all([

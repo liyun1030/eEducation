@@ -1,7 +1,7 @@
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect } from 'react';
 import Icon from './icon';
 import './video-player.scss';
-import { AgoraElectronStream, StreamType, nativeRTCClient as nativeClient } from '../utils/agora-electron-client';
+import { AgoraElectronStream, StreamType, AgoraRtcEngine } from '../utils/agora-electron-client';
 import { useRoomState } from '../containers/root-container';
 import { platform } from '../utils/platform';
 
@@ -47,12 +47,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   const lockPlay = useRef<boolean>(false);
 
-  const AgoraRtcEngine = useMemo(() => {
-    return nativeClient.rtcEngine;
-  }, [nativeClient.rtcEngine]);
-
   useEffect(() => {
-    if (!domId || !stream || !nativeClient) return;
+    if (!domId || !stream || !AgoraRtcEngine) return;
     if (platform === 'electron') {
       const _stream = stream as AgoraElectronStream;
       const dom = document.getElementById(domId);

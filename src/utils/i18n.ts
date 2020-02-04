@@ -6,6 +6,7 @@ const build_version = BUILD_VERSION ? BUILD_VERSION : '0.0.1';
 
 const zhCN: any = {
   'toast': {
+    'api_login_failured': '房间加入失败, 原因: {reason}',
     'confirm': '确定',
     'cancel': '取消',
     'quit_room': '确定退出课程吗？',
@@ -22,7 +23,8 @@ const zhCN: any = {
     'rtm_login_failed': '房间登录失败, 请检查网络设置',
     'rtm_login_failed_reason': '房间登录失败, 原因： {reason}',
     'replay_failed': '回放失败，请刷新页面重试',
-    'teacher_exists': '该房间老师已存在',
+    'teacher_exists': '该房间老师已存在，请等待30秒或重新创建教室',
+    'student_over_limit': '超出学生最大人数，请等待30秒或重新创建教室',
     'teacher_accept_whiteboard': '老师已授权了你白板的权限',
     'teacher_cancel_whiteboard': '老师已收回了你白板的权限',
     'teacher_accept_co_video': '老师已允许连麦',
@@ -52,6 +54,7 @@ const zhCN: any = {
     'class_start': '课程开始'
   },
   'home': {
+    'entry-home': '进入教室',
     'teacher': '老师',
     'student': '学生',
     'cover_class': 'cover-cn',
@@ -68,7 +71,10 @@ const zhCN: any = {
     'large_class': '大班课',
     'missing_room_name': '缺少房间名',
     'missing_your_name': '缺少昵称',
+    'missing_password': '缺少房间密码',
     'missing_role': '缺少角色',
+    'account': '姓名',
+    'password': '密码',
   },
   'room': {
     'chat_room': '消息列表',
@@ -88,6 +94,7 @@ const zhCN: any = {
 
 const en = {
   'toast': {
+    'api_login_failured': 'Join Failured, Reason: {reason}',
     'confirm': 'Confirm',
     'cancel': 'Cancel',
     'quit_room': 'Are U sure to exit the classroom?',
@@ -104,7 +111,8 @@ const en = {
     'rtm_login_failed': 'login failure, please checkout ur network',
     'rtm_login_failed_reason': 'login failure, reason: {reason}',
     'replay_failed': 'Replay Failed please refresh browser',
-    'teacher_exists': 'Teacher already permit your whiteboard',
+    'teacher_exists': 'Teacher already exists, Please waiting for 30s or reopen new class',
+    'student_over_limit': 'Student have reached upper limit, , Please waiting for 30s or rejoin new class',
     'teacher_accept_whiteboard': 'Teacher already grant your whiteboard',
     'teacher_cancel_whiteboard': 'Teacher already cancel your whiteboard',
     'teacher_accept_co_video': 'Teacher already accept co-video',
@@ -134,6 +142,7 @@ const en = {
     'class_start': 'Class start'
   },
   'home': {
+    'entry-home': 'Enter in Home',
     'teacher': 'teacher',
     'student': 'student',
     'cover_class': 'cover-en',
@@ -150,7 +159,10 @@ const en = {
     'large_class': 'Large Class',
     'missing_room_name': 'missing room name',
     'missing_your_name': 'missing your name',
-    'missing_role': 'missing role'
+    'missing_password': 'missing password',
+    'missing_role': 'missing role',
+    'account': 'nickname',
+    'password': 'password',
   },
   'room': {
     'chat_room': 'Chat Room',

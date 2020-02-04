@@ -32,7 +32,7 @@ function canJoin({onlineStatus, roomType, channelCount, role}: {onlineStatus: an
     const isOnline = teacher;
     if (isOnline) {
       result.permitted = false;
-      result.reason = 'Teacher already existed';
+      result.reason = t('teacher_exists');
       return result;
     }
   }
@@ -40,7 +40,7 @@ function canJoin({onlineStatus, roomType, channelCount, role}: {onlineStatus: an
   if (role === 'student') {
     if (totalCount+1 > maximum) {
       result.permitted = false;
-      result.reason = 'Student have reached upper limit';
+      result.reason = t('student_over_limit');
       return result;
     }
   }
@@ -77,6 +77,7 @@ export interface ClassState {
 }
 
 type RtcState = {
+  rtcToken: string
   published: boolean
   joined: boolean
   users: Set<number>
@@ -107,11 +108,15 @@ export type SessionInfo = {
 
 export type RtmState = {
   joined: boolean
+  rtmToken: string
   memberCount: number
 }
 
 export type RoomState = {
+  rtcToken: string
+  rtmToken: string
   rtmLock: boolean
+  homePage: string
   me: AgoraUser
   users: Map<string, AgoraUser>
   course: ClassState
@@ -139,8 +144,6 @@ export class RoomStore {
   set state (newState) {
     this._state = newState;
   }
-  public rtmClient: AgoraRTMClient = new AgoraRTMClient();
-  public rtcClient: AgoraWebClient | AgoraElectronClient = isElectron ? new AgoraElectronClient () : new AgoraWebClient();
   public readonly defaultState: RoomState = Object.freeze({
     rtmLock: false,
     me: {
@@ -191,18 +194,23 @@ export class RoomStore {
     },
     messages: List<ChatMessage>(),
     language: navigator.language,
-    ...GlobalStorage.read('agora_room')
+    ...GlobalStorage.read('edu_agora_room')
   });
 
   private applyLock: number = 0;
 
   public windowId: number = 0;
 
+  public rtmClient: AgoraRTMClient;
+  public rtcClient: AgoraWebClient | AgoraElectronClient;
+
   constructor() {
     this.subject = null;
     this._state = {
       ...this.defaultState
     };
+    this.rtmClient = new AgoraRTMClient();
+    this.rtcClient = isElectron ? new AgoraElectronClient ({roomStore: this}) : new AgoraWebClient({roomStore: this});
   }
 
   initialize() {
@@ -573,8 +581,8 @@ export class RoomStore {
   }
 
   async loginAndJoin(payload: any, pass: boolean = false) {
-    const {roomType, role, uid, rid, token} = payload;
-    await this.rtmClient.login(uid, token);
+    const {roomType, role, uid, rid, rtcToken, rtmToken} = payload;
+    await this.rtmClient.login(uid, rtmToken);
     const channelMemberCount = await this.rtmClient.getChannelMemberCount([rid]);
     const channelCount = channelMemberCount[rid];
     let accounts = await this.rtmClient.getChannelAttributeBy(rid);
@@ -594,10 +602,11 @@ export class RoomStore {
         rtm: {
           ...this.state.rtm,
           joined: true
-        }
+        },
+        rtmToken,
+        rtcToken,
       }
       const grantBoard = role === 'teacher' ? 1 : 0;
-      console.log(">>>>>>>>>>#room: ", grantBoard);
       await this.updateMe({...payload, grantBoard});
       this.commit(this.state);
       return;
@@ -814,7 +823,8 @@ export class RoomStore {
         linkId: info.linkId,
         sharedId: info.sharedId,
         boardId: info.boardId,
-      }
+      },
+      homePage: info.homePage,
     }
     this.commit(this.state);
   }
@@ -826,7 +836,7 @@ export class RoomStore {
     } catch(err) {
       console.warn(err);
     } finally {
-      GlobalStorage.clear('agora_room');
+      GlobalStorage.clear('edu_agora_room');
       this.state = {} as RoomState;
       this.state = {
         ...this.defaultState

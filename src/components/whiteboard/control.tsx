@@ -158,11 +158,11 @@ export default function Control({
         }
         {role === 'teacher' ?
           <>
-            <ControlItem
+            {/* <ControlItem
               name={whiteboard.state.recording ? 'stop_recording' : 'recording'}
               onClick={onRecordButtonClick}
               active={false}
-            />
+            /> */}
             <ControlItem
               name={sharing ? 'quit_screen_sharing' : 'screen_sharing'}
               onClick={onClick}

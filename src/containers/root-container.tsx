@@ -155,12 +155,15 @@ export const RootProvider: React.FC<any> = ({children}) => {
     }
 
     const room = value.roomState;
-    GlobalStorage.save('agora_room', {
+    GlobalStorage.save('edu_agora_room', {
       me: room.me,
       course: room.course,
       mediaDevice: room.mediaDevice,
+      rtcToken: room.rtcToken,
+      rtmToken: room.rtmToken,
+      homePage: room.homePage,
     });
-    GlobalStorage.save('language', value.globalState.language);
+    GlobalStorage.save('edu_language', value.globalState.language);
     // WARN: DEBUG ONLY MUST REMOVED IN PRODUCTION
     //@ts-ignore
     window.room = roomState;

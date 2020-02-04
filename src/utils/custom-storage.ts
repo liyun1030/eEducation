@@ -26,7 +26,7 @@ export class CustomStorage {
   }
 
   getLanguage() {
-    const language = this.read('language') ? this.read('language') : navigator.language;
+    const language = this.read('edu_language') ? this.read('edu_language') : navigator.language;
     return {language};
   }
 

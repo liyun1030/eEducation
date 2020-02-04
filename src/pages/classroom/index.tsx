@@ -32,6 +32,8 @@ export function RoomPage({ children }: any) {
     const roomType = roomStore.state.course.roomType;
     const roomName = roomStore.state.course.roomName;
 
+    const homePage = roomStore.state.homePage;
+
     if (!rid || !me.uid) {
       history.push('/');
     }
@@ -53,6 +55,7 @@ export function RoomPage({ children }: any) {
       sharedId: me.sharedId,
       lockBoard: me.lockBoard,
       grantBoard: me.grantBoard,
+      homePage
     }
     lock.current = true;
     if (roomStore.state.rtm.joined) return;
@@ -65,7 +68,8 @@ export function RoomPage({ children }: any) {
           type: 'rtmClient',
           message: t('toast.login_failure'),
         });
-        history.push('/');
+        // history.push('/');
+        history.push(homePage);
         console.warn(err)
       }).finally(() => {
         globalStore.stopLoading();
@@ -292,7 +296,7 @@ export function RoomPage({ children }: any) {
           .joinChannel({
             uid: +roomState.me.uid, 
             channel: roomState.course.rid,
-            token: '',
+            token: roomState.rtcToken,
             dual: isSmallClass
           }).then(() => {
             
@@ -380,7 +384,7 @@ export function RoomPage({ children }: any) {
         nativeClient.joinChannel({
           uid: +roomState.me.uid, 
           channel: roomState.course.rid,
-          token: '',
+          token: roomState.rtcToken,
           dual: isSmallClass
         });
         roomStore.setRTCJoined(true);

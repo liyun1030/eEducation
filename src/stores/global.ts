@@ -64,7 +64,8 @@ export class Root {
       items: []
     },
     active: 'chatroom',
-    language: navigator.language,
+    language: 'zh-CN',
+    // language: navigator.language,
     newMessageCount: 0,
     ...GlobalStorage.getLanguage(),
   }
@@ -219,7 +220,7 @@ export class Root {
       language,
     }
     this.commit(this.state);
-    GlobalStorage.save('language', this.state.language);
+    GlobalStorage.save('edu_language', this.state.language);
     window.location.reload();
   }
 
