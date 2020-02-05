@@ -65,7 +65,6 @@ export class Root {
     },
     active: 'chatroom',
     language: 'zh-CN',
-    // language: navigator.language,
     newMessageCount: 0,
     ...GlobalStorage.getLanguage(),
   }

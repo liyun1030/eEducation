@@ -1,6 +1,7 @@
 import { RoomMessage } from './agora-rtm-client';
 import * as _ from 'lodash';
 import OSS from 'ali-oss';
+import uuidv4 from 'uuid/v4';
 
 export interface OSSConfig {
   accessKeyId: string,
@@ -26,6 +27,16 @@ export function getOSSUrl (mediaUrl: string): string {
   const res = `${OSS_PREFIX}/${mediaUrl}`;
   console.log("resolve: ", res, OSS_PREFIX);
   return res;
+}
+
+export function genUUID (): string {
+  let uuid = localStorage.getItem('edu_uuid');
+  if (uuid) {
+    return uuid;
+  }
+  uuid = uuidv4();
+  localStorage.setItem('edu_uuid', uuid);
+  return uuid;
 }
 
 export const handleRegion = (region: string): number => {

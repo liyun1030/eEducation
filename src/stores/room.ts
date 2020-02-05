@@ -116,6 +116,7 @@ export type RoomState = {
   rtcToken: string
   rtmToken: string
   rtmLock: boolean
+  uuid: string
   homePage: string
   me: AgoraUser
   users: Map<string, AgoraUser>
