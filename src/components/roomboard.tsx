@@ -12,7 +12,7 @@ export default function Roomboard (props: any) {
     messages, sendMessage, handleChange
   } = useChatText();
 
-  const {active} = useGlobalState();
+  const {active, newMessageCount} = useGlobalState();
 
   const [visible, setVisible] = useState(true);
 
@@ -20,7 +20,7 @@ export default function Roomboard (props: any) {
     setVisible(!visible);
   }
 
-  const count = active !== 'chatroom' ? globalStore.state.newMessageCount : 0;
+  const count = active !== 'chatroom' ? newMessageCount : 0;
 
   return (
     <>

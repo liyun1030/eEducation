@@ -21,7 +21,7 @@ function canJoin({onlineStatus, roomType, channelCount, role}: {onlineStatus: an
   let maximum = channelCountLimit[roomType];
   if (channelCount >= maximum) {
     result.permitted = false;
-    result.reason = 'The number of students and teacher have reached upper limit';
+    result.reason = t('teacher_and_student_over_limit');
     return result;
   }
 

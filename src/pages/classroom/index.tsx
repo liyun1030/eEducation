@@ -102,6 +102,7 @@ export function RoomPage({ children }: any) {
   useEffect(() => {
     return () => {
       globalStore.removeUploadNotice();
+      globalStore.setMessageCount(0);
       roomStore.exitAll()
       .then(() => {
       })
