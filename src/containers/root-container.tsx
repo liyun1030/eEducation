@@ -86,7 +86,7 @@ export const RootProvider: React.FC<any> = ({children}) => {
           type: 'rtmClient',
           message: t('toast.login_failure'),
         });
-        history.push('/');
+        history.goBack();
         return;
       }
       if (reason === 'REMOTE_LOGIN' || newState === 'ABORTED') {
@@ -94,7 +94,7 @@ export const RootProvider: React.FC<any> = ({children}) => {
           type: 'rtmClient',
           message: t('toast.kicked'),
         });
-        history.push('/');
+        history.goBack();
         return;
       }
     });

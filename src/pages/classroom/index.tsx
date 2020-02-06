@@ -35,7 +35,7 @@ export function RoomPage({ children }: any) {
     const homePage = roomStore.state.homePage;
 
     if (!rid || !me.uid) {
-      history.push('/');
+      history.goBack();
     }
 
     const uid = me.uid;
@@ -68,8 +68,8 @@ export function RoomPage({ children }: any) {
           type: 'rtmClient',
           message: t('toast.login_failure'),
         });
-        // history.push('/');
-        history.push(homePage);
+        history.goBack();
+        // history.push(homePage);
         console.warn(err)
       }).finally(() => {
         globalStore.stopLoading();
@@ -80,7 +80,8 @@ export function RoomPage({ children }: any) {
         type: 'rtmClient',
         message: t('toast.login_failure'),
       });
-      history.push('/');
+      history.goBack();
+      // history.push(homePage || '/');
       console.warn(err)
     })
     .finally(() => {
