@@ -255,7 +255,7 @@ function HomePage({type: roomType, roomId, title, startTime, endTime, role}: Hom
               />
             </FormControl>
             <FormControl className={classes.formControl}>
-              <FormInput Label={t('home.password')} value={session.password} onChange={
+              <FormInput pattern={/^[a-zA-Z0-9]*/} Label={t('home.password')} value={session.password} onChange={
                 (val: string) => {
                   setSessionInfo({
                     ...session,

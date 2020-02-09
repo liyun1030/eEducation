@@ -584,35 +584,42 @@ export class RoomStore {
   async loginAndJoin(payload: any, pass: boolean = false) {
     const {roomType, role, uid, rid, rtcToken, rtmToken} = payload;
     await this.rtmClient.login(uid, rtmToken);
-    const channelMemberCount = await this.rtmClient.getChannelMemberCount([rid]);
-    const channelCount = channelMemberCount[rid];
-    let accounts = await this.rtmClient.getChannelAttributeBy(rid);
-    const onlineStatus = await this.rtmClient.queryOnlineStatusBy(accounts);
-    const argsJoin = {
-      channelCount,
-      onlineStatus,
-      role,
-      accounts,
-      roomType
-    };
-    const result = pass === false ? canJoin(argsJoin) : {permitted: true, reason: ''};
-    if (result.permitted) {
-      let res = await this.rtmClient.join(rid);
-      this.state = {
-        ...this.state,
-        rtm: {
-          ...this.state.rtm,
-          joined: true
-        },
-        rtmToken,
-        rtcToken,
+
+    let result = {permitted: true, reason: ''};
+    try {
+      const channelMemberCount = await this.rtmClient.getChannelMemberCount([rid]);
+      const channelCount = channelMemberCount[rid];
+      let accounts = await this.rtmClient.getChannelAttributeBy(rid);
+      const onlineStatus = await this.rtmClient.queryOnlineStatusBy(accounts);
+      const argsJoin = {
+        channelCount,
+        onlineStatus,
+        role,
+        accounts,
+        roomType
+      };
+      result = pass === false ? canJoin(argsJoin) : {permitted: true, reason: ''};
+      if (result.permitted) {
+        let res = await this.rtmClient.join(rid);
+        this.state = {
+          ...this.state,
+          rtm: {
+            ...this.state.rtm,
+            joined: true
+          },
+          rtmToken,
+          rtcToken,
+        }
+        const grantBoard = role === 'teacher' ? 1 : 0;
+        await this.updateMe({...payload, grantBoard});
+        this.commit(this.state);
+        return;
       }
-      const grantBoard = role === 'teacher' ? 1 : 0;
-      await this.updateMe({...payload, grantBoard});
-      this.commit(this.state);
-      return;
+    } catch (err) {
+      if (this.rtmClient._logged) {
+        await this.rtmClient.logout();
+      }
     }
-    await this.rtmClient.logout();
     throw {
       type: 'not_permitted',
       reason: result.reason
