@@ -232,7 +232,7 @@ const onClose = (evt: any) => {
 const me = useRoomState().me;
 
 return (
-  <div className={`${className ? className : (preview ? 'preview-video' : `agora-video-view ${Boolean(video) === false && stream ? 'show-placeholder' : ''}`)}`}>
+  <div className={`${className ? className : (preview ? 'preview-video rotateY180deg' : `agora-video-view ${Boolean(video) === false && stream ? 'show-placeholder' : ''}`)}`}>
     {close ? <div className="icon-close" onClick={onClose}></div> : null}
     {className !== 'screen-sharing' ? <div className={role === 'teacher' ? 'teacher-placeholder' : 'student-placeholder'}></div> : null }
     {preview ? null :
@@ -247,7 +247,7 @@ return (
         </div>
         : null
     }
-    <div id={`${domId}`} className={`agora-rtc-video ${local && platform === 'electron' ? 'rotateY180deg' : ''}`}></div>
+    <div id={`${domId}`} className={`agora-rtc-video ${local ? 'rotateY180deg' : ''}`}></div>
   </div>
 )
 }

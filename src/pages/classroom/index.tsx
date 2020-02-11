@@ -171,7 +171,7 @@ export function RoomPage({ children }: any) {
         streamID: uid,
         video: true,
         audio: true,
-        mirror: false,
+        mirror: true,
         screen: false,
         microphoneId: mediaDevice.microphoneId,
         cameraId: mediaDevice.cameraId,

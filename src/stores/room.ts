@@ -16,12 +16,12 @@ function canJoin({onlineStatus, roomType, channelCount, role}: {onlineStatus: an
     permitted: true,
     reason: ''
   }
-  const channelCountLimit = [2, 17, 17];
+  const channelCountLimit = [2, 17, Infinity];
 
   let maximum = channelCountLimit[roomType];
   if (channelCount >= maximum) {
     result.permitted = false;
-    result.reason = t('teacher_and_student_over_limit');
+    result.reason = t('toast.teacher_and_student_over_limit');
     return result;
   }
 
@@ -32,7 +32,7 @@ function canJoin({onlineStatus, roomType, channelCount, role}: {onlineStatus: an
     const isOnline = teacher;
     if (isOnline) {
       result.permitted = false;
-      result.reason = t('teacher_exists');
+      result.reason = t('toast.teacher_exists');
       return result;
     }
   }
@@ -40,7 +40,7 @@ function canJoin({onlineStatus, roomType, channelCount, role}: {onlineStatus: an
   if (role === 'student') {
     if (totalCount+1 > maximum) {
       result.permitted = false;
-      result.reason = t('student_over_limit');
+      result.reason = t('toast.student_over_limit');
       return result;
     }
   }
@@ -840,17 +840,19 @@ export class RoomStore {
   async exitAll() {
     try {
       await this.rtmClient.exit();
-      await this.rtcClient.exit();
     } catch(err) {
       console.warn(err);
-    } finally {
-      GlobalStorage.clear('edu_agora_room');
-      this.state = {} as RoomState;
-      this.state = {
-        ...this.defaultState
-      }
-      this.commit(this.state);
     }
+    try {
+      await this.rtcClient.exit();
+    } catch (err) {
+      console.warn(err);
+    }
+    GlobalStorage.clear('edu_agora_room');
+    this.state = {
+      ...this.defaultState
+    }
+    this.commit(this.state);
   }
 
   setScreenShare(shared: boolean) {
