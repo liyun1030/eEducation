@@ -2,7 +2,7 @@ import { APP_ID } from './../utils/agora-rtm-client';
 import { EventEmitter } from 'events';
 import { videoPlugin } from '@netless/white-video-plugin';
 import { audioPlugin } from '@netless/white-audio-plugin';
-import { Room, WhiteWebSdk, DeviceType, SceneState, createPlugins } from 'white-web-sdk';
+import { Room, WhiteWebSdk, DeviceType, SceneState, createPlugins, RoomPhase } from 'white-web-sdk';
 import { Subject } from 'rxjs';
 import { WhiteboardAPI, RecordOperator } from '../utils/api';
 import {Map} from 'immutable';
@@ -53,6 +53,7 @@ plugins.setPluginContext("video", {identity: 'guest'});
 plugins.setPluginContext("audio", {identity: 'guest'});
 
 export type WhiteboardState = {
+  loading: boolean
   joined: boolean
   scenes: Map<string, CustomScene>
   currentScenePath: string
@@ -94,6 +95,7 @@ class Whiteboard extends EventEmitter {
     startTime: 0,
     endTime: 0,
     room: null,
+    loading: true,
     ...GlobalStorage.read('mediaDirs'),
   }
 
@@ -284,6 +286,14 @@ class Whiteboard extends EventEmitter {
     throw reason;
   }
 
+  updateLoading(value: boolean) {
+    this.state = {
+      ...this.state,
+      loading: value
+    }
+    this.commit(this.state);
+  }
+
   async join({rid, uid, userPayload}: JoinParams) {
     await this.leave();
     const {uuid, roomToken} = await this.connect(rid, uid);
@@ -297,7 +307,14 @@ class Whiteboard extends EventEmitter {
       roomToken,
       disableBezier: true,
     }, {
-      onPhaseChanged: phase => {},
+      onPhaseChanged: (phase: RoomPhase) => {
+        if (phase === RoomPhase.Connected) {
+          this.updateLoading(false);
+        } else {
+          this.updateLoading(true);
+        }
+        console.log("[White] onPhaseChanged phase : ", phase);
+      },
       onRoomStateChanged: state => {
         if (state.zoomScale) {
           whiteboard.updateScale(state.zoomScale);

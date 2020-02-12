@@ -180,6 +180,14 @@ export default class AgoraRTMClient {
       {enableNotificationToChannelMembers: true});
   }
 
+  async deleteChannelAttributesWith(uid: string) {
+    await this._client.deleteChannelAttributesByKeys(
+      this._currentChannelName,
+      [uid],
+      {enableNotificationToChannelMembers: true}
+    );
+  }
+
   async deleteChannelAttributesByKey() {
     if (!this._channelAttrsKey) return;
     await this._client.deleteChannelAttributesByKeys(

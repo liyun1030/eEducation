@@ -135,7 +135,7 @@ export default function Control({
             active={notice.reason === current} />
         : null}
       </div>
-      <div className="controls control-btn">
+      <div className="controls">
         {!sharing && role === 'teacher' ?
           <>
             <ControlItem name={`first_page`}

@@ -42,36 +42,43 @@ export default function BigClass() {
     }
   }, []);
 
+  const sendApplyCoVideo = async () => {
+    await roomStore.updateMe({...roomStore.state.me}, true);
+    await roomStore.rtmClient.sendPeerMessage(roomStore.state.course.teacherId,
+      {cmd: RoomMessage.applyCoVideo});
+  }
+
+  const sendCancelCoVideo = async () => {
+    await roomStore.rtmClient.deleteChannelAttributesWith(`${roomStore.state.me.uid}`);
+    // await roomStore.updateMe({...roomStore.state.me}, true);
+    await roomStore.rtmClient.sendPeerMessage(roomStore.state.course.teacherId,
+      {cmd: RoomMessage.cancelCoVideo});
+  }
+
   const handleClick = (type: string) => {
     if (rtmLock.current) return;
 
     if (type === 'hands_up') {
       if (roomStore.state.course.teacherId) {
         rtmLock.current = true;
-        roomStore.rtmClient.sendPeerMessage(roomStore.state.course.teacherId,
-          {cmd: RoomMessage.applyCoVideo})
-          .then((result: any) => {
-            console.log("peerMessage result ", result);
-          })
-          .catch(console.warn)
+        sendApplyCoVideo()
+        .then(() => {})
+        .catch(console.warn)
           .finally(() => {
             rtmLock.current = false;
-          })
+          });
       }
     }
   
     if (type === 'hands_up_end') {
       if (roomStore.state.course.teacherId) {
         rtmLock.current = true;
-        roomStore.rtmClient.sendPeerMessage(roomStore.state.course.teacherId,
-          {cmd: RoomMessage.cancelCoVideo})
-          .then((result: any) => {
-            console.log("peerMessage result ", result);
-          })
-          .catch(console.warn)
+        sendCancelCoVideo()
+        .then(() => {})
+        .catch(console.warn)
           .finally(() => {
             rtmLock.current = false;
-          })
+          });
       }
     }
   }

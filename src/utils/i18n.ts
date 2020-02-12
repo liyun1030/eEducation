@@ -5,6 +5,9 @@ const BUILD_VERSION = process.env.REACT_APP_BUILD_VERSION as string;
 const build_version = BUILD_VERSION ? BUILD_VERSION : '0.0.1';
 
 const zhCN: any = {
+  'whiteboard': {
+    'loading': '加载中...',
+  },
   'toast': {
     'api_login_failured': '房间加入失败, 原因: {reason}',
     'confirm': '确定',
@@ -95,6 +98,9 @@ const zhCN: any = {
 }
 
 const en = {
+  'whiteboard': {
+    'loading': 'Loading...',
+  },
   'toast': {
     'api_login_failured': 'Join Failured, Reason: {reason}',
     'confirm': 'Confirm',

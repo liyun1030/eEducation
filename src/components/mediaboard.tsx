@@ -451,6 +451,9 @@ const items = [
           return;
         }
       }}
+      onSuccess={() => {
+        console.log("on success");
+      }}
       onFailure={(err: any) => {
         // WARN: capture exception
         if (uploadPhase === 'uploading') {
@@ -558,6 +561,7 @@ const items = [
         />
         :
         <Whiteboard
+          loading={whiteboardState.loading}
           className={selector}
           room={room}
         />

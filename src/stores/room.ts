@@ -440,18 +440,20 @@ export class RoomStore {
           return;
         }
         case RoomMessage.rejectCoVideo: {
-          globalStore.showToast({
-            type: 'co-video',
-            message: t("toast.teacher_reject_co_video")
-          });
-          return;
+          return this.rtmClient.deleteChannelAttributesWith(this.state.me.uid).finally(() => {
+            globalStore.showToast({
+              type: 'co-video',
+              message: t("toast.teacher_reject_co_video")
+            });
+          })
         }
         case RoomMessage.cancelCoVideo: {
-          globalStore.showToast({
-            type: 'co-video',
-            message: t("toast.teacher_cancel_co_video")
-          });
-          return;
+          return this.rtmClient.deleteChannelAttributesWith(this.state.me.uid).finally(() => {
+            globalStore.showToast({
+              type: 'co-video',
+              message: t("toast.teacher_cancel_co_video")
+            });
+          })
         }
         default:
       }
@@ -615,14 +617,15 @@ export class RoomStore {
         this.commit(this.state);
         return;
       }
+      throw {
+        type: 'not_permitted',
+        reason: result.reason
+      }
     } catch (err) {
       if (this.rtmClient._logged) {
         await this.rtmClient.logout();
       }
-    }
-    throw {
-      type: 'not_permitted',
-      reason: result.reason
+      throw err;
     }
   }
 
@@ -701,11 +704,11 @@ export class RoomStore {
     return res;
   }
 
-  async updateMe(user: any) {
+  async updateMe(user: any, forceUseRtm: boolean = false) {
     const {role, uid, account, rid, video, audio, chat, boardId, linkId, sharedId, muteChat, grantBoard} = user;
     const key = role === 'teacher' ? 'teacher' : uid;
     const me = this.state.me;
-    const attrs = {
+    const attrs: any = {
       uid: me.uid,
       account: me.account,
       chat: me.chat,
@@ -747,6 +750,35 @@ export class RoomStore {
       })
       console.log("teacher attrs: >>>> ", attrs);
     }
+
+    const roomType = user.roomType;
+
+    console.log("roomType", roomType);
+    
+    if (forceUseRtm && role === 'student' && roomType === 2) {
+      const {
+        whiteboard_uid: boardId,
+        link_uid: linkId,
+        shared_uid: sharedId,
+        grant_board: grantBoard,
+        ...others} = attrs;
+      this.state = {
+        ...this.state,
+        me: {
+          ...this.state.me,
+          ...me,
+          ...others,
+          boardId,
+          linkId,
+          sharedId,
+          grantBoard
+        }
+      }
+      this.commit({
+        ...this.state,
+      })
+      return;
+    } 
     let res = await this.rtmClient.updateChannelAttrsByKey(key, attrs);
     return res;
   }
