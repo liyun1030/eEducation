@@ -6,22 +6,26 @@ import uuidv4 from 'uuid/v4';
 export interface OSSConfig {
   accessKeyId: string,
   accessKeySecret: string,
-  region: string,
+  endpoint: string,
+  // region: string,
   bucket: string,
   folder: string,
+  cname: boolean,
 }
 
 export const ossConfig: OSSConfig = {
   "accessKeyId": process.env.REACT_APP_AGORA_OSS_BUCKET_KEY as string,
   "accessKeySecret": process.env.REACT_APP_AGORA_OSS_BUCKET_SECRET as string,
   "bucket": process.env.REACT_APP_AGORA_OSS_BUCKET_NAME as string,
-  "region": process.env.REACT_APP_AGORA_OSS_BUCKET_REGION as string,
-  "folder": process.env.REACT_APP_AGORA_OSS_BUCKET_FOLDER as string
+  "endpoint": process.env.REACT_APP_AGORA_OSS_CDN_ACCELERATE as string,
+  // "region": process.env.REACT_APP_AGORA_OSS_BUCKET_REGION as string,
+  "folder": process.env.REACT_APP_AGORA_OSS_BUCKET_FOLDER as string,
+  "cname": false,
 }
 
 export const ossClient = new OSS(ossConfig);
 
-const OSS_PREFIX = process.env.REACT_APP_AGORA_RECORDING_OSS_URL as string;
+const OSS_PREFIX = process.env.REACT_APP_AGORA_OSS_CDN_DOMAIN as string;
 
 export function getOSSUrl (mediaUrl: string): string {
   const res = `${OSS_PREFIX}/${mediaUrl}`;

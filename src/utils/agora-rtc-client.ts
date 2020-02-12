@@ -182,7 +182,7 @@ class AgoraRTCClient {
         resolve();
         this.destroyLocalStream();
         this._published = false;
-      }, 300);
+      }, 180);
     })
   }
 
@@ -265,8 +265,13 @@ class AgoraRTCClient {
   }
 
   async exit () {
-    await this.leave();
-    await this.destroy();
+    try {
+      await this.leave();
+    } catch(err) {
+      throw err;
+    } finally {
+      await this.destroy();
+    }
   }
 
   getDevices (): Promise<Device[]> {

@@ -43,13 +43,13 @@ export default function BigClass() {
   }, []);
 
   const sendApplyCoVideo = async () => {
-    await roomStore.updateMe({...roomStore.state.me}, true);
+    // await roomStore.updateMe({...roomStore.state.me}, true);
     await roomStore.rtmClient.sendPeerMessage(roomStore.state.course.teacherId,
       {cmd: RoomMessage.applyCoVideo});
   }
 
   const sendCancelCoVideo = async () => {
-    await roomStore.rtmClient.deleteChannelAttributesWith(`${roomStore.state.me.uid}`);
+    // await roomStore.rtmClient.deleteChannelAttributesWith(`${roomStore.state.me.uid}`);
     // await roomStore.updateMe({...roomStore.state.me}, true);
     await roomStore.rtmClient.sendPeerMessage(roomStore.state.course.teacherId,
       {cmd: RoomMessage.cancelCoVideo});

@@ -299,6 +299,8 @@ class Whiteboard extends EventEmitter {
     const {uuid, roomToken} = await this.connect(rid, uid);
     const identity = userPayload.identity === 'host' ? 'host' : 'guest';
 
+    console.log("Whiteboard join");
+
     plugins.setPluginContext("video", {identity});
     plugins.setPluginContext("audio", {identity});
 

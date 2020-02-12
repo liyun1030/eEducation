@@ -106,9 +106,14 @@ export default class AgoraRTMClient {
 
   async logout () {
     if (!this._logged) return;
-    await this._client.logout();
-    this.destroy();
-    this._logged = false;
+    try {
+      await this._client.logout();
+    } catch (err) {
+      throw err;
+    } finally {
+      this.destroy();
+      this._logged = false;
+    }
     return;
   }
 

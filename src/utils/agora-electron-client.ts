@@ -288,8 +288,13 @@ export class AgoraElectronClient {
   }
 
   exit () {
-    this.leave();
-    this.destroyClient();
+    try {
+      this.leave();
+    } catch(err) {
+      throw err;
+    } finally {
+      this.destroyClient();
+    }
   }
 
   publish() {

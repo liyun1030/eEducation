@@ -440,20 +440,20 @@ export class RoomStore {
           return;
         }
         case RoomMessage.rejectCoVideo: {
-          return this.rtmClient.deleteChannelAttributesWith(this.state.me.uid).finally(() => {
-            globalStore.showToast({
+          // return this.rtmClient.deleteChannelAttributesWith(this.state.me.uid).finally(() => {
+          return globalStore.showToast({
               type: 'co-video',
               message: t("toast.teacher_reject_co_video")
             });
-          })
+          // })
         }
         case RoomMessage.cancelCoVideo: {
-          return this.rtmClient.deleteChannelAttributesWith(this.state.me.uid).finally(() => {
-            globalStore.showToast({
+          // return this.rtmClient.deleteChannelAttributesWith(this.state.me.uid).finally(() => {
+          return globalStore.showToast({
               type: 'co-video',
               message: t("toast.teacher_cancel_co_video")
             });
-          })
+          // })
         }
         default:
       }
@@ -755,30 +755,30 @@ export class RoomStore {
 
     console.log("roomType", roomType);
     
-    if (forceUseRtm && role === 'student' && roomType === 2) {
-      const {
-        whiteboard_uid: boardId,
-        link_uid: linkId,
-        shared_uid: sharedId,
-        grant_board: grantBoard,
-        ...others} = attrs;
-      this.state = {
-        ...this.state,
-        me: {
-          ...this.state.me,
-          ...me,
-          ...others,
-          boardId,
-          linkId,
-          sharedId,
-          grantBoard
-        }
-      }
-      this.commit({
-        ...this.state,
-      })
-      return;
-    } 
+    // if (forceUseRtm && role === 'student' && roomType === 2) {
+    //   const {
+    //     whiteboard_uid: boardId,
+    //     link_uid: linkId,
+    //     shared_uid: sharedId,
+    //     grant_board: grantBoard,
+    //     ...others} = attrs;
+    //   this.state = {
+    //     ...this.state,
+    //     me: {
+    //       ...this.state.me,
+    //       ...me,
+    //       ...others,
+    //       boardId,
+    //       linkId,
+    //       sharedId,
+    //       grantBoard
+    //     }
+    //   }
+    //   this.commit({
+    //     ...this.state,
+    //   })
+    //   return;
+    // } 
     let res = await this.rtmClient.updateChannelAttrsByKey(key, attrs);
     return res;
   }
