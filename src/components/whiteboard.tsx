@@ -16,6 +16,8 @@ export default function Whiteboard ({
   loading
 }: WhiteBoardProps) {
 
+  console.log("Component Whiteboard, ", loading, room);
+
   useEffect(() => {
     if (!room) return;
     room.bindHtmlElement(document.getElementById('whiteboard') as HTMLDivElement);
@@ -23,7 +25,7 @@ export default function Whiteboard ({
     whiteboard.updateRoomState();
     if ($whiteboard) {
       window.addEventListener("resize", (evt: any) => {
-        console.log("loading", loading, whiteboard.state.loading);
+        console.log("loading",whiteboard.state.loading);
         if (!whiteboard.state.loading) {
           room.moveCamera({centerX: 0, centerY: 0});
           room.refreshViewSize();           
@@ -33,7 +35,7 @@ export default function Whiteboard ({
         window.removeEventListener("resize", (evt: any) => {});
       }
     }
-  }, [room, loading])
+  }, [room])
 
   return (
     <div className="whiteboard">

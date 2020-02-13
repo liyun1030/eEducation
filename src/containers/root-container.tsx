@@ -101,7 +101,7 @@ export const RootProvider: React.FC<any> = ({children}) => {
     rtmClient.on("MessageFromPeer", ({ message: { text }, peerId, props }: { message: { text: string }, peerId: string, props: any }) => {
       const body = resolvePeerMessage(text);
       resolveMessage(peerId, body);
-      roomStore.handlePeerMessage(body.cmd, peerId)
+      roomStore.handlePeerMessage(body, peerId)
       .then(() => {
       }).catch(console.warn);
     });
@@ -110,16 +110,6 @@ export const RootProvider: React.FC<any> = ({children}) => {
       console.log('[rtm-client] updated resolved attrs', channelAttrs);
       console.log('[rtm-client] updated origin attributes', attributes);
       roomStore.updateRoomAttrs(channelAttrs)
-    });
-    rtmClient.on("MemberJoined", (memberId: string) => {
-    });
-    rtmClient.on("MemberLeft", (memberId: string) => {
-      if (roomStore.state.applyUid === +memberId) {
-        roomStore.updateCourseLinkUid(0)
-        .then(() => {
-          globalStore.removeNotice();
-        }).catch(console.warn);
-      }
     });
     rtmClient.on("MemberCountUpdated", (count: number) => {
       !ref.current && roomStore.updateMemberCount(count);

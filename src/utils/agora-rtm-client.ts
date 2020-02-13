@@ -37,7 +37,7 @@ export interface EntityBody {
 export interface MessageBody {
   cmd: RoomMessage
   text?: string
-  data?: ChatBody | EntityBody
+  account?: ChatBody | EntityBody | string
 }
 
 export type SessionProps = {
@@ -155,16 +155,19 @@ export default class AgoraRTMClient {
 
   async leave (channel: string) {
     if (this._channels[channel]) {
-      await this._channels[channel].leave();
+      // await this._channels[channel].leave();
       this._joined = false;
       this.destroyChannel(channel);
     }
   }
 
   async exit() {
-    await this.deleteChannelAttributesByKey();
-    await this.leave(this._currentChannelName);
-    await this.logout();
+    try {
+      await this.deleteChannelAttributesByKey();
+      await this.logout();
+    } finally {
+      await this.leave(this._currentChannelName);
+    }
   }
 
   async sendChannelMessage(body: string) {
@@ -195,12 +198,15 @@ export default class AgoraRTMClient {
 
   async deleteChannelAttributesByKey() {
     if (!this._channelAttrsKey) return;
-    await this._client.deleteChannelAttributesByKeys(
-      this._currentChannelName,
-      [this._channelAttrsKey],
-      {enableNotificationToChannelMembers: true}
-    );
-    this._channelAttrsKey = null;
+    try {
+      await this._client.deleteChannelAttributesByKeys(
+        this._currentChannelName,
+        [this._channelAttrsKey],
+        {enableNotificationToChannelMembers: true}
+      );
+    } finally {
+      this._channelAttrsKey = null;
+    }
     return;
   }
 

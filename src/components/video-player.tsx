@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import Icon from './icon';
 import './video-player.scss';
 import { AgoraElectronStream, StreamType, AgoraRtcEngine } from '../utils/agora-electron-client';
@@ -46,6 +46,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const loadAudio = useRef<boolean>(false);
 
   const lockPlay = useRef<boolean>(false);
+
+  const [resume, setResume] = useState<boolean>(false);
 
   useEffect(() => {
     if (!domId || !stream || !AgoraRtcEngine) return;
@@ -114,7 +116,8 @@ useEffect(() => {
     stream.play(`${domId}`, { fit: 'cover' }, (err: any) => {
       lockPlay.current = false;
       if (err && err.status !== 'aborted') {
-        console.warn('[video-player] ', err, id);
+        stream.isPaused() && setResume(true);
+        console.warn('[video-player] ', err, id, stream.isPaused(), stream.isPlaying());
       }
     })
     return () => {
@@ -248,6 +251,12 @@ return (
         : null
     }
     <div id={`${domId}`} className={`agora-rtc-video ${local ? 'rotateY180deg' : ''}`}></div>
+    {resume ? <div className="clickable" onClick={() => {
+      stream.resume().then(() => {
+        setResume(false);
+        console.log("clickable");
+      }).catch(console.warn);
+    }}></div> : null}
   </div>
 )
 }

@@ -250,19 +250,12 @@ export class RoomStore {
   }
 
   isTeacher(peerId: string) {
-    if (!peerId) return false;
-    const user = this.state.users.get(peerId)
-    if (!user) return false;
-    if (user.role === 'teacher') return true;
+    if (peerId === this.state.course.teacherId) return true;
     return false;
   }
 
   isStudent (peerId: string) {
-    if (!peerId) return false;
-    const user = this.state.users.get(peerId);
-    if (!user) return false;
-    if (user.role === 'student') return true;
-    return false;
+    if (peerId !== this.state.course.teacherId) return true;
   }
 
   addLocalStream(stream: AgoraStream) {
@@ -391,7 +384,7 @@ export class RoomStore {
     this.commit(this.state);
   }
 
-  async handlePeerMessage(cmd: RoomMessage, peerId: string) {
+  async handlePeerMessage({cmd, account}: {cmd: RoomMessage, account: string}, peerId: string) {
     if (!peerId) return console.warn('state is not assigned');
     const myUid = this.state.me.uid;
     console.log("Teacher: ", this.isTeacher(myUid) , ", peerId: ", this.isStudent(peerId));
@@ -440,20 +433,18 @@ export class RoomStore {
           return;
         }
         case RoomMessage.rejectCoVideo: {
-          // return this.rtmClient.deleteChannelAttributesWith(this.state.me.uid).finally(() => {
-          return globalStore.showToast({
-              type: 'co-video',
-              message: t("toast.teacher_reject_co_video")
-            });
-          // })
+          globalStore.showToast({
+            type: 'co-video',
+            message: t("toast.teacher_reject_co_video")
+          });
+          return;
         }
         case RoomMessage.cancelCoVideo: {
-          // return this.rtmClient.deleteChannelAttributesWith(this.state.me.uid).finally(() => {
-          return globalStore.showToast({
-              type: 'co-video',
-              message: t("toast.teacher_cancel_co_video")
-            });
-          // })
+          globalStore.showToast({
+            type: 'co-video',
+            message: t("toast.teacher_cancel_co_video")
+          });
+          return;
         }
         default:
       }
@@ -584,7 +575,7 @@ export class RoomStore {
   }
 
   async loginAndJoin(payload: any, pass: boolean = false) {
-    const {roomType, role, uid, rid, rtcToken, rtmToken} = payload;
+    const {roomType, roomName, role, uid, rid, rtcToken, rtmToken} = payload;
     await this.rtmClient.login(uid, rtmToken);
 
     let result = {permitted: true, reason: ''};
@@ -603,6 +594,7 @@ export class RoomStore {
       result = pass === false ? canJoin(argsJoin) : {permitted: true, reason: ''};
       if (result.permitted) {
         let res = await this.rtmClient.join(rid);
+        const teacher = accounts.find(it => it.role === 'teacher');
         this.state = {
           ...this.state,
           rtm: {
@@ -611,6 +603,35 @@ export class RoomStore {
           },
           rtmToken,
           rtcToken,
+          course: {
+            rid,
+            roomName,
+            teacherId: get(teacher, 'uid', ''),
+            roomType,
+            boardId: get(teacher, 'whiteboard_uid', ''),
+            sharedId: get(teacher, 'shared_uid', 0),
+            linkId: get(teacher, 'link_uid', 0),
+            lockBoard: get(teacher, 'lock_board', 0),
+            courseState: get(teacher, 'class_state', 0),
+            muteChat: get(teacher, 'mute_chat', 0),
+
+            // mute_chat: this.state.course.muteChat,
+            // class_state: this.state.course.courseState,
+            // whiteboard_uid: this.state.course.boardId,
+            // link_uid: this.state.course.linkId,
+            // shared_uid: this.state.course.sharedId,
+
+            // rid: string
+            // roomName: string
+            // teacherId: string
+            // roomType: number
+            // boardId: string // whiteboard_uuid
+            // sharedId: number // shared_uid
+            // linkId: number // link_uid
+            // lockBoard: number // lock_board
+            // courseState: number 
+            // muteChat: number
+          }
         }
         const grantBoard = role === 'teacher' ? 1 : 0;
         await this.updateMe({...payload, grantBoard});
@@ -704,7 +725,7 @@ export class RoomStore {
     return res;
   }
 
-  async updateMe(user: any, forceUseRtm: boolean = false) {
+  async updateMe(user: any) {
     const {role, uid, account, rid, video, audio, chat, boardId, linkId, sharedId, muteChat, grantBoard} = user;
     const key = role === 'teacher' ? 'teacher' : uid;
     const me = this.state.me;
@@ -750,35 +771,21 @@ export class RoomStore {
       })
       console.log("teacher attrs: >>>> ", attrs);
     }
-
     const roomType = user.roomType;
-
-    console.log("roomType", roomType);
-    
-    // if (forceUseRtm && role === 'student' && roomType === 2) {
-    //   const {
-    //     whiteboard_uid: boardId,
-    //     link_uid: linkId,
-    //     shared_uid: sharedId,
-    //     grant_board: grantBoard,
-    //     ...others} = attrs;
-    //   this.state = {
-    //     ...this.state,
-    //     me: {
-    //       ...this.state.me,
-    //       ...me,
-    //       ...others,
-    //       boardId,
-    //       linkId,
-    //       sharedId,
-    //       grantBoard
-    //     }
-    //   }
-    //   this.commit({
-    //     ...this.state,
-    //   })
-    //   return;
-    // } 
+    this.state = {
+      ...this.state,
+      me: {
+        ...this.state.me,
+        ...me,
+        boardId,
+        linkId,
+        sharedId,
+        grantBoard
+      }
+    }
+    this.commit({
+      ...this.state,
+    })
     let res = await this.rtmClient.updateChannelAttrsByKey(key, attrs);
     return res;
   }

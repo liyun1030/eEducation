@@ -43,16 +43,19 @@ export default function BigClass() {
   }, []);
 
   const sendApplyCoVideo = async () => {
-    // await roomStore.updateMe({...roomStore.state.me}, true);
     await roomStore.rtmClient.sendPeerMessage(roomStore.state.course.teacherId,
+      // {cmd: RoomMessage.applyCoVideo, account: roomStore.state.me.account});
       {cmd: RoomMessage.applyCoVideo});
   }
 
   const sendCancelCoVideo = async () => {
-    // await roomStore.rtmClient.deleteChannelAttributesWith(`${roomStore.state.me.uid}`);
-    // await roomStore.updateMe({...roomStore.state.me}, true);
+    // console.log("[big-class] teacherId", roomStore.state.course.teacherId, " uid ", roomStore.state.me.uid);
     await roomStore.rtmClient.sendPeerMessage(roomStore.state.course.teacherId,
+      // {cmd: RoomMessage.cancelCoVideo, account: roomStore.state.me.account});
       {cmd: RoomMessage.cancelCoVideo});
+    // await roomStore.rtmClient.deleteChannelAttributesWith(`${roomStore.state.me.uid}`);
+    // const webClient = roomStore.rtcClient as AgoraWebClient;
+    // await webClient.unpublishLocalStream();
   }
 
   const handleClick = (type: string) => {
@@ -103,29 +106,30 @@ export default function BigClass() {
       console.log("close rtmClient: ", rtmClient, ", rtcClient: ", rtcClient, ", teacherUid: ", teacherUid, ", lock :", closeLock.current);
 
       if (currentHost.streamID === +me.uid && teacherUid) {
-        const quitClient = new Promise((resolve, reject) => {
-          if (platform === 'electron') {
-            const nativeClient = rtcClient as AgoraElectronClient;
-            const val = nativeClient.unpublish();
-            if (val >= 0) {
-              resolve();
-            } else {
-              console.warn('quit native client failed');
-              reject(val);
-            }
-          }
-          if (platform === 'web') {
-            const webClient = rtcClient as AgoraWebClient;
-            resolve(webClient.unpublishLocalStream());
-          }
-        });
+        // const quitClient = new Promise((resolve, reject) => {
+        //   if (platform === 'electron') {
+        //     const nativeClient = rtcClient as AgoraElectronClient;
+        //     const val = nativeClient.unpublish();
+        //     if (val >= 0) {
+        //       resolve();
+        //     } else {
+        //       console.warn('quit native client failed');
+        //       reject(val);
+        //     }
+        //   }
+        //   if (platform === 'web') {
+        //     const webClient = rtcClient as AgoraWebClient;
+        //     resolve(webClient.unpublishLocalStream());
+        //   }
+        // });
         closeLock.current = true;
         rtmLock.current = true;
         Promise.all([
-          rtmClient.sendPeerMessage(`${teacherUid}`,{
-            cmd: RoomMessage.cancelCoVideo
-          }),
-          quitClient
+          sendCancelCoVideo(),
+          // rtmClient.sendPeerMessage(`${teacherUid}`,{
+          //   cmd: RoomMessage.cancelCoVideo
+          // }),
+          // quitClient
         ]).then(() => {
           rtmLock.current = false;
         }).catch((err: any) => {

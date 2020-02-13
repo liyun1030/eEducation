@@ -72,6 +72,7 @@ export type WhiteboardState = {
 type JoinParams = {
   rid: string
   uid?: string
+  location?: string
   userPayload: {
     userId: string,
     identity: string
@@ -294,7 +295,7 @@ class Whiteboard extends EventEmitter {
     this.commit(this.state);
   }
 
-  async join({rid, uid, userPayload}: JoinParams) {
+  async join({rid, uid, location, userPayload}: JoinParams) {
     await this.leave();
     const {uuid, roomToken} = await this.connect(rid, uid);
     const identity = userPayload.identity === 'host' ? 'host' : 'guest';
@@ -308,6 +309,8 @@ class Whiteboard extends EventEmitter {
       uuid,
       roomToken,
       disableBezier: true,
+      disableDeviceInputs: location!.match(/big-class/) && identity !== 'host' ? true : false,
+      disableOperations: location!.match(/big-class/) && identity !== 'host' ? true : false,
     }, {
       onPhaseChanged: (phase: RoomPhase) => {
         if (phase === RoomPhase.Connected) {
@@ -345,6 +348,7 @@ class Whiteboard extends EventEmitter {
   async leave() {
     if (!this.state.room) return;
     await this.state.room.disconnect();
+    this.updateLoading(true);
   }
 
   async destroy() {
