@@ -16,7 +16,7 @@ export const PageNotFound: React.FC<any> = () => {
       <div className="layout-content">
         <h1>404</h1>
         <h2>你似乎进错了页面</h2>
-        <a href="https://webdemo.agora.io/edu_admin">进入主页</a>
+        <a href="https://solutions-edu.sh.agoralab.co/admin">进入主页</a>
       </div>
     </BasicLayout>
   )

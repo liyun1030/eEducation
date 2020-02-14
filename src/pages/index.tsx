@@ -29,8 +29,8 @@ export default function () {
             <EntryHome />
           </Route>
           <Route exact path="/">
-            <Home />
-            {/* <Redirect to="/404" /> */}
+            {/* <Home /> */}
+            <Redirect to="/404" />
           </Route>
           <Route exact path="/device_test">
             <DeviceTest />
