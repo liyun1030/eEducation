@@ -72,7 +72,7 @@ export class AgoraOpenEduApi {
 
   async roomInfo(roomId: string) {
     let json = await AgoraFetchJson({
-      url: `/edu/v2/apps/${this.appID}/room/${roomId}`,
+      url: `${OPEN_EDU_API}/edu/v2/apps/${this.appID}/room/${roomId}`,
       method: 'GET',
       authToken: this.authorization,
     });
@@ -89,7 +89,7 @@ export class AgoraOpenEduApi {
    */
   async entry(params: EntryRoomParams) {
     let json = await AgoraFetchJson({
-      url: `/edu/v2/apps/${this.appID}/room/entry`,
+      url: `${OPEN_EDU_API}/edu/v2/apps/${this.appID}/room/entry`,
       method: 'POST',
       data: params,
       authToken: this.authorization,
