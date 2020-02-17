@@ -74,6 +74,8 @@
 WARN: IF YOU ENABLED APP CERTIFICATE, PLEASE SIGN YOUR TOKEN IN YOUR SERVER SIDE AND OBTAIN IT FROM YOUR OWN TRUSTED SERVER API
 ```
 
+# 注意uid生成规则请预留1000以下作为云录制和屏幕共享使用。
+
 # 搭建之前先获取 agora appid和netless sdktoken
   按照.env.example
   修改为.env.local
@@ -97,6 +99,8 @@ REACT_APP_AGORA_OSS_BUCKET_FOLDER=你的oss存储目录
 REACT_APP_AGORA_OSS_BUCKET_REGION=你的oss存储节点地区
 REACT_APP_AGORA_OSS_BUCKET_KEY=你的oss存储key或者存储id
 REACT_APP_AGORA_OSS_BUCKET_SECRET=你的oss的存储秘钥
+REACT_APP_AGORA_OPEN_EDU_API=你使用的教育业务场景化demo api
+REACT_APP_AGORA_OPEN_EDU_AUTH_KEY=你使用的教育场景化demo api key
 ```
 
 # Web发布和开发操作  

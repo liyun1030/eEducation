@@ -57,6 +57,8 @@
 WARN: IF YOU ENABLED APP CERTIFICATE, PLEASE SIGN YOUR TOKEN IN YOUR SERVER SIDE AND OBTAIN IT FROM YOUR OWN TRUSTED SERVER API
 ```
 
+# Please Guarantee uid < 1000, For Cloud Recording and Screen Sharing.
+
 # obtain agora appid 和 netless sdktoken
   rename .env.example to .env.local
 ```bash
