@@ -187,6 +187,7 @@
     } else {
         [AlertViewUtil showAlertWithController:self title:NSLocalizedString(@"RoomTypeVerifyText", nil)];
         return;
+
     }
 }
 
