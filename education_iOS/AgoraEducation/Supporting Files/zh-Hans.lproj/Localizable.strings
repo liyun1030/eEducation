@@ -29,12 +29,18 @@ OneToOneText = "1V1";
 SmallClassText = "小班课";
 LargeClassText = "大班课";
 
-UserNameVerifyText = "用户名为11位及以内的数字或者英文字符";
+UserNameVerifyText = "教室名、用户名最多为20个字符";
 RoomTypeVerifyText = "请选择房间类型";
 RoomCountVerifyText = "人数已满,请换个房间";
 RequestFailedText = "请求失败";
+RequestConfigFailedText = "请求配置失败";
+EnterRoomFailedText = "加入房间失败";
+GetRoomInfoFailedText = "获取房间信息失败";
+UpdateRoomInfoFailedText = "更新房间信息失败";
 
 MuteBoardText = "老师已回收了你的白板权限";
 UnMuteBoardText = "老师已授权了你的白板权限";
 
 UpdateText = "版本已经更新了，请下载最新版本";
+
+JoinWhiteErrorText = "白板加入失败";

@@ -50,11 +50,12 @@
     [super setSelected:selected animated:animated];
 }
 
-- (void)setMessageModel:(SignalRoomModel *)messageModel {
+- (void)setMessageModel:(MessageInfoModel *)messageModel {
     _messageModel = messageModel;
 
     NSMutableAttributedString *contentString;
-    if(messageModel.roomid != nil){
+
+    if(messageModel.recordId != nil && messageModel.recordId.length > 0){
         contentString = [[NSMutableAttributedString alloc] initWithString:NSLocalizedString(@"ReplayRecordingText", nil) attributes:@{NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)}];
     } else {
         contentString = [[NSMutableAttributedString alloc] initWithString:messageModel.content];

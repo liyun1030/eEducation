@@ -29,12 +29,19 @@ OneToOneText = "One-to-One";
 SmallClassText = "Small Class";
 LargeClassText = "Large Class";
 
-UserNameVerifyText = "User name must be within 11 digits or English characters";
+UserNameVerifyText = "Class name and user name must be within 20 characters";
+
 RoomTypeVerifyText = "Please select a room type";
 RoomCountVerifyText = "Room is full, please change another room";
 RequestFailedText = "request failed";
+RequestConfigFailedText = "request config failed";
+EnterRoomFailedText = "enter room failed";
+GetRoomInfoFailedText = "get room info failed";
+UpdateRoomInfoFailedText = "update room info failed";
 
 MuteBoardText = "Teacher has revoked your whiteboard permissions";
 UnMuteBoardText = "Teacher has authorized your whiteboard permissions";
 
 UpdateText = "The version has been updated. Please download the new version";
+
+JoinWhiteErrorText = "white board join error";

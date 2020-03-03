@@ -8,7 +8,6 @@
 
 #import "HttpManager.h"
 #import <AFNetworking/AFNetworking.h>
-#import "KeyCenter.h"
 
 @interface HttpManager ()
 
@@ -79,6 +78,7 @@ static HttpManager *manager = nil;
             [HttpManager.shareManager.sessionManager.requestSerializer setValue:headers[key] forHTTPHeaderField:key];
         }
     }
+
     NSLog(@"\n============>Post HTTP Start<============\n\
           \nurl==>\n%@\n\
           \nheaders==>\n%@\n\
@@ -97,7 +97,7 @@ static HttpManager *manager = nil;
         if (failure) {
           failure(error);
         }
-        
+
         NSLog(@"\n============>Post HTTP Error<============\n\
               \nError==>\n%@\n\
               ", error.description);
@@ -107,7 +107,7 @@ static HttpManager *manager = nil;
 + (void)POSTWhiteBoardRoomWithUuid:(NSString *)uuid token:(void (^)(NSString *token))token failure:(void (^)(NSString *msg))failure {
     
     NSString *urlString = @"https://cloudcapiv4.herewhite.com/room/join";
-    NSString *url = [NSString stringWithFormat:@"%@?uuid=%@&token=%@", urlString, uuid, [KeyCenter whiteBoardToken]];
+    NSString *url = @"";//[NSString stringWithFormat:@"%@?uuid=%@&token=%@", urlString, uuid, [KeyCenter whiteBoardToken]];
     [HttpManager post:url params:nil headers:nil success:^(id responseObj) {
         if ([responseObj[@"code"] integerValue] == 200) {
             if (token) {

@@ -7,11 +7,6 @@
 //
 
 #import "SignalManager.h"
-#import "SignalP2PModel.h"
-#import "GenerateSignalBody.h"
-#import "SignalRoomModel.h"
-
-NSString * const RoleTypeTeacther = @"teacher";
 
 @interface SignalManager()<AgoraRtmDelegate, AgoraRtmChannelDelegate>
 
@@ -40,7 +35,9 @@ NSString * const RoleTypeTeacther = @"teacher";
 }
 
 - (void)joinChannelWithName:(NSString *)channelName completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (void))failBlock {
-
+    
+    self.channelName = channelName;
+    
     self.agoraRtmChannel = [self.agoraRtmKit createChannelWithId:channelName delegate:self];
     [self.agoraRtmChannel joinWithCompletion:^(AgoraRtmJoinChannelErrorCode errorCode) {
         
@@ -144,7 +141,7 @@ NSString * const RoleTypeTeacther = @"teacher";
     if(self.channelName != nil){
         AgoraRtmChannelAttributeOptions *options = [[AgoraRtmChannelAttributeOptions alloc] init];
         options.enableNotificationToChannelMembers = YES;
-        [self.agoraRtmKit deleteChannel:self.channelName AttributesByKeys:@[self.messageModel.uid] Options:options completion:nil];
+        [self.agoraRtmKit deleteChannel:self.channelName AttributesByKeys:@[    self.messageModel.uid] Options:options completion:nil];
         
         [self.agoraRtmChannel leaveWithCompletion:nil];
         self.channelName = nil;

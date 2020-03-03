@@ -9,11 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <AgoraRtmKit/AgoraRtmKit.h>
 #import "SignalManagerDelegate.h"
-
 #import "SignalModel.h"
-
-typedef NSString *RoleType NS_STRING_ENUM;
-FOUNDATION_EXPORT RoleType const _Nonnull RoleTypeTeacther;
 
 NS_ASSUME_NONNULL_BEGIN
 
