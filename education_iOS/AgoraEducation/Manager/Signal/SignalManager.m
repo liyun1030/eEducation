@@ -17,7 +17,7 @@
 
 @implementation SignalManager
 
-- (void)initWithMessageModel:(SignalModel*)model completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (void))failBlock {
+- (void)initWithMessageModel:(SignalModel*)model completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSInteger errorCode))failBlock {
 
     self.agoraRtmKit = [[AgoraRtmKit alloc] initWithAppId:model.appId delegate:self];
     [self.agoraRtmKit loginByToken:model.token user:model.uid completion:^(AgoraRtmLoginErrorCode errorCode) {
@@ -28,13 +28,13 @@
             }
         } else {
             if(failBlock != nil){
-                failBlock();
+                failBlock(errorCode);
             }
         }
     }];
 }
 
-- (void)joinChannelWithName:(NSString *)channelName completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (void))failBlock {
+- (void)joinChannelWithName:(NSString *)channelName completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSInteger errorCode))failBlock {
     
     self.channelName = channelName;
     
@@ -47,7 +47,7 @@
             }
         } else {
             if(failBlock != nil){
-                failBlock();
+                failBlock(errorCode);
             }
         }
     }];
@@ -100,7 +100,7 @@
     [self.agoraRtmKit queryPeersOnlineStatus:peerIds completion:completionBlock];
 }
 
-- (void)sendMessage:(NSString *)value completeSuccessBlock:(void (^) (void))successBlock completeFailBlock:(void (^) (void))failBlock {
+- (void)sendMessage:(NSString *)value completeSuccessBlock:(void (^) (void))successBlock completeFailBlock:(void (^) (NSInteger errorCode))failBlock {
 
     AgoraRtmMessage *rtmMessage = [[AgoraRtmMessage alloc] initWithText:value];
     [self.agoraRtmChannel sendMessage:rtmMessage completion:^(AgoraRtmSendChannelMessageErrorCode errorCode) {
@@ -113,13 +113,13 @@
             
         } else {
             if(failBlock != nil){
-                failBlock();
+                failBlock(errorCode);
             }
         }
     }];
 }
 
-- (void)sendMessage:(NSString *)value toPeer:(NSString *)peerId completeSuccessBlock:(void (^) (void))successBlock completeFailBlock:(void (^) (void))failBlock {
+- (void)sendMessage:(NSString *)value toPeer:(NSString *)peerId completeSuccessBlock:(void (^) (void))successBlock completeFailBlock:(void (^) (NSInteger errorCode))failBlock {
     
     AgoraRtmMessage *rtmMessage = [[AgoraRtmMessage alloc] initWithText:value];
     [self.agoraRtmKit sendMessage:rtmMessage toPeer:peerId completion:^(AgoraRtmSendPeerMessageErrorCode errorCode) {
@@ -129,7 +129,7 @@
             }
         } else {
             if(failBlock != nil){
-                failBlock();
+                failBlock(errorCode);
             }
         }
     }];

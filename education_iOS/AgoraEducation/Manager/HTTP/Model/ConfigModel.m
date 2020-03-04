@@ -18,7 +18,9 @@
 @end
 
 @implementation ConfigAllInfoModel
-
++ (NSDictionary *)modelCustomPropertyMapper {
+    return @{@"configInfoModel": @"config"};
+}
 @end
 
 

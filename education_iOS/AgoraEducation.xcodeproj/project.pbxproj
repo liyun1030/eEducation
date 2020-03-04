@@ -53,13 +53,14 @@
 		787E7A3D23A9FE97005F8F0C /* EduButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 787E7A3023A9FE97005F8F0C /* EduButton.m */; };
 		787E7A3F23A9FE97005F8F0C /* ReplayViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 787E7A3423A9FE97005F8F0C /* ReplayViewController.xib */; };
 		787E7A4023A9FE97005F8F0C /* ReplayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 787E7A3523A9FE97005F8F0C /* ReplayViewController.m */; };
+		78A22C77240E0660003CEBBA /* ReplayModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 78A22C76240E0660003CEBBA /* ReplayModel.m */; };
 		78C127A324037E2100420E72 /* CombineReplayManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 78C127A224037E2100420E72 /* CombineReplayManager.m */; };
 		78C127A624037EB300420E72 /* RTCReplayManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 78C127A524037EB300420E72 /* RTCReplayManager.m */; };
 		78C127A924037ECD00420E72 /* WhiteReplayManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 78C127A824037ECD00420E72 /* WhiteReplayManager.m */; };
 		78D7307223B3638B00D2146C /* SignalManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 78D7306423B3638B00D2146C /* SignalManager.m */; };
 		78D7307423B3638B00D2146C /* RTCManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 78D7306723B3638B00D2146C /* RTCManager.m */; };
 		78D7307523B3638B00D2146C /* WhiteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 78D7306C23B3638B00D2146C /* WhiteManager.m */; };
-		78D730A923B3833500D2146C /* ReplayerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 78D7309E23B3833500D2146C /* ReplayerModel.m */; };
+		78D730A923B3833500D2146C /* ReplayManagerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 78D7309E23B3833500D2146C /* ReplayManagerModel.m */; };
 		78D730B223B383E600D2146C /* SignalModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 78D730B023B383E500D2146C /* SignalModel.m */; };
 		78D730C323B384D400D2146C /* HttpManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 78D730C223B384D400D2146C /* HttpManager.m */; };
 		78D730E823B3889D00D2146C /* EEMessageViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 78D730D223B3889D00D2146C /* EEMessageViewCell.m */; };
@@ -231,6 +232,9 @@
 		787E7A3223A9FE97005F8F0C /* ReplayViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReplayViewController.h; sourceTree = "<group>"; };
 		787E7A3423A9FE97005F8F0C /* ReplayViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ReplayViewController.xib; sourceTree = "<group>"; };
 		787E7A3523A9FE97005F8F0C /* ReplayViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReplayViewController.m; sourceTree = "<group>"; };
+		78A22C75240E0660003CEBBA /* ReplayModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ReplayModel.h; sourceTree = "<group>"; };
+		78A22C76240E0660003CEBBA /* ReplayModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ReplayModel.m; sourceTree = "<group>"; };
+		78A22C78240E0FCC003CEBBA /* WhitePlayDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WhitePlayDelegate.h; sourceTree = "<group>"; };
 		78C127A124037E2100420E72 /* CombineReplayManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CombineReplayManager.h; sourceTree = "<group>"; };
 		78C127A224037E2100420E72 /* CombineReplayManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CombineReplayManager.m; sourceTree = "<group>"; };
 		78C127A424037EB200420E72 /* RTCReplayManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RTCReplayManager.h; sourceTree = "<group>"; };
@@ -249,9 +253,8 @@
 		78D7307C23B3649500D2146C /* WhiteManagerDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WhiteManagerDelegate.h; sourceTree = "<group>"; };
 		78D7308523B3677800D2146C /* SignalDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignalDelegate.h; sourceTree = "<group>"; };
 		78D7308623B3677800D2146C /* RTCDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTCDelegate.h; sourceTree = "<group>"; };
-		78D7308723B3677800D2146C /* WhitePlayDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WhitePlayDelegate.h; sourceTree = "<group>"; };
-		78D7309E23B3833500D2146C /* ReplayerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReplayerModel.m; sourceTree = "<group>"; };
-		78D730A423B3833500D2146C /* ReplayerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReplayerModel.h; sourceTree = "<group>"; };
+		78D7309E23B3833500D2146C /* ReplayManagerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReplayManagerModel.m; sourceTree = "<group>"; };
+		78D730A423B3833500D2146C /* ReplayManagerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReplayManagerModel.h; sourceTree = "<group>"; };
 		78D730B023B383E500D2146C /* SignalModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignalModel.m; sourceTree = "<group>"; };
 		78D730B123B383E500D2146C /* SignalModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignalModel.h; sourceTree = "<group>"; };
 		78D730C123B384D400D2146C /* HttpManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HttpManager.h; sourceTree = "<group>"; };
@@ -700,6 +703,8 @@
 				783FB700240D12BA007298C1 /* RoomAllModel.m */,
 				783FB6FD240D12BA007298C1 /* ConfigModel.h */,
 				783FB6FF240D12BA007298C1 /* ConfigModel.m */,
+				78A22C75240E0660003CEBBA /* ReplayModel.h */,
+				78A22C76240E0660003CEBBA /* ReplayModel.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -827,9 +832,9 @@
 		78D7308423B3677800D2146C /* EduProtocol */ = {
 			isa = PBXGroup;
 			children = (
+				78A22C78240E0FCC003CEBBA /* WhitePlayDelegate.h */,
 				78D7308523B3677800D2146C /* SignalDelegate.h */,
 				78D7308623B3677800D2146C /* RTCDelegate.h */,
-				78D7308723B3677800D2146C /* WhitePlayDelegate.h */,
 			);
 			path = EduProtocol;
 			sourceTree = "<group>";
@@ -839,8 +844,8 @@
 			children = (
 				783FB6F1240D07B3007298C1 /* EduConfigModel.h */,
 				783FB6F0240D07B3007298C1 /* EduConfigModel.m */,
-				78D730A423B3833500D2146C /* ReplayerModel.h */,
-				78D7309E23B3833500D2146C /* ReplayerModel.m */,
+				78D730A423B3833500D2146C /* ReplayManagerModel.h */,
+				78D7309E23B3833500D2146C /* ReplayManagerModel.m */,
 				783FB6E1240D07B3007298C1 /* RTCModel */,
 				783FB6E7240D07B3007298C1 /* SignalModel */,
 			);
@@ -1186,7 +1191,7 @@
 				78D730FC23B388A400D2146C /* OTOStudentView.m in Sources */,
 				1A70AFB22359F17500942742 /* SettingViewCell.m in Sources */,
 				783FB6DC240D0746007298C1 /* AlertViewUtil.m in Sources */,
-				78D730A923B3833500D2146C /* ReplayerModel.m in Sources */,
+				78D730A923B3833500D2146C /* ReplayManagerModel.m in Sources */,
 				78D7312223B388BE00D2146C /* BCStudentVideoView.m in Sources */,
 				78D7307523B3638B00D2146C /* WhiteManager.m in Sources */,
 				783FB6C4240D0739007298C1 /* BaseEducationManager+RTC.m in Sources */,
@@ -1216,6 +1221,7 @@
 				78D7311023B388B100D2146C /* MCTeacherVideoView.m in Sources */,
 				78D7307223B3638B00D2146C /* SignalManager.m in Sources */,
 				78D7307423B3638B00D2146C /* RTCManager.m in Sources */,
+				78A22C77240E0660003CEBBA /* ReplayModel.m in Sources */,
 				78D7311123B388B100D2146C /* MCStudentListView.m in Sources */,
 				787E7A3A23A9FE97005F8F0C /* SliderView.m in Sources */,
 				783FB6DF240D0746007298C1 /* NSString+MD5.m in Sources */,

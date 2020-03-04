@@ -1,13 +1,13 @@
 //
-//  ReplayerModel.m
+//  ReplayManagerModel.m
 //  AgoraEducation
 //
 //  Created by SRS on 2019/12/18.
 //  Copyright © 2019 Agora. All rights reserved.
 //
 
-#import "ReplayerModel.h"
+#import "ReplayManagerModel.h"
 
-@implementation ReplayerModel
+@implementation ReplayManagerModel
 
 @end

@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 // room info
 @property (nonatomic, assign) NSInteger uid;//rtm&rtc
 @property (nonatomic, strong) NSString* userToken;
-@property (nonatomic, assign) NSInteger roomId;
+@property (nonatomic, strong) NSString* roomId;
 @property (nonatomic, strong) NSString* channelName;
 
 // account

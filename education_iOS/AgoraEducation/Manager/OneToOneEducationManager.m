@@ -75,19 +75,44 @@
 #pragma mark RTC
 - (void)setupRTCVideoCanvas:(RTCVideoCanvasModel *)model completeBlock:(void(^ _Nullable)(AgoraRtcVideoCanvas *videoCanvas))block {
     
+    RTCVideoSessionModel *currentSessionModel;
+    RTCVideoSessionModel *removeSessionModel;
+    for (RTCVideoSessionModel *videoSessionModel in self.rtcVideoSessionModels) {
+        // view rerender
+        if(videoSessionModel.videoCanvas.view == model.videoView){
+            videoSessionModel.videoCanvas.view = nil;
+            if(videoSessionModel.uid == self.signalManager.messageModel.uid.integerValue) {
+                [self.rtcManager setupLocalVideo:videoSessionModel.videoCanvas];
+            } else {
+                [self.rtcManager setupRemoteVideo:videoSessionModel.videoCanvas];
+            }
+            removeSessionModel = videoSessionModel;
+
+        } else if(videoSessionModel.uid == model.uid){
+            videoSessionModel.videoCanvas.view = nil;
+            if(videoSessionModel.uid == self.signalManager.messageModel.uid.integerValue) {
+                [self.rtcManager setupLocalVideo:videoSessionModel.videoCanvas];
+            } else {
+                [self.rtcManager setupRemoteVideo:videoSessionModel.videoCanvas];
+            }
+            currentSessionModel = videoSessionModel;
+        }
+    }
+    
     WEAK(self);
     [super setupRTCVideoCanvas:model completeBlock:^(AgoraRtcVideoCanvas *videoCanvas) {
         
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"uid == %d", model.uid];
-        NSArray<RTCVideoSessionModel *> *filteredArray = [weakself.rtcVideoSessionModels filteredArrayUsingPredicate:predicate];
-        NSAssert(filteredArray.count == 0, @"uid already exist");
-
-        if(filteredArray.count == 0) {
-           RTCVideoSessionModel *videoSessionModel = [RTCVideoSessionModel new];
-           videoSessionModel.uid = model.uid;
-           videoSessionModel.videoCanvas = videoCanvas;
-           [weakself.rtcVideoSessionModels addObject:videoSessionModel];
+        if(removeSessionModel != nil){
+            [weakself.rtcVideoSessionModels removeObject:removeSessionModel];
         }
+        if(currentSessionModel != nil){
+            [weakself.rtcVideoSessionModels removeObject:currentSessionModel];
+        }
+        
+        RTCVideoSessionModel *videoSessionModel = [RTCVideoSessionModel new];
+        videoSessionModel.uid = model.uid;
+        videoSessionModel.videoCanvas = videoCanvas;
+        [weakself.rtcVideoSessionModels addObject:videoSessionModel];
         
         if(block != nil){
             block(videoCanvas);

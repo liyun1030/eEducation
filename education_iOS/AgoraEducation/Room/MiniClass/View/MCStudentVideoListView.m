@@ -85,7 +85,6 @@
             [self.videoListView reloadData];
         });
     } else {
-
         NSMutableArray<NSIndexPath *> *indexPaths = [NSMutableArray array];
 
         NSInteger count = studentArray.count;

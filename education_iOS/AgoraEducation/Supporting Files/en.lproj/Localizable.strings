@@ -38,9 +38,17 @@ RequestConfigFailedText = "request config failed";
 EnterRoomFailedText = "enter room failed";
 GetRoomInfoFailedText = "get room info failed";
 UpdateRoomInfoFailedText = "update room info failed";
+RequestReplayFailedText = "request replay info failed";
+SendMessageFailedText = "send message failed";
+SendPeerMessageFailedText = "send peer message failed";
+InitSignalFailedText = "init signal failed";
+JoinSignalFailedText = "join signal failed";
 
 MuteBoardText = "Teacher has revoked your whiteboard permissions";
 UnMuteBoardText = "Teacher has authorized your whiteboard permissions";
+
+LockBoardText = "Teacher sets whiteboard to follow";
+UnlockBoardText = "The teacher lifted the whiteboard to follow";
 
 UpdateText = "The version has been updated. Please download the new version";
 

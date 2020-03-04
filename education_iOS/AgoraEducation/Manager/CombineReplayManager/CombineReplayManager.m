@@ -67,7 +67,7 @@
     return self.rtcReplayManager.nativePlayer;
 }
 
-- (void)setupWhiteReplayWithValue:(ReplayerModel *)model completeSuccessBlock:(void (^) (void)) successBlock completeFailBlock:(void (^) (NSError * _Nullable error))failBlock {
+- (void)setupWhiteReplayWithValue:(ReplayManagerModel *)model completeSuccessBlock:(void (^) (void)) successBlock completeFailBlock:(void (^) (NSError * _Nullable error))failBlock {
     
     self.classStartTime = model.startTime;
     self.classEndTime = model.endTime;
@@ -283,7 +283,6 @@
         [self.delegate combinePlayError:error];
     }
 }
-
 
 - (void)releaseResource {
     [NSNotificationCenter.defaultCenter removeObserver:self];

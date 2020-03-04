@@ -19,10 +19,10 @@ static char kAssociatedConfig;
 - (void)getConfigWithSuccessBolck:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSString *errMessage))failBlock {
     
     WEAK(self);
-    [HttpManager get:HTTP_GET_CONFIG params:nil headers:nil success:^(id responseObj) {
+    [HttpManager getAppConfigWithSuccess:^(id responseObj) {
         
         ConfigModel *model = [ConfigModel yy_modelWithDictionary:responseObj];
-        if(model.code == 0){
+        if(model.code == 0) {
             
             weakself.eduConfigModel.appId = model.data.configInfoModel.appId;
             weakself.eduConfigModel.oneToOneStudentLimit = model.data.configInfoModel.oneToOneStudentLimit.integerValue;
@@ -41,12 +41,10 @@ static char kAssociatedConfig;
                 }
             }
         }
-        
     } failure:^(NSError *error) {
         if(failBlock != nil){
-            failBlock(NSLocalizedString(@"RequestConfigFailedText", nil));
+            failBlock(error.description);
         }
-        NSLog(@"HTTP get config error:%@", error.description);
     }];
 }
 
@@ -92,9 +90,8 @@ static char kAssociatedConfig;
         
     } failure:^(NSError *error) {
         if(failBlock != nil){
-            failBlock(NSLocalizedString(@"EnterRoomFailedText", nil));
+            failBlock(error.description);
         }
-        NSLog(@"HTTP enter room error:%@", error.description);
     }];
 }
 
@@ -132,7 +129,7 @@ static char kAssociatedConfig;
 
 - (void)getRoomInfoCompleteSuccessBlock:(void (^ _Nullable) (RoomInfoModel * roomInfoModel))successBlock completeFailBlock:(void (^ _Nullable) (NSString *errMessage))failBlock {
  
-    NSString *url = [NSString stringWithFormat:HTTP_GET_ROOM_INFO, self.eduConfigModel.appId, @(self.eduConfigModel.roomId)];
+    NSString *url = [NSString stringWithFormat:HTTP_GET_ROOM_INFO, self.eduConfigModel.appId, self.eduConfigModel.roomId];
     
     NSMutableDictionary *headers = [NSMutableDictionary dictionary];
     headers[@"token"] = self.eduConfigModel.userToken;
@@ -155,15 +152,14 @@ static char kAssociatedConfig;
         
     } failure:^(NSError *error) {
         if(failBlock != nil){
-            failBlock(NSLocalizedString(@"GetRoomInfoFailedText", nil));
+            failBlock(error.description);
         }
-        NSLog(@"HTTP get room info error:%@", error.description);
     }];
 }
 
 - (void)updateRoomInfoWithParams:(NSDictionary*)params completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSString *errMessage))failBlock {
     
-    NSString *url = [NSString stringWithFormat:HTTP_GET_ROOM_INFO, self.eduConfigModel.appId, @(self.eduConfigModel.roomId)];
+    NSString *url = [NSString stringWithFormat:HTTP_GET_ROOM_INFO, self.eduConfigModel.appId, self.eduConfigModel.roomId];
     
     NSMutableDictionary *headers = [NSMutableDictionary dictionary];
     headers[@"token"] = self.eduConfigModel.userToken;
@@ -187,9 +183,8 @@ static char kAssociatedConfig;
         
     } failure:^(NSError *error) {
         if(failBlock != nil){
-            failBlock(NSLocalizedString(@"UpdateRoomInfoFailedText", nil));
+            failBlock(error.description);
         }
-        NSLog(@"HTTP update room error:%@", error.description);
     }];
 }
 

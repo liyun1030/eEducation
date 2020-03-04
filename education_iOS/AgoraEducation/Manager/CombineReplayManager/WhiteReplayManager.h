@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Whiteboard/Whiteboard.h>
-#import "ReplayerModel.h"
+#import "ReplayManagerModel.h"
 
 @protocol WhiteReplayProtocol <NSObject>
 
@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, weak, nullable) id<WhiteReplayProtocol> delegate;
 
-- (void)setupWithValue:(ReplayerModel *)model completeSuccessBlock:(void (^) (void)) successBlock completeFailBlock:(void (^) (NSError * _Nullable error))failBlock;
+- (void)setupWithValue:(ReplayManagerModel *)model completeSuccessBlock:(void (^) (void)) successBlock completeFailBlock:(void (^) (NSError * _Nullable error))failBlock;
 
 /** 播放时，播放速率。即使暂停，该值也不会变为 0 */
 @property (nonatomic, assign) CGFloat playbackSpeed;

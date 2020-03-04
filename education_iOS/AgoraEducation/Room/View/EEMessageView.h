@@ -13,6 +13,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface EEMessageView : UIView
 
+@property (nonatomic, strong) NSString *appId;
+@property (nonatomic, strong) NSString *roomId;
+@property (nonatomic, strong) NSString *userToken;
+
 - (void)addMessageModel:(MessageInfoModel *)model;
 - (void)updateTableView;
 @end

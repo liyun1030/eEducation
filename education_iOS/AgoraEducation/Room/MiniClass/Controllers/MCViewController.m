@@ -50,7 +50,7 @@
 @property (nonatomic, assign) NSInteger sceneCount;
 
 @property (nonatomic, assign) BOOL isChatTextFieldKeyboard;
-
+@property (nonatomic, assign) BOOL hasSignalReconnect;
 @end
 
 @implementation MCViewController
@@ -63,6 +63,7 @@
 }
 
 - (void)initData {
+    self.hasSignalReconnect = NO;
     
     self.pageControlView.delegate = self;
     self.whiteboardTool.delegate = self;
@@ -79,10 +80,13 @@
         [weakself.educationManager setWhiteStrokeColor:colorArray];
     }];
     
-    EduConfigModel *model = self.educationManager.eduConfigModel;
-    
-    [self.navigationView updateClassName:model.className];
-    self.studentListView.uid = model.uid;
+    EduConfigModel *configModel = self.educationManager.eduConfigModel;
+    self.messageView.userToken = configModel.userToken;
+    self.messageView.roomId = configModel.roomId;
+    self.messageView.appId = configModel.appId;
+
+    [self.navigationView updateClassName:configModel.className];
+    self.studentListView.uid = configModel.uid;
 
     // api -> init rtm -> rtc & white
     [self.educationManager getRoomInfoCompleteSuccessBlock:^(RoomInfoModel * _Nonnull roomInfoModel) {
@@ -93,11 +97,27 @@
             
             [weakself updateTimeState];
             [weakself updateChatViews];
-            [weakself checkNeedRender];
         }];
         
     } completeFailBlock:^(NSString * _Nonnull errMessage) {
         [weakself showToast:errMessage];
+    }];
+}
+
+- (void)updateViewOnReconnected{
+    WEAK(self);
+    [self.educationManager getRoomInfoCompleteSuccessBlock:^(RoomInfoModel * _Nonnull roomInfoModel) {
+        
+        [weakself updateTimeState];
+         [weakself updateChatViews];
+         
+         [weakself.educationManager disableCameraTransform:roomInfoModel.room.lockBoard];
+         [weakself.educationManager disableWhiteDeviceInputs:!weakself.educationManager.studentModel.grantBoard];
+         
+         [weakself checkNeedRender];
+        
+    } completeFailBlock:^(NSString * _Nonnull errMessage) {
+ 
     }];
 }
 
@@ -131,12 +151,14 @@
                 successBlock();
             }
             
-        } completeFailBlock:^{
-            
+        } completeFailBlock:^(NSInteger errorCode) {
+            NSString *errMsg = [NSString stringWithFormat:@"%@:%ld", NSLocalizedString(@"JoinSignalFailedText", nil), (long)errorCode];
+            [weakself showToast:errMsg];
         }];
         
-    } completeFailBlock:^{
-        
+    } completeFailBlock:^(NSInteger errorCode) {
+        NSString *errMsg = [NSString stringWithFormat:@"%@:%ld", NSLocalizedString(@"InitSignalFailedText", nil), (long)errorCode];
+        [weakself showToast:errMsg];
     }];
 }
 
@@ -146,19 +168,15 @@
     
     RoomModel *roomModel = self.educationManager.roomModel;
     WEAK(self);
-    [self.educationManager joinWhiteRoomWithBoardId:roomModel.boardId boardToken:roomModel.boardToken completeSuccessBlock:^(WhiteRoom * _Nullable room) {
+    [self.educationManager joinWhiteRoomWithBoardId:roomModel.boardId boardToken:roomModel.boardToken whiteWriteModel:YES  completeSuccessBlock:^(WhiteRoom * _Nullable room) {
         
-        CMTime cmTime = CMTimeMakeWithSeconds(0, 100);
-        [weakself.educationManager seekWhiteToTime:cmTime completionHandler:^(BOOL finished) {
-        }];
-
-        [weakself.educationManager disableWhiteDeviceInputs:NO];
+        [weakself.educationManager disableWhiteDeviceInputs:!weakself.educationManager.studentModel.grantBoard];
         [weakself.educationManager disableCameraTransform:roomModel.lockBoard];
 
         [weakself.educationManager currentWhiteScene:^(NSInteger sceneCount, NSInteger sceneIndex) {
             weakself.sceneCount = sceneCount;
             weakself.sceneIndex = sceneIndex;
-            [weakself.pageControlView.pageCountLabel setText:[NSString stringWithFormat:@"%ld/%ld", weakself.sceneIndex + 1, weakself.sceneCount]];
+            [weakself.pageControlView.pageCountLabel setText:[NSString stringWithFormat:@"%ld/%ld", (long)(weakself.sceneIndex + 1), (long)weakself.sceneCount]];
             [weakself.educationManager moveWhiteToContainer:sceneIndex];
         }];
         
@@ -213,7 +231,7 @@
 }
 
 - (void)showToast:(NSString *)title {
-    [self.view makeToast:title];
+    [self.navigationController.view makeToast:title];
 }
 
 - (void)setupView {
@@ -287,6 +305,9 @@
 - (void)addNotification {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHidden:) name:UIKeyboardWillHideNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMessageReconnecting) name:NOTICE_KEY_ON_MESSAGE_RECONNECTING object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMessageConnected) name:NOTICE_KEY_ON_MESSAGE_CONNECTED object:nil];
 }
 
 - (void)keyboardDidShow:(NSNotification *)notification {
@@ -302,6 +323,16 @@
 - (void)keyboardWillHidden:(NSNotification *)notification {
     self.chatTextFiledBottomCon.constant = 0;
     self.chatTextFiledWidthCon.constant = 222;
+}
+
+- (void)onMessageReconnecting {
+    self.hasSignalReconnect = YES;
+}
+-(void)onMessageConnected {
+    if(self.hasSignalReconnect){
+        self.hasSignalReconnect = NO;
+        [self updateViewOnReconnected];
+    }
 }
 
 - (IBAction)messageViewshowAndHide:(UIButton *)sender {
@@ -325,8 +356,10 @@
             }
             [self updateTeacherViews:self.educationManager.teacherModel];
         } else {
-            [self removeTeacherCanvas:teacherUid];
+            [self removeTeacherCanvas];
         }
+    } else {
+        [self removeTeacherCanvas];
     }
     
     [self reloadStudentViews];
@@ -342,7 +375,7 @@
     [self.educationManager setupRTCVideoCanvas:model completeBlock:nil];
 }
 
-- (void)removeTeacherCanvas:(NSUInteger)uid {
+- (void)removeTeacherCanvas {
     self.teacherVideoView.defaultImageView.hidden = NO;
     [self.teacherVideoView updateUserName:@""];
 }
@@ -378,7 +411,13 @@
     [self.educationManager updateEnableVideoWithValue:!mute completeSuccessBlock:^{
         
         [weakself reloadStudentViews];
-        [weakself sendSignalWithType:NSStringFromSignalValueType(SignalValueTypeVideo) value:mute];
+        [weakself sendSignalWithType:NSStringFromSignalValueType(SignalValueTypeVideo) value:mute success:^{
+            
+        } fail:^(NSInteger errorCode) {
+            NSString *errMsg = [NSString stringWithFormat:@"%@:%ld", NSLocalizedString(@"SendMessageFailedText", nil), (long)errorCode];
+            [weakself showToast:errMsg];
+        }];
+        
         
     } completeFailBlock:^(NSString * _Nonnull errMessage) {
         
@@ -387,27 +426,35 @@
     }];
 }
 
-- (void)sendSignalWithType:(NSString *)type value:(BOOL)mute {
+- (void)sendSignalWithType:(NSString *)type value:(BOOL)mute success:(void (^ _Nullable) (void))successBlock fail:(void (^ _Nullable) (NSInteger errorCode))failBlock {
+    
     SignalMessageInfoModel *model = [SignalMessageInfoModel new];
     model.uid = self.educationManager.eduConfigModel.uid;
     model.account = self.educationManager.eduConfigModel.userName;
     model.resource = type;
     model.value = mute ? 0 : 1;
-    [self.educationManager sendSignalWithModel:model completeSuccessBlock:nil completeFailBlock:nil];
+    [self.educationManager sendSignalWithModel:model completeSuccessBlock:successBlock completeFailBlock:failBlock];
 }
 
 - (void)muteAudioStream:(BOOL)mute {
+    
     WEAK(self);
     [self.educationManager updateEnableAudioWithValue:!mute completeSuccessBlock:^{
         
         [weakself reloadStudentViews];
-        [weakself sendSignalWithType:NSStringFromSignalValueType(SignalValueTypeAudio) value:mute];
+        [weakself sendSignalWithType:NSStringFromSignalValueType(SignalValueTypeAudio) value:mute success:^{
+            
+        } fail:^(NSInteger errorCode) {
+            NSString *errMsg = [NSString stringWithFormat:@"%@:%ld", NSLocalizedString(@"SendMessageFailedText", nil), (long)errorCode];
+            [weakself showToast:errMsg];
+        }];
         
     } completeFailBlock:^(NSString * _Nonnull errMessage) {
         
         [weakself showToast:errMessage];
         [weakself reloadStudentViews];
     }];
+
 }
 
 #pragma mark  --------  Mandatory landscape -------
@@ -432,8 +479,7 @@
   return UIStatusBarStyleLightContent;
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
 }
@@ -449,6 +495,21 @@
     
 #pragma mark SignalDelegate
 - (void)didReceivedSignal:(SignalMessageInfoModel *)model {
+    
+    // SignalP2PTypeMuteBoard
+//    weakself.tipLabel.hidden = NO;
+//    [weakself.tipLabel setText:NSLocalizedString(@"MuteBoardText", nil)];
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//        weakself.tipLabel.hidden = YES;
+//    });
+    
+    // SignalP2PTypeUnMuteBoard
+//    weakself.tipLabel.hidden = NO;
+//    [weakself.tipLabel setText:NSLocalizedString(@"UnMuteBoardText", nil)];
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//        weakself.tipLabel.hidden = YES;
+//    });
+    
     WEAK(self);
     [self.educationManager getRoomInfoCompleteSuccessBlock:^(RoomInfoModel * _Nonnull roomInfoModel) {
 
@@ -456,6 +517,7 @@
         [weakself updateChatViews];
         
         [weakself.educationManager disableCameraTransform:roomInfoModel.room.lockBoard];
+        [weakself.educationManager disableWhiteDeviceInputs:!weakself.educationManager.studentModel.grantBoard];
         
         if(model.uid == weakself.educationManager.teacherModel.uid) {
             
@@ -497,7 +559,7 @@
         
         NSString *uidStr = [NSString stringWithFormat:@"%lu", (unsigned long)uid];
         [self.educationManager.rtcUids removeObject:uidStr];
-        [self removeTeacherCanvas: uid];
+        [self removeTeacherCanvas];
     } else {
         NSString *uidStr = [NSString stringWithFormat:@"%lu", (unsigned long)uid];
         [self.educationManager.rtcUids removeObject: uidStr];
@@ -542,8 +604,9 @@
         WEAK(self);
         [self.educationManager sendMessageWithModel:model completeSuccessBlock:^{
             [weakself.messageView addMessageModel:model];
-        } completeFailBlock:^{
-            
+        } completeFailBlock:^(NSInteger errorCode) {
+            NSString *errMsg = [NSString stringWithFormat:@"%@:%ld", NSLocalizedString(@"SendMessageFailedText", nil), (long)errorCode];
+            [weakself showToast:errMsg];
         }];
     }
     textField.text = nil;
@@ -557,7 +620,7 @@
         self.sceneIndex--;
         WEAK(self);
         [self setWhiteSceneIndex:self.sceneIndex completionSuccessBlock:^{
-            [weakself.pageControlView.pageCountLabel setText:[NSString stringWithFormat:@"%ld/%ld", weakself.sceneIndex + 1, weakself.sceneCount]];
+            [weakself.pageControlView.pageCountLabel setText:[NSString stringWithFormat:@"%ld/%ld", (long)(weakself.sceneIndex + 1), (long)weakself.sceneCount]];
         }];
     }
 }
@@ -568,7 +631,7 @@
         
         WEAK(self);
         [self setWhiteSceneIndex:self.sceneIndex completionSuccessBlock:^{
-            [weakself.pageControlView.pageCountLabel setText:[NSString stringWithFormat:@"%ld/%ld", weakself.sceneIndex + 1, weakself.sceneCount]];
+            [weakself.pageControlView.pageCountLabel setText:[NSString stringWithFormat:@"%ld/%ld", (long)(weakself.sceneIndex + 1), (long)weakself.sceneCount]];
         }];
     }
 }
@@ -578,7 +641,7 @@
     
     WEAK(self);
     [self setWhiteSceneIndex:self.sceneIndex completionSuccessBlock:^{
-        [weakself.pageControlView.pageCountLabel setText:[NSString stringWithFormat:@"%ld/%ld", weakself.sceneIndex + 1, (long)weakself.sceneCount]];
+        [weakself.pageControlView.pageCountLabel setText:[NSString stringWithFormat:@"%ld/%ld", (long)(weakself.sceneIndex + 1), (long)weakself.sceneCount]];
     }];
 }
 
@@ -586,7 +649,7 @@
     self.sceneIndex = 0;
     WEAK(self);
     [self setWhiteSceneIndex:self.sceneIndex completionSuccessBlock:^{
-        [weakself.pageControlView.pageCountLabel setText:[NSString stringWithFormat:@"%ld/%ld", weakself.sceneIndex + 1, weakself.sceneCount]];
+        [weakself.pageControlView.pageCountLabel setText:[NSString stringWithFormat:@"%ld/%ld", (long)(weakself.sceneIndex + 1), (long)weakself.sceneCount]];
     }];
 }
 
@@ -629,7 +692,7 @@
     [self.educationManager currentWhiteScene:^(NSInteger sceneCount, NSInteger sceneIndex) {
         weakself.sceneCount = sceneCount;
         weakself.sceneIndex = sceneIndex;
-        [weakself.pageControlView.pageCountLabel setText:[NSString stringWithFormat:@"%ld/%ld", weakself.sceneIndex + 1, weakself.sceneCount]];
+        [weakself.pageControlView.pageCountLabel setText:[NSString stringWithFormat:@"%ld/%ld", (long)(weakself.sceneIndex + 1), (long)weakself.sceneCount]];
         [weakself.educationManager moveWhiteToContainer:sceneIndex];
     }];
 }

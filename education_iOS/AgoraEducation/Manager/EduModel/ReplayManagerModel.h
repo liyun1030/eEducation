@@ -1,5 +1,5 @@
 //
-//  ReplayerModel.h
+//  ReplayManagerModel.h
 //  AgoraEducation
 //
 //  Created by SRS on 2019/12/18.
@@ -9,14 +9,15 @@
 #import <Foundation/Foundation.h>
 #import <Whiteboard/Whiteboard.h>
 
-@interface ReplayerModel : NSObject
+@interface ReplayManagerModel : NSObject
 
 @property (nonatomic, copy) NSString *uuid;
+@property (nonatomic, copy) NSString *uutoken;
 @property (nonatomic, copy) NSString *videoPath;
 @property (nonatomic, copy) NSString *startTime;
 @property (nonatomic, copy) NSString *endTime;
 
-@property (nonatomic, strong) WhiteBoardView *boardView;
+@property (nonatomic, weak) WhiteBoardView *boardView;
 
 @end
 

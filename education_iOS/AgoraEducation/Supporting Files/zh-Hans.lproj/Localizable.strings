@@ -37,9 +37,17 @@ RequestConfigFailedText = "请求配置失败";
 EnterRoomFailedText = "加入房间失败";
 GetRoomInfoFailedText = "获取房间信息失败";
 UpdateRoomInfoFailedText = "更新房间信息失败";
+RequestReplayFailedText = "获取回放信息失败";
+SendMessageFailedText = "消息发送失败";
+SendPeerMessageFailedText = "点对点消息发送失败";
+InitSignalFailedText = "初始化信令失败";
+JoinSignalFailedText = "加入信令失败";
 
 MuteBoardText = "老师已回收了你的白板权限";
 UnMuteBoardText = "老师已授权了你的白板权限";
+
+LockBoardText = "老师设置了白板跟随";
+UnlockBoardText = "老师解除了白板跟随";
 
 UpdateText = "版本已经更新了，请下载最新版本";
 

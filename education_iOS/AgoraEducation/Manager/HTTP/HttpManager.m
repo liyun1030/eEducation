@@ -53,20 +53,20 @@ static HttpManager *manager = nil;
     [HttpManager.shareManager.sessionManager GET:url parameters:params progress:^(NSProgress * _Nonnull downloadProgress) {
         
     } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-        if (success) {
-            success(responseObject);
-        }
         
         NSLog(@"\n============>Get HTTP Success<============\n\
               \nResult==>\n%@\n\
               ", responseObject);
-    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        if (failure) {
-            failure(error);
+        if (success) {
+            success(responseObject);
         }
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         NSLog(@"\n============>Get HTTP Error<============\n\
               \nError==>\n%@\n\
               ", error.description);
+        if (failure) {
+            failure(error);
+        }
     }];
 }
 
@@ -86,41 +86,21 @@ static HttpManager *manager = nil;
           ", url, headers, params);
     
     [HttpManager.shareManager.sessionManager POST:url parameters:params progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-        if (success) {
-            success(responseObject);
-        }
         
         NSLog(@"\n============>Post HTTP Success<============\n\
               \nResult==>\n%@\n\
               ", responseObject);
-    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        if (failure) {
-          failure(error);
+        if (success) {
+            success(responseObject);
         }
+        
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
 
         NSLog(@"\n============>Post HTTP Error<============\n\
               \nError==>\n%@\n\
               ", error.description);
-    }];
-}
-
-+ (void)POSTWhiteBoardRoomWithUuid:(NSString *)uuid token:(void (^)(NSString *token))token failure:(void (^)(NSString *msg))failure {
-    
-    NSString *urlString = @"https://cloudcapiv4.herewhite.com/room/join";
-    NSString *url = @"";//[NSString stringWithFormat:@"%@?uuid=%@&token=%@", urlString, uuid, [KeyCenter whiteBoardToken]];
-    [HttpManager post:url params:nil headers:nil success:^(id responseObj) {
-        if ([responseObj[@"code"] integerValue] == 200) {
-            if (token) {
-                token(responseObj[@"msg"][@"roomToken"]);
-            }
-        }else {
-            if (failure) {
-                failure(@"Get roomToken error");
-            }
-        }
-    } failure:^(NSError *error) {
         if (failure) {
-            failure(@"Get roomToken error");
+          failure(error);
         }
     }];
 }
@@ -145,6 +125,25 @@ static HttpManager *manager = nil;
     };
     
     [HttpManager get:HTTP_GET_CONFIG params:params headers:nil success:^(id responseObj) {
+        
+        if(success != nil){
+            success(responseObj);
+        }
+    } failure:^(NSError *error) {
+        
+        if(failure != nil) {
+            failure(error);
+        }
+    }];
+}
+
++ (void)getReplayInfoWithUserToken:(NSString *)userToken appId:(NSString *)appId roomId:(NSString *)roomId recordId:(NSString *)recordId success:(void (^)(id responseObj))success failure:(void (^)(NSError *error))failure {
+    
+    NSMutableDictionary *headers = [NSMutableDictionary dictionary];
+    headers[@"token"] = userToken;
+
+    NSString *url = [NSString stringWithFormat:HTTP_GET_REPLAY_INFO, appId, roomId, recordId];
+    [HttpManager get:url params:nil headers:headers success:^(id responseObj) {
         
         if(success != nil){
             success(responseObj);

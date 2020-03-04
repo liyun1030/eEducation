@@ -54,7 +54,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) WhiteManager *whiteManager;
 @property (nonatomic, weak) id<WhitePlayDelegate> whitePlayerDelegate;
 
-
 - (void)releaseResources;
 
 @end

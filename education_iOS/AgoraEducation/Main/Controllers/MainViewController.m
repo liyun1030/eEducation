@@ -43,6 +43,21 @@
     [self addNotification];
 }
 
+- (void)getConfigWithSuccessBolck:(void (^)(void))successBlock {
+    
+    WEAK(self);
+    [self setLoadingVisible:YES];
+    [self.educationManager getConfigWithSuccessBolck:^{
+        [weakself setLoadingVisible:NO];
+        if(successBlock != nil){
+            successBlock();
+        }
+    } completeFailBlock:^(NSString * _Nonnull errMessage) {
+        [weakself.view makeToast:errMessage];
+        [weakself setLoadingVisible:NO];
+    }];
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     self.navigationController.navigationBarHidden = YES;
@@ -163,53 +178,51 @@
     
     SceneType sceneType;
     NSString *vcIdentifier;
-    if ([self.roomType.titleLabel.text isEqualToString:@"One-to-One"]) {
+    if ([self.roomType.titleLabel.text isEqualToString:NSLocalizedString(@"OneToOneText", nil)]) {
         self.educationManager = [OneToOneEducationManager new];
         sceneType = SceneType1V1;
         vcIdentifier = @"oneToOneRoom";
-    } else if ([self.roomType.titleLabel.text isEqualToString:@"Small Class"]) {
+    } else if ([self.roomType.titleLabel.text isEqualToString:NSLocalizedString(@"SmallClassText", nil)]) {
         self.educationManager = [MinEducationManager new];
         sceneType = SceneTypeSmall;
         vcIdentifier = @"mcRoom";
-    } else if ([self.roomType.titleLabel.text isEqualToString:@"Large Class"]) {
+    } else if ([self.roomType.titleLabel.text isEqualToString:NSLocalizedString(@"LargeClassText", nil)]) {
         self.educationManager = [BigEducationManager new];
         sceneType = SceneTypeBig;
         vcIdentifier = @"bcroom";
     } else {
         [AlertViewUtil showAlertWithController:self title:NSLocalizedString(@"RoomTypeVerifyText", nil)];
         return;
-
     }
     
     self.educationManager.eduConfigModel.className = className;
     self.educationManager.eduConfigModel.userName = userName;
+    WEAK(self);
+    [self getConfigWithSuccessBolck:^{
+        [weakself entryRoomWithUserName:userName className:className sceneType:sceneType vcIdentifier:vcIdentifier];
+    }];
+}
 
+- (void)entryRoomWithUserName:(NSString *)userName className:(NSString *)className sceneType:(SceneType)sceneType vcIdentifier:(NSString *)identifier {
+ 
     WEAK(self);
     [self setLoadingVisible:YES];
-    [self.educationManager getConfigWithSuccessBolck:^{
-        
-        [weakself.educationManager enterRoomWithUserName:userName roomName:className sceneType:sceneType successBolck:^{
+    [self.educationManager enterRoomWithUserName:userName roomName:className sceneType:sceneType successBolck:^{
             
             [weakself setLoadingVisible:NO];
        
             if(sceneType == SceneType1V1) {
-                [weakself join1V1RoomWithIdentifier:vcIdentifier];
+                [weakself join1V1RoomWithIdentifier:identifier];
             } else if(sceneType == SceneTypeSmall){
-                [weakself joinMinRoomWithIdentifier:vcIdentifier];
+                [weakself joinMinRoomWithIdentifier:identifier];
             } else if(sceneType == SceneTypeBig){
-                [weakself joinBigRoomWithIdentifier:vcIdentifier];
+                [weakself joinBigRoomWithIdentifier:identifier];
             }
     
         } completeFailBlock:^(NSString * _Nonnull errMessage) {
             [weakself.view makeToast:errMessage];
             [weakself setLoadingVisible:NO];
         }];
-        
-    } completeFailBlock:^(NSString * _Nonnull errMessage) {
-        
-        [weakself.view makeToast:errMessage];
-        [weakself setLoadingVisible:NO];
-    }];
 }
 
 - (void)setLoadingVisible:(BOOL)show {
@@ -259,6 +272,7 @@
 
 #pragma mark EEClassRoomTypeDelegate
 - (void)selectRoomTypeName:(NSString *)name {
+    [self.roomType setTitleColor:[UIColor colorWithHex:0x333333]  forState:(UIControlStateNormal)];
     [self.roomType setTitle:name forState:(UIControlStateNormal)];
     self.classRoomTypeView.hidden = YES;
 }

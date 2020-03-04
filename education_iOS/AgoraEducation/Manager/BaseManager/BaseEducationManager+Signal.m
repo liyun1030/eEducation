@@ -12,7 +12,7 @@
 
 @implementation BaseEducationManager (Signal)
 
-- (void)initSignalWithAppid:(NSString *)appid appToken:(NSString *)token userId:(NSString *)uid dataSourceDelegate:(id<SignalDelegate> _Nullable)signalDelegate completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (void))failBlock {
+- (void)initSignalWithAppid:(NSString *)appid appToken:(NSString *)token userId:(NSString *)uid dataSourceDelegate:(id<SignalDelegate> _Nullable)signalDelegate completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSInteger errorCode))failBlock {
     
     self.signalDelegate = signalDelegate;
     
@@ -27,12 +27,12 @@
     [self.signalManager initWithMessageModel:model completeSuccessBlock:successBlock completeFailBlock:failBlock];
 }
 
-- (void)joinSignalWithChannelName:(NSString *)channelName completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (void))failBlock {
+- (void)joinSignalWithChannelName:(NSString *)channelName completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSInteger errorCode))failBlock {
     
     [self.signalManager joinChannelWithName:channelName completeSuccessBlock:successBlock completeFailBlock:failBlock];
 }
 
-- (void)sendSignalWithModel:(SignalMessageInfoModel *)model completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (void))failBlock {
+- (void)sendSignalWithModel:(SignalMessageInfoModel *)model completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSInteger errorCode))failBlock {
     
     NSMutableDictionary *dataParams = [NSMutableDictionary dictionary];
     dataParams[@"uid"] = @(model.uid);
@@ -51,14 +51,14 @@
             successBlock();
         }
         
-    } completeFailBlock:^{
+    } completeFailBlock:^(NSInteger errorCode) {
         if(failBlock != nil){
-            failBlock();
+            failBlock(errorCode);
         }
     }];
 }
 
-- (void)sendMessageWithModel:(MessageInfoModel *)model completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (void))failBlock {
+- (void)sendMessageWithModel:(MessageInfoModel *)model completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSInteger errorCode))failBlock {
     
     NSMutableDictionary *dataParams = [NSMutableDictionary dictionary];
     dataParams[@"account"] = model.account;
@@ -75,9 +75,9 @@
             successBlock();
         }
 
-    } completeFailBlock:^{
+    } completeFailBlock:^(NSInteger errorCode) {
         if(failBlock != nil){
-            failBlock();
+            failBlock(errorCode);
         }
     }];
 }
@@ -89,7 +89,11 @@
 #pragma mark SignalManagerDelegate
 - (void)rtmKit:(AgoraRtmKit * _Nonnull)kit connectionStateChanged:(AgoraRtmConnectionState)state reason:(AgoraRtmConnectionChangeReason)reason {
     
-    if(state == AgoraRtmConnectionStateDisconnected) {
+    if(state == AgoraRtmConnectionStateConnected) {
+        [NSNotificationCenter.defaultCenter postNotificationName:NOTICE_KEY_ON_MESSAGE_CONNECTED object:nil];
+    } else if(state == AgoraRtmConnectionStateReconnecting) {
+        [NSNotificationCenter.defaultCenter postNotificationName:NOTICE_KEY_ON_MESSAGE_RECONNECTING object:nil];
+    } else if(state == AgoraRtmConnectionStateDisconnected) {
         [NSNotificationCenter.defaultCenter postNotificationName:NOTICE_KEY_ON_MESSAGE_DISCONNECT object:nil];
     }
 }

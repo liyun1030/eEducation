@@ -27,14 +27,16 @@
 // http: get global state
 #define HTTP_GET_ROOM_INFO @""HTTP_BASE_URL"/v1/apps/%@/room/%@"
 
+// http: get replay info
+#define HTTP_GET_REPLAY_INFO @""HTTP_BASE_URL"/v1/apps/%@/room/%@/record/%@"
+
 @interface HttpManager : NSObject
-
+// common
 + (void)get:(NSString *)url params:(NSDictionary *)params headers:(NSDictionary<NSString*, NSString*> *)headers success:(void (^)(id))success failure:(void (^)(NSError *))failure;
-
 + (void)post:(NSString *)url params:(NSDictionary *)params headers:(NSDictionary<NSString*, NSString*> *)headers success:(void (^)(id responseObj))success failure:(void (^)(NSError *error))failure;
 
-+ (void)POSTWhiteBoardRoomWithUuid:(NSString *)uuid token:(void (^)(NSString *token))token failure:(void (^)(NSString *msg))failure;
-
+// service
 + (void)getAppConfigWithSuccess:(void (^)(id responseObj))success failure:(void (^)(NSError *error))failure;
++ (void)getReplayInfoWithUserToken:(NSString *)userToken appId:(NSString *)appId roomId:(NSString *)roomId recordId:(NSString *)recordId success:(void (^)(id responseObj))success failure:(void (^)(NSError *error))failure;
 
 @end

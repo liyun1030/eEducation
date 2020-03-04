@@ -15,7 +15,7 @@
 
 @implementation WhiteReplayManager
 
-- (void)setupWithValue:(ReplayerModel *)model completeSuccessBlock:(void (^) (void)) successBlock completeFailBlock:(void (^) (NSError * _Nullable error))failBlock {
+- (void)setupWithValue:(ReplayManagerModel *)model completeSuccessBlock:(void (^) (void)) successBlock completeFailBlock:(void (^) (NSError * _Nullable error))failBlock {
     
     NSAssert(model.startTime && model.startTime.length == 13, @"startTime must be millisecond unit");
     NSAssert(model.endTime && model.endTime.length == 13, @"endTime must be millisecond unit");
@@ -23,42 +23,28 @@
     [self initWhiteSDKWithBoardView:model.boardView];
     
     WEAK(self);
-    [HttpManager POSTWhiteBoardRoomWithUuid:model.uuid token:^(NSString * _Nonnull token) {
-        
-        WhitePlayerConfig *playerConfig = [[WhitePlayerConfig alloc] initWithRoom:model.uuid roomToken:token];
-        
-        // make up
-        NSInteger iStartTime = [model.startTime substringToIndex:10].integerValue;
-        NSInteger iDuration = labs(model.endTime.integerValue - model.startTime.integerValue) * 0.001;
+    WhitePlayerConfig *playerConfig = [[WhitePlayerConfig alloc] initWithRoom:model.uuid roomToken:model.uutoken];
+    
+    // make up
+    NSInteger iStartTime = [model.startTime substringToIndex:10].integerValue;
+    NSInteger iDuration = labs(model.endTime.integerValue - model.startTime.integerValue) * 0.001;
 
-        playerConfig.beginTimestamp = @(iStartTime);
-        playerConfig.duration = @(iDuration);
+    playerConfig.beginTimestamp = @(iStartTime);
+    playerConfig.duration = @(iDuration);
 
-        [self.whiteSDK createReplayerWithConfig:playerConfig callbacks:self completionHandler:^(BOOL success, WhitePlayer * _Nonnull player, NSError * _Nonnull error) {
-            if (success) {
-                weakself.whitePlayer = player;
-                [weakself.whitePlayer refreshViewSize];
+    [self.whiteSDK createReplayerWithConfig:playerConfig callbacks:self completionHandler:^(BOOL success, WhitePlayer * _Nonnull player, NSError * _Nonnull error) {
+        if (success) {
+            weakself.whitePlayer = player;
+            [weakself.whitePlayer refreshViewSize];
 
-                if(successBlock != nil){
-                    successBlock();
-                }
-            } else {
-                if(failBlock != nil){
-                    failBlock(error);
-                    AgoraLog(@"createReplayer Err:%@", error);
-                }
+            if(successBlock != nil){
+                successBlock();
             }
-        }];
-        
-    } failure:^(NSString *msg) {
-        
-        if(failBlock != nil) {
-            NSString *domain = @"";
-            NSString *desc = msg;
-            NSDictionary *userInfo = @{ NSLocalizedDescriptionKey : desc };
-            NSError *error = [NSError errorWithDomain:domain code:-101 userInfo:userInfo];
-            failBlock(error);
-            AgoraLog(@"get white token Err:%@", msg);
+        } else {
+            if(failBlock != nil){
+                failBlock(error);
+                AgoraLog(@"createReplayer Err:%@", error);
+            }
         }
     }];
 }

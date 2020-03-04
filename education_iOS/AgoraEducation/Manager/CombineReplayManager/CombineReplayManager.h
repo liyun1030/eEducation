@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
-#import "ReplayerModel.h"
+#import "ReplayManagerModel.h"
 
 @protocol CombineReplayDelegate <NSObject>
 
@@ -58,7 +58,7 @@ typedef NS_OPTIONS(NSUInteger, CombineSyncManagerPauseReason) {
 @property (nonatomic, assign, readonly) NSUInteger pauseReason;
 
 - (AVPlayer *)setupRTCReplayWithURL:(NSURL *)mediaUrl;
-- (void)setupWhiteReplayWithValue:(ReplayerModel *)model completeSuccessBlock:(void (^) (void)) successBlock completeFailBlock:(void (^) (NSError * _Nullable error))failBlock;
+- (void)setupWhiteReplayWithValue:(ReplayManagerModel *)model completeSuccessBlock:(void (^) (void)) successBlock completeFailBlock:(void (^) (NSError * _Nullable error))failBlock;
 
 - (void)play;
 - (void)pause;

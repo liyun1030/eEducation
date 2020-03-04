@@ -10,11 +10,15 @@
 #import <AVKit/AVKit.h>
 
 #import "CombineReplayManager.h"
+#import "HttpManager.h"
 
 #import "ReplayControlView.h"
 #import "HttpManager.h"
 #import "EduButton.h"
 #import "LoadingView.h"
+
+#import "UIView+Toast.h"
+#import "ReplayModel.h"
 
 @interface ReplayViewController ()<ReplayControlViewDelegate, CombineReplayDelegate>
 
@@ -36,19 +40,21 @@
 // can seek when has buffer only for m3u8 video
 @property (nonatomic, assign) BOOL canSeek;
 
+@property (strong, nonatomic) NSString *boardId;
+@property (strong, nonatomic) NSString *boardToken;
+
+@property (nonatomic, strong) NSString *videoPath;
+@property (nonatomic, assign) NSInteger startTime;
+@property (nonatomic, assign) NSInteger endTime;
+
 @end
 
 @implementation ReplayViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-//    for video test
-//    self.videoPath = @"https://netless-media.oss-cn-hangzhou.aliyuncs.com/c447a98ece45696f09c7fc88f649c082_3002a61acef14e4aa1b0154f734a991d.m3u8";
     [self setupView];
     [self initData];
-    
-    self.playFinished = NO;
 }
 
 - (void)initData {
@@ -56,14 +62,47 @@
     self.canSeek = NO;
     self.controlView.delegate = self;
     
+    self.playFinished = NO;
+    
     self.combineReplayManager = [CombineReplayManager new];
     self.combineReplayManager.delegate = self;
     
-    [self setupRTCReplay];
-    [self setupWhiteReplay];
+    WEAK(self);
+    [HttpManager getReplayInfoWithUserToken:self.userToken appId:self.appId roomId:self.roomId recordId:self.recordId success:^(id responseObj) {
+
+        ReplayModel *model = [ReplayModel yy_modelWithDictionary:responseObj];
+        if(model.code == 0) {
+            
+            weakself.boardId = model.data.boardId;
+            weakself.boardToken = model.data.boardToken;
+            
+            weakself.startTime = model.data.startTime;
+            weakself.endTime = model.data.endTime;
+
+            for(RecordDetailsModel *detailModel in model.data.recordDetails) {
+                // teacher
+                if(detailModel.role == 1) {
+                    weakself.videoPath = detailModel.url;
+                    break;
+                }
+            }
+            NSAssert(weakself.videoPath != nil, @"can't find record video");
+            [weakself setupRTCReplay];
+            [weakself setupWhiteReplay];
+        } else {
+            if(model.msg != nil) {
+                [weakself.view makeToast:model.msg];
+            } else {
+                [weakself.view makeToast:NSLocalizedString(@"RequestReplayFailedText", nil)];
+            }
+        }
+    } failure:^(NSError *error) {
+        [weakself.view makeToast:error.description];
+    }];
 }
 
 - (void)setupRTCReplay {
+    
     AVPlayer *player = [self.combineReplayManager setupRTCReplayWithURL:[NSURL URLWithString:self.videoPath]];
     AVPlayerLayer *avplayerLayer = (AVPlayerLayer *)self.videoView.layer;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -74,33 +113,32 @@
 
 - (void)setupWhiteReplay {
     
-    ReplayerModel *replayerModel = [ReplayerModel new];
-    replayerModel.uuid = self.roomid;
-    replayerModel.videoPath = self.videoPath;
-    replayerModel.startTime = self.startTime;
-    replayerModel.endTime = self.endTime;
-    replayerModel.boardView = self.boardView;
+    ReplayManagerModel *replayManagerModel = [ReplayManagerModel new];
+    replayManagerModel.uuid = self.boardId;
+    replayManagerModel.uutoken = self.boardToken;
+    replayManagerModel.videoPath = self.videoPath;
+    replayManagerModel.startTime = @(self.startTime).stringValue;
+    replayManagerModel.endTime = @(self.endTime).stringValue;
+    replayManagerModel.boardView = self.boardView;
     
     WEAK(self);
-    [self.combineReplayManager setupWhiteReplayWithValue:replayerModel completeSuccessBlock:^{
+    [self.combineReplayManager setupWhiteReplayWithValue:replayManagerModel completeSuccessBlock:^{
         
         [weakself seekToTimeInterval:0 completionHandler:^(BOOL finished) {
         }];
         
     } completeFailBlock:^(NSError * _Nullable error) {
-        
+        [weakself.view makeToast:error.description];
     }];
 }
 
 - (void)setupView {
     
-    if(self.videoPath != nil && self.videoPath.length > 0) {
-        WhiteVideoView *videoView = [[WhiteVideoView alloc] initWithFrame:self.teacherView.bounds];
-        videoView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        [self.teacherView addSubview:videoView];
-        self.videoView = videoView;
-    }
-
+    WhiteVideoView *videoView = [[WhiteVideoView alloc] initWithFrame:self.teacherView.bounds];
+    videoView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [self.teacherView addSubview:videoView];
+    self.videoView = videoView;
+    
     WhiteBoardView *boardView = [[WhiteBoardView alloc] init];
     boardView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.whiteboardBaseView insertSubview:boardView belowSubview:self.playBackgroundView];
@@ -178,7 +216,7 @@
 }
 
 - (NSTimeInterval)timeTotleDuration {
-    return (NSInteger)(self.endTime.integerValue - self.startTime.integerValue) * 0.001;
+    return (NSInteger)(self.endTime - self.startTime) * 0.001;
 }
 
 #pragma mark ReplayControlViewDelegate

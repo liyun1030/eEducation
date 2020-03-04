@@ -41,7 +41,9 @@
 @property (nonatomic, assign) StudentLinkState linkState;
 @property (nonatomic, assign) BOOL isChatTextFieldKeyboard;
 @property (nonatomic, assign) BOOL isLandscape;
+@property (nonatomic, assign) BOOL isRenderShare;
 
+@property (nonatomic, assign) BOOL hasSignalReconnect;
 @end
 
 @implementation BCViewController
@@ -55,13 +57,20 @@
 
 -(void)initData {
     
+    self.isRenderShare = NO;
+    self.hasSignalReconnect = NO;
+    
     self.segmentedView.delegate = self;
     self.studentVideoView.delegate = self;
     self.navigationView.delegate = self;
     self.chatTextFiled.contentTextFiled.delegate = self;
     
-    EduConfigModel *model = self.educationManager.eduConfigModel;
-    [self.navigationView updateClassName:model.className];
+    EduConfigModel *configModel = self.educationManager.eduConfigModel;
+    self.messageView.userToken = configModel.userToken;
+    self.messageView.roomId = configModel.roomId;
+    self.messageView.appId = configModel.appId;
+    
+    [self.navigationView updateClassName:configModel.className];
     
     WEAK(self);
     // api -> init rtm -> rtc & white
@@ -78,11 +87,30 @@
             }
             
             [weakself updateChatViews];
-            [weakself checkNeedRender];
         }];
         
     } completeFailBlock:^(NSString * _Nonnull errMessage) {
         [weakself showToast:errMessage];
+    }];
+}
+
+- (void)updateViewOnReconnected{
+    WEAK(self);
+    
+    if(self.educationManager.renderStudentModels.count > 0){
+        UserModel *renderStudentModel = [self.educationManager.renderStudentModels firstObject];
+        [self removeStudentCanvas:renderStudentModel.uid];
+    }
+    
+    [self.educationManager getRoomInfoCompleteSuccessBlock:^(RoomInfoModel * _Nonnull roomInfoModel) {
+        
+        [weakself updateChatViews];
+        [weakself.educationManager disableCameraTransform:roomInfoModel.room.lockBoard];
+
+        [weakself checkNeedRender];
+        
+    } completeFailBlock:^(NSString * _Nonnull errMessage) {
+ 
     }];
 }
 
@@ -116,12 +144,14 @@
                 successBlock();
             }
             
-        } completeFailBlock:^{
-            
+        } completeFailBlock:^(NSInteger errorCode) {
+            NSString *errMsg = [NSString stringWithFormat:@"%@:%ld", NSLocalizedString(@"JoinSignalFailedText", nil), (long)errorCode];
+            [weakself showToast:errMsg];
         }];
         
-    } completeFailBlock:^{
-        
+    } completeFailBlock:^(NSInteger errorCode) {
+        NSString *errMsg = [NSString stringWithFormat:@"%@:%ld", NSLocalizedString(@"InitSignalFailedText", nil), (long)errorCode];
+        [weakself showToast:errMsg];
     }];
 }
 
@@ -136,8 +166,13 @@
         
         UserModel *renderModel = weakself.educationManager.renderStudentModels.firstObject;
         [weakself updateStudentViews:renderModel remoteVideo:NO];
-       
-        [weakself sendSignalWithType:NSStringFromSignalValueType(SignalValueTypeVideo) value:mute];
+        
+        [weakself sendSignalWithType:NSStringFromSignalValueType(SignalValueTypeVideo) value:mute success:^{
+            
+        } fail:^(NSInteger errorCode) {
+            NSString *errMsg = [NSString stringWithFormat:@"%@:%ld", NSLocalizedString(@"SendMessageFailedText", nil), (long)errorCode];
+            [weakself showToast:errMsg];
+        }];
         
     } completeFailBlock:^(NSString * _Nonnull errMessage) {
         
@@ -147,13 +182,14 @@
     }];
 }
 
-- (void)sendSignalWithType:(NSString *)type value:(BOOL)mute {
+- (void)sendSignalWithType:(NSString *)type value:(BOOL)mute success:(void (^ _Nullable) (void))successBlock fail:(void (^ _Nullable) (NSInteger errorCode))failBlock {
+    
     SignalMessageInfoModel *model = [SignalMessageInfoModel new];
     model.uid = self.educationManager.eduConfigModel.uid;
     model.account = self.educationManager.eduConfigModel.userName;
     model.resource = type;
     model.value = mute ? 0 : 1;
-    [self.educationManager sendSignalWithModel:model completeSuccessBlock:nil completeFailBlock:nil];
+    [self.educationManager sendSignalWithModel:model completeSuccessBlock:successBlock completeFailBlock:failBlock];
 }
 
 - (void)muteAudioStream:(BOOL)mute {
@@ -168,7 +204,12 @@
        UserModel *renderModel = weakself.educationManager.renderStudentModels.firstObject;
        [weakself updateStudentViews:renderModel remoteVideo:NO];
       
-       [weakself sendSignalWithType:NSStringFromSignalValueType(SignalValueTypeAudio) value:mute];
+       [weakself sendSignalWithType:NSStringFromSignalValueType(SignalValueTypeAudio) value:mute success:^{
+           
+       } fail:^(NSInteger errorCode) {
+           NSString *errMsg = [NSString stringWithFormat:@"%@:%ld", NSLocalizedString(@"SendMessageFailedText", nil), (long)errorCode];
+           [weakself showToast:errMsg];
+       }];
        
    } completeFailBlock:^(NSString * _Nonnull errMessage) {
        
@@ -192,6 +233,8 @@
         } else {
             [self removeTeacherCanvas];
         }
+    } else {
+        [self removeTeacherCanvas];
     }
     
     if(self.educationManager.renderStudentModels.count > 0) {
@@ -243,10 +286,12 @@
     [self.educationManager setupRTCVideoCanvas:model completeBlock:nil];
     
     self.shareScreenView.hidden = NO;
+    self.isRenderShare = YES;
 }
 
 - (void)removeShareCanvas:(NSUInteger)uid {
     self.shareScreenView.hidden = YES;
+    self.isRenderShare = NO;
 }
 
 - (void)renderStudentCanvas:(NSUInteger)uid remoteVideo:(BOOL)remote {
@@ -297,7 +342,7 @@
          muteChat = studentModel.enableChat == 0 ? YES : NO;
      }
      self.chatTextFiled.contentTextFiled.enabled = muteChat ? NO : YES;
-     self.chatTextFiled.contentTextFiled.placeholder = muteChat ? @" Prohibited post" : @" Input message";
+     self.chatTextFiled.contentTextFiled.placeholder = muteChat ? NSLocalizedString(@"ProhibitedPostText", nil) : NSLocalizedString(@"InputMessageText", nil);
 }
 
 - (void)updateStudentViews:(UserModel *)studentModel remoteVideo:(BOOL)remote {
@@ -319,7 +364,7 @@
 }
 
 - (void)showToast:(NSString *)title {
-    [self.view makeToast:title];
+    [self.navigationController.view makeToast:title];
 }
 
 - (void)setupView {
@@ -410,8 +455,9 @@
     WEAK(self);
     [self.educationManager sendPeerSignalWithModel:SignalP2PTypeApply completeSuccessBlock:^{
         weakself.linkState = StudentLinkStateApply;
-    } completeFailBlock:^{
-        
+    } completeFailBlock:^(NSInteger errorCode) {
+        NSString *errMsg = [NSString stringWithFormat:@"%@:%ld", NSLocalizedString(@"SendPeerMessageFailedText", nil), (long)errorCode];
+        [weakself showToast:errMsg];
     }];
 }
 
@@ -426,7 +472,12 @@
             [weakself removeStudentCanvas: renderModel.uid];
         }
         
-        [weakself sendSignalWithType:NSStringFromSignalValueType(SignalValueTypeCoVideo) value:NO];
+        [weakself sendSignalWithType:NSStringFromSignalValueType(SignalValueTypeCoVideo) value:NO success:^{
+            
+        } fail:^(NSInteger errorCode) {
+            NSString *errMsg = [NSString stringWithFormat:@"%@:%ld", NSLocalizedString(@"SendMessageFailedText", nil), (long)errorCode];
+            [weakself showToast:errMsg];
+        }];
         
     } completeFailBlock:^(NSString * _Nonnull errMessage) {
         [weakself showToast:errMessage];
@@ -471,6 +522,10 @@
     self.chatTextFiled.hidden = self.segmentedIndex == 0 ? YES : NO;
     self.messageView.hidden = self.segmentedIndex == 0 ? YES : NO;
     self.handUpButton.hidden = self.educationManager.teacherModel ? NO: YES;
+    
+    if(self.isRenderShare) {
+        self.shareScreenView.hidden = NO;
+    }
 }
 
 #pragma mark Notification
@@ -478,6 +533,9 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWasShow:) name:UIKeyboardDidShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHidden:) name:UIKeyboardWillHideNotification object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(handleDeviceOrientationChange:) name:UIDeviceOrientationDidChangeNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMessageReconnecting) name:NOTICE_KEY_ON_MESSAGE_RECONNECTING object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMessageConnected) name:NOTICE_KEY_ON_MESSAGE_CONNECTED object:nil];
 }
 
 - (void)keyboardWasShow:(NSNotification *)notification {
@@ -495,22 +553,25 @@
     self.textFiledBottomConstraint.constant = 0;
 }
 
+- (void)onMessageReconnecting {
+    self.hasSignalReconnect = YES;
+}
+-(void)onMessageConnected {
+    if(self.hasSignalReconnect){
+        self.hasSignalReconnect = NO;
+        [self updateViewOnReconnected];
+    }
+}
+
 - (void)setupWhiteBoard {
     
     [self.educationManager initWhiteSDK:self.boardView dataSourceDelegate:self];
     
     RoomModel *roomModel = self.educationManager.roomModel;
     WEAK(self);
-    [self.educationManager joinWhiteRoomWithBoardId:roomModel.boardId boardToken:roomModel.boardToken completeSuccessBlock:^(WhiteRoom * _Nullable room) {
-        
-        CMTime cmTime = CMTimeMakeWithSeconds(0, 100);
-        [weakself.educationManager seekWhiteToTime:cmTime completionHandler:^(BOOL finished) {
-        }];
-        [weakself.educationManager disableWhiteDeviceInputs:YES];
+    [self.educationManager joinWhiteRoomWithBoardId:roomModel.boardId boardToken:roomModel.boardToken whiteWriteModel:NO  completeSuccessBlock:^(WhiteRoom * _Nullable room) {
+
         [weakself.educationManager disableCameraTransform:roomModel.lockBoard];
-        [weakself.educationManager currentWhiteScene:^(NSInteger sceneCount, NSInteger sceneIndex) {
-            [weakself.educationManager moveWhiteToContainer:sceneIndex];
-        }];
         
     } completeFailBlock:^(NSError * _Nullable error) {
         [weakself showToast:NSLocalizedString(@"JoinWhiteErrorText", nil)];
@@ -525,13 +586,17 @@
         self.messageView.hidden = YES;
         self.chatTextFiled.hidden = YES;
         self.handUpButton.hidden = self.educationManager.teacherModel ? NO: YES;
-    }else {
+        if(self.isRenderShare) {
+            self.shareScreenView.hidden = NO;
+        }
+    } else {
         self.segmentedIndex = 1;
         self.messageView.hidden = NO;
         self.chatTextFiled.hidden = NO;
         self.handUpButton.hidden = YES;
         self.unreadMessageCount = 0;
         [self.segmentedView hiddeBadge];
+        self.shareScreenView.hidden = YES;
     }
 }
 
@@ -541,7 +606,13 @@
     [AlertViewUtil showAlertWithController:self title:NSLocalizedString(@"QuitClassroomText", nil) sureHandler:^(UIAlertAction * _Nullable action) {
         
         if (weakself.linkState == StudentLinkStateAccept) {
-            [weakself sendSignalWithType:NSStringFromSignalValueType(SignalValueTypeCoVideo) value:NO];
+            
+            [weakself sendSignalWithType:NSStringFromSignalValueType(SignalValueTypeCoVideo) value:NO success:^{
+                
+            } fail:^(NSInteger errorCode) {
+                NSString *errMsg = [NSString stringWithFormat:@"%@:%ld", NSLocalizedString(@"SendMessageFailedText", nil), (long)errorCode];
+                [weakself showToast:errMsg];
+            }];
         }
         [weakself.educationManager releaseResources];
         [weakself dismissViewControllerAnimated:YES completion:nil];
@@ -579,7 +650,7 @@
             [self.handUpButton setBackgroundImage:[UIImage imageNamed:@"icon-handup"] forState:(UIControlStateNormal)];
             
             self.tipLabel.hidden = NO;
-            [self.tipLabel setText: NSLocalizedString(@"AcceptRequestText", nil)];
+            [self.tipLabel setText: NSLocalizedString(@"CancelRequestText", nil)];
             WEAK(self);
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 weakself.tipLabel.hidden = YES;
@@ -713,8 +784,9 @@
         WEAK(self);
         [self.educationManager sendMessageWithModel:model completeSuccessBlock:^{
             [weakself.messageView addMessageModel:model];
-        } completeFailBlock:^{
-            
+        } completeFailBlock:^(NSInteger errorCode) {
+            NSString *errMsg = [NSString stringWithFormat:@"%@:%ld", NSLocalizedString(@"SendMessageFailedText", nil), (long)errorCode];
+            [weakself showToast:errMsg];
         }];
     }
     textField.text = nil;

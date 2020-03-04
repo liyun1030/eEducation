@@ -8,7 +8,6 @@
 
 #import "EEMessageView.h"
 #import "EEMessageViewCell.h"
-
 #import "ReplayViewController.h"
 
 @interface EEMessageView ()<UITableViewDelegate,UITableViewDataSource>
@@ -47,30 +46,6 @@
 - (void)updateTableView {
     [self.messageTableView reloadData];
 }
-
-//- (void)checkMessageDataLink {
-//
-//    for (SignalRoomModel *messageModel in self.messageArray) {
-//
-//        if(messageModel.link == nil){
-//            continue;
-//        }
-//
-//        NSString *regex = @"^/replay/*/*/*/*";
-//        NSError *error;
-//        NSRegularExpression *regular = [NSRegularExpression regularExpressionWithPattern:regex options:NSRegularExpressionCaseInsensitive error:&error];
-//        NSArray *matches = [regular matchesInString:messageModel.link options:0 range:NSMakeRange(0, messageModel.link.length)];
-//        if(matches != nil && matches.count == 1) {
-//            NSArray *componentsArray = [messageModel.link componentsSeparatedByString:@"/"];
-//            if(componentsArray != nil && componentsArray.count == 6) {
-//                messageModel.roomid = componentsArray[2];
-//                messageModel.startTime = componentsArray[3];
-//                messageModel.endTime = componentsArray[4];
-//                messageModel.content = NSLocalizedString(@"ReplayRecordingText", nil);
-//            }
-//        }
-//    }
-//}
 
 - (void)addMessageModel:(MessageInfoModel *)model {
 
@@ -119,13 +94,16 @@
         return;
     }
     
-//    OneToOneReplayViewController *vc = [[OneToOneReplayViewController alloc] initWithNibName:@"OneToOneReplayViewController" bundle:nil];
-//    vc.recordId = messageModel.recordId;
-//    vc.modalPresentationStyle = UIModalPresentationFullScreen;
-//    UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
-//    UINavigationController *nvc = (UINavigationController*)window.rootViewController;
-//    if(nvc != nil){
-//        [nvc.visibleViewController presentViewController:vc animated:YES completion:nil];
-//    }
+    ReplayViewController *vc = [[ReplayViewController alloc] initWithNibName:@"ReplayViewController" bundle:nil];
+    vc.appId = self.appId;
+    vc.recordId = messageModel.recordId;
+    vc.userToken = self.userToken;
+    vc.roomId = self.roomId;
+    vc.modalPresentationStyle = UIModalPresentationFullScreen;
+    UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
+    UINavigationController *nvc = (UINavigationController*)window.rootViewController;
+    if(nvc != nil){
+        [nvc.visibleViewController presentViewController:vc animated:YES completion:nil];
+    }
 }
 @end

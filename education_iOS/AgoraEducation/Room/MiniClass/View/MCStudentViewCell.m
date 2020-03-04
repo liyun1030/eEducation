@@ -24,8 +24,6 @@
     self.muteVideoButton.selected = YES;
     self.muteAudioButton.selected = YES;
     self.muteWhiteButton.selected = YES;
-    
-//    self.muteWhiteButton.enabled = NO;
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -53,7 +51,6 @@
     
     self.muteWhiteButton.selected = studentModel.grantBoard ? YES : NO;
     self.muteWhiteButton.hidden = studentModel.uid != self.uid ? YES : NO;
-
 }
 
 @end

@@ -12,10 +12,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ReplayViewController : UIViewController
 
-@property (strong, nonatomic) NSString *roomid;
-@property (strong, nonatomic) NSString *startTime;
-@property (strong, nonatomic) NSString *endTime;
-@property (strong, nonatomic) NSString *videoPath;
+@property (strong, nonatomic) NSString *appId;
+@property (strong, nonatomic) NSString *roomId;
+@property (strong, nonatomic) NSString *recordId;
+@property (strong, nonatomic) NSString *userToken;
 
 @end
 
