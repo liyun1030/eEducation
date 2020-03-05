@@ -22,10 +22,13 @@
 #define HTTP_GET_CONFIG @""HTTP_BASE_URL"/v1/app/version"
 
 // http: get global state when enter room
-#define HTTP_POST_ENTER_ROOM @""HTTP_BASE_URL"/v1/apps/%@/room/entry"
+#define HTTP_ENTER_ROOM @""HTTP_BASE_URL"/v1/apps/%@/room/entry"
 
-// http: get global state
-#define HTTP_GET_ROOM_INFO @""HTTP_BASE_URL"/v1/apps/%@/room/%@"
+// http: get or update global state
+#define HTTP_ROOM_INFO @""HTTP_BASE_URL"/v1/apps/%@/room/%@"
+
+// http: update user info
+#define HTTP_UPDATE_USER_INFO @""HTTP_BASE_URL"/v1/apps/%@/room/%@/user/%@"
 
 // http: get replay info
 #define HTTP_GET_REPLAY_INFO @""HTTP_BASE_URL"/v1/apps/%@/room/%@/record/%@"

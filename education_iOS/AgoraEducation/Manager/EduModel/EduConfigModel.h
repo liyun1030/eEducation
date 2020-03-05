@@ -12,13 +12,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface EduConfigModel : NSObject
 
-// room info
+// user & room info
 @property (nonatomic, assign) NSInteger uid;//rtm&rtc
+@property (nonatomic, strong) NSString* userId;
 @property (nonatomic, strong) NSString* userToken;
 @property (nonatomic, strong) NSString* roomId;
 @property (nonatomic, strong) NSString* channelName;
 
-// account
+// key
 @property (nonatomic, strong) NSString* appId;
 @property (nonatomic, strong) NSString* rtcToken;
 @property (nonatomic, strong) NSString* rtmToken;

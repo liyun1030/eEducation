@@ -50,7 +50,7 @@ static char kAssociatedConfig;
 
 - (void)enterRoomWithUserName:(NSString *)userName roomName:(NSString *)roomName sceneType:(SceneType)sceneType successBolck:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSString *errMessage))failBlock {
     
-    NSString *url = [NSString stringWithFormat:HTTP_POST_ENTER_ROOM, self.eduConfigModel.appId];
+    NSString *url = [NSString stringWithFormat:HTTP_ENTER_ROOM, self.eduConfigModel.appId];
     
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
     params[@"userName"] = userName;
@@ -58,6 +58,7 @@ static char kAssociatedConfig;
     params[@"type"] = @(sceneType);
     // student
     params[@"role"] = @(2);
+    params[@"uuid"] = [UIDevice currentDevice].identifierForVendor.UUIDString;
     
     WEAK(self);
     [HttpManager post:url params:params headers:nil success:^(id responseObj) {
@@ -65,16 +66,9 @@ static char kAssociatedConfig;
         EnterRoomAllModel *model = [EnterRoomAllModel yy_modelWithDictionary:responseObj];
         if(model.code == 0){
             
-            weakself.eduConfigModel.uid = model.data.user.uid;
-            weakself.eduConfigModel.userToken = model.data.user.userToken;
-            weakself.eduConfigModel.roomId = model.data.room.roomId;
-            weakself.eduConfigModel.channelName = model.data.room.channelName;
-            
-            weakself.eduConfigModel.rtcToken = model.data.user.rtcToken;
-            weakself.eduConfigModel.rtmToken = model.data.user.rtmToken;
-            weakself.eduConfigModel.boardId = model.data.room.boardId;
-            weakself.eduConfigModel.boardToken = model.data.room.boardToken;
-            
+            weakself.eduConfigModel.userToken = model.data.userToken;
+            weakself.eduConfigModel.roomId = model.data.roomId;
+                    
             if(successBlock != nil){
                 successBlock();
             }
@@ -97,46 +91,48 @@ static char kAssociatedConfig;
 
 - (void)updateEnableChatWithValue:(BOOL)enableChat completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSString *errMessage))failBlock {
     
-    NSMutableDictionary *userParams = [NSMutableDictionary dictionary];
-    userParams[@"userId"] = @(self.eduConfigModel.uid);
-    userParams[@"enableChat"] = @(enableChat ? 1 : 0);
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    params[@"users"] = @[userParams];
+    params[@"enableChat"] = @(enableChat ? 1 : 0);
     
-    [self updateRoomInfoWithParams:params completeSuccessBlock:successBlock completeFailBlock:failBlock];
+    [self updateUserInfoWithParams:params completeSuccessBlock:successBlock completeFailBlock:failBlock];
 }
 
 - (void)updateEnableVideoWithValue:(BOOL)enableVideo completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSString *errMessage))failBlock {
     
-    NSMutableDictionary *userParams = [NSMutableDictionary dictionary];
-    userParams[@"userId"] = @(self.eduConfigModel.uid);
-    userParams[@"enableVideo"] = @(enableVideo ? 1 : 0);
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    params[@"users"] = @[userParams];
+    params[@"enableVideo"] = @(enableVideo ? 1 : 0);
     
-    [self updateRoomInfoWithParams:params completeSuccessBlock:successBlock completeFailBlock:failBlock];
+    [self updateUserInfoWithParams:params completeSuccessBlock:successBlock completeFailBlock:failBlock];
 }
 
 - (void)updateEnableAudioWithValue:(BOOL)enableAudio completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSString *errMessage))failBlock {
     
-    NSMutableDictionary *userParams = [NSMutableDictionary dictionary];
-    userParams[@"userId"] = @(self.eduConfigModel.uid);
-    userParams[@"enableAudio"] = @(enableAudio ? 1 : 0);
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    params[@"users"] = @[userParams];
-    [self updateRoomInfoWithParams:params completeSuccessBlock:successBlock completeFailBlock:failBlock];
+    params[@"enableAudio"] = @(enableAudio ? 1 : 0);
+    [self updateUserInfoWithParams:params completeSuccessBlock:successBlock completeFailBlock:failBlock];
 }
 
 - (void)getRoomInfoCompleteSuccessBlock:(void (^ _Nullable) (RoomInfoModel * roomInfoModel))successBlock completeFailBlock:(void (^ _Nullable) (NSString *errMessage))failBlock {
  
-    NSString *url = [NSString stringWithFormat:HTTP_GET_ROOM_INFO, self.eduConfigModel.appId, self.eduConfigModel.roomId];
+    NSString *url = [NSString stringWithFormat:HTTP_ROOM_INFO, self.eduConfigModel.appId, self.eduConfigModel.roomId];
     
     NSMutableDictionary *headers = [NSMutableDictionary dictionary];
     headers[@"token"] = self.eduConfigModel.userToken;
+    WEAK(self);
     [HttpManager get:url params:nil headers:headers success:^(id responseObj) {
         
         RoomAllModel *model = [RoomAllModel yy_modelWithDictionary:responseObj];
         if(model.code == 0) {
+            
+            weakself.eduConfigModel.uid = model.data.localUser.uid;
+            weakself.eduConfigModel.userId = model.data.localUser.userId;
+            weakself.eduConfigModel.channelName = model.data.room.channelName;
+            
+            weakself.eduConfigModel.rtcToken = model.data.localUser.rtcToken;
+            weakself.eduConfigModel.rtmToken = model.data.localUser.rtmToken;
+            weakself.eduConfigModel.boardId = model.data.room.boardId;
+            weakself.eduConfigModel.boardToken = model.data.room.boardToken;
+            
             if(successBlock != nil){
                 successBlock(model.data);
             }
@@ -157,9 +153,9 @@ static char kAssociatedConfig;
     }];
 }
 
-- (void)updateRoomInfoWithParams:(NSDictionary*)params completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSString *errMessage))failBlock {
+- (void)updateUserInfoWithParams:(NSDictionary*)params completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSString *errMessage))failBlock {
     
-    NSString *url = [NSString stringWithFormat:HTTP_GET_ROOM_INFO, self.eduConfigModel.appId, self.eduConfigModel.roomId];
+    NSString *url = [NSString stringWithFormat:HTTP_UPDATE_USER_INFO, self.eduConfigModel.appId, self.eduConfigModel.roomId, self.eduConfigModel.userId];
     
     NSMutableDictionary *headers = [NSMutableDictionary dictionary];
     headers[@"token"] = self.eduConfigModel.userToken;

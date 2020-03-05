@@ -29,11 +29,14 @@
     [super getRoomInfoCompleteSuccessBlock:^(RoomInfoModel * _Nonnull roomInfoModel) {
         
         weakself.roomModel = roomInfoModel.room;
-        for(UserModel *userModel in roomInfoModel.users) {
-            if(userModel.role == UserRoleTypeTeacher) {
-                weakself.teacherModel = userModel;
-            } else if(userModel.role == UserRoleTypeStudent) {
-                weakself.studentModel = userModel;
+        weakself.studentModel = roomInfoModel.localUser;
+        
+        if(weakself.roomModel != nil && weakself.roomModel.coVideoUsers != nil) {
+            for(UserModel *userModel in weakself.roomModel.coVideoUsers) {
+                if(userModel.role == UserRoleTypeTeacher) {
+                    weakself.teacherModel = userModel;
+                    break;
+                }
             }
         }
         if(successBlock != nil) {

@@ -364,7 +364,7 @@
 }
 
 - (void)showToast:(NSString *)title {
-    [self.navigationController.view makeToast:title];
+    [UIApplication.sharedApplication.keyWindow makeToast:title];
 }
 
 - (void)setupView {

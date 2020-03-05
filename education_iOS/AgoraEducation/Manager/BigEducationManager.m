@@ -34,22 +34,18 @@
         weakself.renderStudentModels = [NSMutableArray array];
         
         weakself.roomModel = roomInfoModel.room;
+        weakself.studentModel = roomInfoModel.localUser;
         
-        for(UserModel *userModel in roomInfoModel.users) {
-            if(userModel.role == UserRoleTypeTeacher) {
-                weakself.teacherModel = userModel;
-            } else if(userModel.role == UserRoleTypeStudent) {
-
-                if(userModel.coVideo == 1) {
-                    [weakself.renderStudentModels addObject:[userModel yy_modelCopy]];
-                }
-
-                if(userModel.uid == weakself.eduConfigModel.uid) {
-                    weakself.studentModel = userModel;
-                }
+        if(weakself.roomModel != nil && weakself.roomModel.coVideoUsers != nil) {
+            for(UserModel *userModel in weakself.roomModel.coVideoUsers) {
+               if(userModel.role == UserRoleTypeTeacher) {
+                   weakself.teacherModel = userModel;
+               } else if(userModel.role == UserRoleTypeStudent) {
+                   [weakself.renderStudentModels addObject:[userModel yy_modelCopy]];
+               }
             }
         }
-        
+
         if(successBlock != nil) {
             successBlock(roomInfoModel);
         }
@@ -109,14 +105,11 @@
 
 - (void)updateLinkStateWithValue:(BOOL)coVideo completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSString *errMessage))failBlock {
     
-    NSMutableDictionary *userParams = [NSMutableDictionary dictionary];
-    userParams[@"userId"] = @(self.eduConfigModel.uid);
-    userParams[@"coVideo"] = @(coVideo ? 1 : 0);
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    params[@"users"] = @[userParams];
+    params[@"coVideo"] = @(coVideo ? 1 : 0);
     
     WEAK(self);
-    [self updateRoomInfoWithParams:params completeSuccessBlock:^{
+    [self updateUserInfoWithParams:params completeSuccessBlock:^{
         
         weakself.studentModel.coVideo = coVideo;
         for (UserModel *model in weakself.renderStudentModels) {
@@ -131,7 +124,7 @@
         }
         
     } completeFailBlock:failBlock];
-    [self updateRoomInfoWithParams:params completeSuccessBlock:successBlock completeFailBlock:failBlock];
+    [self updateUserInfoWithParams:params completeSuccessBlock:successBlock completeFailBlock:failBlock];
 }
 
 #pragma mark Signal

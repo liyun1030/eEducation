@@ -8,14 +8,6 @@
 
 #import "EnterRoomAllModel.h"
 
-@implementation EnterRoomModel
-@end
-
-
-@implementation EnterUserModel
-@end
-
-
 @implementation EnterRoomInfoModel
 @end
 

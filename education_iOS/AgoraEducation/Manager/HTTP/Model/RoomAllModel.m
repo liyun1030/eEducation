@@ -8,21 +8,20 @@
 
 #import "RoomAllModel.h"
 
-@implementation RoomModel
-
+@implementation UserModel
 @end
 
-@implementation UserModel
-
+@implementation RoomModel
++ (NSDictionary *)modelContainerPropertyGenericClass {
+    return @{@"coVideoUsers" : [UserModel class]};
+}
 @end
 
 @implementation RoomInfoModel
-
-+ (NSDictionary *)modelContainerPropertyGenericClass {
-    return @{@"users" : [UserModel class]};
++ (NSDictionary *)modelCustomPropertyMapper {
+    return @{@"localUser": @"user"};
 }
 @end
 
 @implementation RoomAllModel
-
 @end
