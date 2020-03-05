@@ -32,7 +32,6 @@
 		783FB6E0240D0746007298C1 /* UIView+Toast.m in Sources */ = {isa = PBXBuildFile; fileRef = 783FB6DA240D0746007298C1 /* UIView+Toast.m */; };
 		783FB6F2240D07B3007298C1 /* RTCVideoCanvasModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 783FB6E2240D07B3007298C1 /* RTCVideoCanvasModel.m */; };
 		783FB6F3240D07B3007298C1 /* RTCVideoSessionModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 783FB6E3240D07B3007298C1 /* RTCVideoSessionModel.m */; };
-		783FB6F4240D07B3007298C1 /* SignalEnum.m in Sources */ = {isa = PBXBuildFile; fileRef = 783FB6E8240D07B3007298C1 /* SignalEnum.m */; };
 		783FB6F5240D07B3007298C1 /* SignalMessageModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 783FB6E9240D07B3007298C1 /* SignalMessageModel.m */; };
 		783FB6F6240D07B3007298C1 /* MessageModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 783FB6EA240D07B3007298C1 /* MessageModel.m */; };
 		783FB6F7240D07B3007298C1 /* SignalP2PModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 783FB6EE240D07B3007298C1 /* SignalP2PModel.m */; };
@@ -192,7 +191,6 @@
 		783FB6E4240D07B3007298C1 /* RTCEnum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTCEnum.h; sourceTree = "<group>"; };
 		783FB6E5240D07B3007298C1 /* RTCVideoCanvasModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTCVideoCanvasModel.h; sourceTree = "<group>"; };
 		783FB6E6240D07B3007298C1 /* RTCVideoSessionModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTCVideoSessionModel.h; sourceTree = "<group>"; };
-		783FB6E8240D07B3007298C1 /* SignalEnum.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignalEnum.m; sourceTree = "<group>"; };
 		783FB6E9240D07B3007298C1 /* SignalMessageModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignalMessageModel.m; sourceTree = "<group>"; };
 		783FB6EA240D07B3007298C1 /* MessageModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageModel.m; sourceTree = "<group>"; };
 		783FB6EB240D07B3007298C1 /* SignalP2PModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignalP2PModel.h; sourceTree = "<group>"; };
@@ -681,7 +679,6 @@
 			isa = PBXGroup;
 			children = (
 				783FB6EC240D07B3007298C1 /* SignalEnum.h */,
-				783FB6E8240D07B3007298C1 /* SignalEnum.m */,
 				783FB6ED240D07B3007298C1 /* SignalMessageModel.h */,
 				783FB6E9240D07B3007298C1 /* SignalMessageModel.m */,
 				783FB6EF240D07B3007298C1 /* MessageModel.h */,
@@ -1225,7 +1222,6 @@
 				78D7311123B388B100D2146C /* MCStudentListView.m in Sources */,
 				787E7A3A23A9FE97005F8F0C /* SliderView.m in Sources */,
 				783FB6DF240D0746007298C1 /* NSString+MD5.m in Sources */,
-				783FB6F4240D07B3007298C1 /* SignalEnum.m in Sources */,
 				78C127A624037EB300420E72 /* RTCReplayManager.m in Sources */,
 				78D730EC23B3889D00D2146C /* EEColorViewCell.m in Sources */,
 				783FB6DB240D0746007298C1 /* UIColor+Addition.m in Sources */,

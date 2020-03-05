@@ -14,12 +14,12 @@ EyeProtectionText = "Eye protection";
 SettingText = "Setting";
 ReplayRecordingText = "replay recording";
 
-ProhibitedPostText = " Prohibited post";
-InputMessageText = " Input message";
-QuitClassroomText = "Quit classroom?";
+ProhibitedPostText = " prohibited post";
+InputMessageText = " input message";
+QuitClassroomText = "quit classroom?";
 
-AcceptRequestText = "Teacher accept your interactive request!";
-CancelRequestText = "Teacher cancel your interactive!";
+AcceptRequestText = "teacher accept your interactive request!";
+CancelRequestText = "teacher cancel your interactive!";
 
 MaterialsAreaText = "Materials area";
 ChatroomText = "Chatroom";
@@ -29,9 +29,9 @@ OneToOneText = "One-to-One";
 SmallClassText = "Small Class";
 LargeClassText = "Large Class";
 
-UserNameVerifyText = "Class name and user name must be within 20 characters";
+UserNameVerifyText = "class name and user name must be within 20 characters";
 
-RoomTypeVerifyText = "Please select a room type";
+RoomTypeVerifyText = "please select a room type";
 RoomCountVerifyText = "Room is full, please change another room";
 RequestFailedText = "request failed";
 RequestConfigFailedText = "request config failed";
@@ -44,12 +44,14 @@ SendPeerMessageFailedText = "send peer message failed";
 InitSignalFailedText = "init signal failed";
 JoinSignalFailedText = "join signal failed";
 
-MuteBoardText = "Teacher has revoked your whiteboard permissions";
-UnMuteBoardText = "Teacher has authorized your whiteboard permissions";
+MuteBoardText = "teacher has revoked your whiteboard permissions";
+UnMuteBoardText = "teacher has authorized your whiteboard permissions";
 
-LockBoardText = "Teacher sets whiteboard to follow";
-UnlockBoardText = "The teacher lifted the whiteboard to follow";
+LockBoardText = "teacher sets whiteboard to follow";
+UnlockBoardText = "teacher lifted the whiteboard to follow";
 
-UpdateText = "The version has been updated. Please download the new version";
+UpdateText = "version has been updated. Please download the new version";
 
 JoinWhiteErrorText = "white board join error";
+JoinWhiteErrorText = "white board join error";
+LoginOnAnotherDeviceText = "account signed in on another device";

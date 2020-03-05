@@ -139,13 +139,10 @@
     
     NSString *msgText = @"";
     switch (type) {
-        case SignalP2PTypeCancel: {
-            NSDictionary *dict = @{@"cmd":@(SignalP2PTypeCancel),@"text":@""};
-            msgText = [JsonParseUtil dictionaryToJson:dict];
-        }
-            break;
         case SignalP2PTypeApply: {
-            NSDictionary *dict = @{@"cmd":@(SignalP2PTypeApply),@"text":@"co-video"};
+            NSDictionary *dict = @{@"cmd" : @(SignalP2PTypeApply),
+                                   @"text" : @"co-video",
+                                   @"account" : self.studentModel.userName};
             msgText = [JsonParseUtil dictionaryToJson:dict];
         }
             break;

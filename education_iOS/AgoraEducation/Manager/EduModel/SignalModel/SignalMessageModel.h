@@ -14,8 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SignalMessageInfoModel : NSObject
 @property (nonatomic, assign) NSInteger uid;
 @property (nonatomic, strong) NSString *account;
-@property (nonatomic, strong) NSString *resource; //NSStringFromSignalValueType
-@property (nonatomic, assign) NSInteger value;
+@property (nonatomic, assign) SignalValueType signalValueType;
 @end
 
 @interface SignalMessageModel : NSObject

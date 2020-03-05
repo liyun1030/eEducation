@@ -52,3 +52,4 @@ UnlockBoardText = "老师解除了白板跟随";
 UpdateText = "版本已经更新了，请下载最新版本";
 
 JoinWhiteErrorText = "白板加入失败";
+LoginOnAnotherDeviceText = "账户在其他设备上登录了";

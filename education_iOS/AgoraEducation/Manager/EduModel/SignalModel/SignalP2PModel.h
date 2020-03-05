@@ -9,18 +9,8 @@
 #import <Foundation/Foundation.h>
 
 typedef NS_ENUM(NSInteger, SignalP2PType) {
-    SignalP2PTypeMuteAudio      = 101,
-    SignalP2PTypeUnMuteAudio    = 102,
-    SignalP2PTypeMuteVideo      = 103,
-    SignalP2PTypeUnMuteVideo    = 104,
     SignalP2PTypeApply          = 105,
-    SignalP2PTypeAccept         = 106,
     SignalP2PTypeReject         = 107,
-    SignalP2PTypeCancel         = 108,
-    SignalP2PTypeMuteChat       = 109,
-    SignalP2PTypeUnMuteChat     = 110,
-    SignalP2PTypeMuteBoard      = 111,
-    SignalP2PTypeUnMuteBoard    = 112
 };
 
 NS_ASSUME_NONNULL_BEGIN

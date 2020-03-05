@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)didReceivedReplaySignal:(MessageInfoModel * _Nonnull)model;
 - (void)didReceivedPeerSignal:(SignalP2PModel * _Nonnull)model;
 - (void)didReceivedSignal:(SignalMessageInfoModel * _Nonnull)model;
+- (void)didReceivedConnectionStateChanged:(AgoraRtmConnectionState)state;
 
 @end
 

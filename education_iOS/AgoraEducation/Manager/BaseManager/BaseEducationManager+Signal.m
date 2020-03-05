@@ -37,8 +37,7 @@
     NSMutableDictionary *dataParams = [NSMutableDictionary dictionary];
     dataParams[@"uid"] = @(model.uid);
     dataParams[@"account"] = model.account;
-    dataParams[@"resource"] = model.resource;
-    dataParams[@"value"] = @(model.value);
+    dataParams[@"operate"] = @(model.signalValueType);
     
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
     params[@"cmd"] = @(MessageCmdTypeUpdate);
@@ -89,12 +88,8 @@
 #pragma mark SignalManagerDelegate
 - (void)rtmKit:(AgoraRtmKit * _Nonnull)kit connectionStateChanged:(AgoraRtmConnectionState)state reason:(AgoraRtmConnectionChangeReason)reason {
     
-    if(state == AgoraRtmConnectionStateConnected) {
-        [NSNotificationCenter.defaultCenter postNotificationName:NOTICE_KEY_ON_MESSAGE_CONNECTED object:nil];
-    } else if(state == AgoraRtmConnectionStateReconnecting) {
-        [NSNotificationCenter.defaultCenter postNotificationName:NOTICE_KEY_ON_MESSAGE_RECONNECTING object:nil];
-    } else if(state == AgoraRtmConnectionStateDisconnected) {
-        [NSNotificationCenter.defaultCenter postNotificationName:NOTICE_KEY_ON_MESSAGE_DISCONNECT object:nil];
+    if([self.signalDelegate respondsToSelector:@selector(didReceivedConnectionStateChanged:)]) {
+        [self.signalDelegate didReceivedConnectionStateChanged:state];
     }
 }
 
@@ -121,7 +116,7 @@
             [self.signalDelegate didReceivedMessage:model.data];
         }
         
-    } else if([dict[@"cmd"] integerValue] == MessageCmdTypeUpdate) {
+    } else if([dict[@"cmd"] integerValue] == MessageCmdTypeUpdate || [dict[@"cmd"] integerValue] == MessageCmdTypeCourse) {
         
         if([self.signalDelegate respondsToSelector:@selector(didReceivedSignal:)]) {
             
