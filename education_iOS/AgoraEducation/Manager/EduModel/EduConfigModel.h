@@ -34,6 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 // local data
 @property (nonatomic, strong) NSString* userName;
 @property (nonatomic, strong) NSString* className;
+@property (nonatomic, assign) NSInteger sceneType;
 
 @end
 

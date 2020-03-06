@@ -72,27 +72,21 @@
     
     [self.navigationView updateClassName:configModel.className];
     
-    WEAK(self);
-    // api -> init rtm -> rtc & white
-    [self.educationManager getRoomInfoCompleteSuccessBlock:^(RoomInfoModel * _Nonnull roomInfoModel) {
-
-        [weakself setupSignalWithSuccessBolck:^{
-
-            [weakself setupRTC];
-            [weakself setupWhiteBoard];
-
-            // link
-            if(weakself.educationManager.renderStudentModels.count > 0) {
-                UserModel *renderModel = weakself.educationManager.renderStudentModels.firstObject;
-                [weakself.educationManager.rtcUids addObject:@(renderModel.uid).stringValue];
-            }
-            
-            [weakself updateChatViews];
-        }];
+    // init signal & rtc & white -> init ui
+    {
+        self.educationManager.signalDelegate = self;
         
-    } completeFailBlock:^(NSString * _Nonnull errMessage) {
-        [weakself showToast:errMessage];
-    }];
+        [self setupRTC];
+        [self setupWhiteBoard];
+
+        // link
+        if(self.educationManager.renderStudentModels.count > 0) {
+            UserModel *renderModel = self.educationManager.renderStudentModels.firstObject;
+            [self.educationManager.rtcUids addObject:@(renderModel.uid).stringValue];
+        }
+        
+        [self updateChatViews];
+    }
 }
 
 - (void)updateViewOnReconnected {

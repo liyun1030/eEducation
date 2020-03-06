@@ -82,23 +82,17 @@
         [weakself.educationManager setWhiteStrokeColor:colorArray];
     }];
 
-    // api -> init rtm -> rtc & white
-    [self.educationManager getRoomInfoCompleteSuccessBlock:^(RoomInfoModel * _Nonnull roomInfoModel) {
-
-        [weakself setupSignalWithSuccessBolck:^{
-            
-            [weakself sendSignalWithType:SignalValueAcceptCoVideo success: nil];
-            
-            [weakself setupRTC];
-            [weakself setupWhiteBoard];
-
-            [weakself updateTimeState];
-            [weakself updateChatViews];
-        }];
+    // init signal & rtc & white -> init ui
+    {
+        self.educationManager.signalDelegate = self;
+        [self sendSignalWithType:SignalValueAcceptCoVideo success: nil];
         
-    } completeFailBlock:^(NSString * _Nonnull errMessage) {
-        [weakself showToast:errMessage];
-    }];
+        [self setupRTC];
+        [self setupWhiteBoard];
+
+        [self updateTimeState];
+        [self updateChatViews];
+    }
 }
 
 - (void)updateViewOnReconnected {

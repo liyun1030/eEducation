@@ -43,21 +43,6 @@
     [self addNotification];
 }
 
-- (void)getConfigWithSuccessBolck:(void (^)(void))successBlock {
-    
-    WEAK(self);
-    [self setLoadingVisible:YES];
-    [self.educationManager getConfigWithSuccessBolck:^{
-        [weakself setLoadingVisible:NO];
-        if(successBlock != nil){
-            successBlock();
-        }
-    } completeFailBlock:^(NSString * _Nonnull errMessage) {
-        [weakself.view makeToast:errMessage];
-        [weakself setLoadingVisible:NO];
-    }];
-}
-
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     self.navigationController.navigationBarHidden = YES;
@@ -181,15 +166,12 @@
     if ([self.roomType.titleLabel.text isEqualToString:NSLocalizedString(@"OneToOneText", nil)]) {
         self.educationManager = [OneToOneEducationManager new];
         sceneType = SceneType1V1;
-        vcIdentifier = @"oneToOneRoom";
     } else if ([self.roomType.titleLabel.text isEqualToString:NSLocalizedString(@"SmallClassText", nil)]) {
         self.educationManager = [MinEducationManager new];
         sceneType = SceneTypeSmall;
-        vcIdentifier = @"mcRoom";
     } else if ([self.roomType.titleLabel.text isEqualToString:NSLocalizedString(@"LargeClassText", nil)]) {
         self.educationManager = [BigEducationManager new];
         sceneType = SceneTypeBig;
-        vcIdentifier = @"bcroom";
     } else {
         [AlertViewUtil showAlertWithController:self title:NSLocalizedString(@"RoomTypeVerifyText", nil)];
         return;
@@ -197,32 +179,24 @@
     
     self.educationManager.eduConfigModel.className = className;
     self.educationManager.eduConfigModel.userName = userName;
+    self.educationManager.eduConfigModel.sceneType = sceneType;
+    
     WEAK(self);
     [self getConfigWithSuccessBolck:^{
-        [weakself entryRoomWithUserName:userName className:className sceneType:sceneType vcIdentifier:vcIdentifier];
-    }];
-}
-
-- (void)entryRoomWithUserName:(NSString *)userName className:(NSString *)className sceneType:(SceneType)sceneType vcIdentifier:(NSString *)identifier {
- 
-    WEAK(self);
-    [self setLoadingVisible:YES];
-    [self.educationManager enterRoomWithUserName:userName roomName:className sceneType:sceneType successBolck:^{
-            
-            [weakself setLoadingVisible:NO];
-       
-            if(sceneType == SceneType1V1) {
-                [weakself join1V1RoomWithIdentifier:identifier];
-            } else if(sceneType == SceneTypeSmall){
-                [weakself joinMinRoomWithIdentifier:identifier];
-            } else if(sceneType == SceneTypeBig){
-                [weakself joinBigRoomWithIdentifier:identifier];
-            }
-    
-        } completeFailBlock:^(NSString * _Nonnull errMessage) {
-            [weakself.view makeToast:errMessage];
-            [weakself setLoadingVisible:NO];
+        [weakself getEntryInfoWithSuccessBolck:^{
+            [weakself getRoomInfoWithSuccessBlock:^{
+                [weakself setupSignalWithSuccessBolck:^{
+                    if(sceneType == SceneType1V1) {
+                        [weakself join1V1RoomWithIdentifier:@"oneToOneRoom"];
+                    } else if(sceneType == SceneTypeSmall){
+                        [weakself joinMinRoomWithIdentifier:@"mcRoom"];
+                    } else if(sceneType == SceneTypeBig){
+                        [weakself joinBigRoomWithIdentifier:@"bcroom"];
+                    }
+                }];
+            }];
         }];
+    }];
 }
 
 - (void)setLoadingVisible:(BOOL)show {
@@ -276,4 +250,84 @@
     [self.roomType setTitle:name forState:(UIControlStateNormal)];
     self.classRoomTypeView.hidden = YES;
 }
+
+#pragma mark EnterClassProcess
+- (void)getConfigWithSuccessBolck:(void (^)(void))successBlock {
+    
+    WEAK(self);
+    [self setLoadingVisible:YES];
+    [self.educationManager getConfigWithSuccessBolck:^{
+        [weakself setLoadingVisible:NO];
+        if(successBlock != nil){
+            successBlock();
+        }
+    } completeFailBlock:^(NSString * _Nonnull errMessage) {
+        [weakself.view makeToast:errMessage];
+        [weakself setLoadingVisible:NO];
+    }];
+}
+
+- (void)getEntryInfoWithSuccessBolck:(void (^)(void))successBlock {
+    WEAK(self);
+    [self setLoadingVisible:YES];
+    
+    NSString *userName = self.educationManager.eduConfigModel.userName;
+    NSString *className = self.educationManager.eduConfigModel.className;
+    SceneType sceneType = self.educationManager.eduConfigModel.sceneType;
+    
+    [self.educationManager enterRoomWithUserName:userName roomName:className sceneType:sceneType successBolck:^{
+        
+        [weakself setLoadingVisible:NO];
+        if(successBlock != nil){
+            successBlock();
+        }
+
+    } completeFailBlock:^(NSString * _Nonnull errMessage) {
+        [weakself.view makeToast:errMessage];
+        [weakself setLoadingVisible:NO];
+    }];
+}
+
+- (void)getRoomInfoWithSuccessBlock:(void (^)(void))successBlock {
+    WEAK(self);
+    [self setLoadingVisible:YES];
+    [self.educationManager getRoomInfoCompleteSuccessBlock:^(RoomInfoModel * _Nonnull roomInfoModel) {
+        
+        [weakself setLoadingVisible:NO];
+        if(successBlock != nil){
+            successBlock();
+        }
+        
+    } completeFailBlock:^(NSString * _Nonnull errMessage) {
+        [weakself.view makeToast:errMessage];
+        [weakself setLoadingVisible:NO];
+    }];
+}
+
+- (void)setupSignalWithSuccessBolck:(void (^)(void))successBlock {
+
+    NSString *appid = self.educationManager.eduConfigModel.appId;
+    NSString *appToken = self.educationManager.eduConfigModel.rtmToken;
+    NSString *uid = @(self.educationManager.eduConfigModel.uid).stringValue;
+    
+    WEAK(self);
+    [self.educationManager initSignalWithAppid:appid appToken:appToken userId:uid dataSourceDelegate:nil completeSuccessBlock:^{
+        
+        NSString *channelName = weakself.educationManager.eduConfigModel.channelName;
+        [weakself.educationManager joinSignalWithChannelName:channelName completeSuccessBlock:^{
+            if(successBlock != nil){
+                successBlock();
+            }
+            
+        } completeFailBlock:^(NSInteger errorCode) {
+            NSString *errMsg = [NSString stringWithFormat:@"%@:%ld", NSLocalizedString(@"JoinSignalFailedText", nil), (long)errorCode];
+            [weakself.view makeToast:errMsg];
+        }];
+        
+    } completeFailBlock:^(NSInteger errorCode){
+        NSString *errMsg = [NSString stringWithFormat:@"%@:%ld", NSLocalizedString(@"InitSignalFailedText", nil), (long)errorCode];
+        [weakself.view makeToast:errMsg];
+    }];
+}
+
 @end
