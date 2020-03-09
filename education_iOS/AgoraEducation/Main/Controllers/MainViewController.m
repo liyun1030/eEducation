@@ -66,7 +66,10 @@
         [weakself.joinButton setEnabled:YES];
         
         ConfigModel *model = [ConfigModel yy_modelWithDictionary:responseObj];
+        
         if(model.code == 0 && model.data != nil){
+            
+            [HttpManager setHttpBaseUrl:model.data.apiHost];
             
             [AppUpdateManager.shareManager checkAppUpdateWithModel:model];
             
@@ -77,7 +80,8 @@
                 successBlock();
             }
         } else {
-            [weakself showToast:model.msg];
+            NSString *msg = [weakself generateHttpErrorMessage: model.code];
+            [weakself showToast: msg];
         }
         
     } failure:^(NSError *error) {
@@ -88,6 +92,28 @@
         [weakself showToast:NSLocalizedString(@"RequestFailedText", nil)];
         NSLog(@"HTTP GET CONFIG ERROR:%@", error.description);
     }];
+}
+
+- (NSString *)generateHttpErrorMessage:(NSInteger)errorCode {
+    
+    if(self.configInfoModel == nil) {
+        return NSLocalizedString(@"RequestFailedText", nil);
+    }
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSArray<NSString*> *allLanguages = [defaults objectForKey:@"AppleLanguages"];
+    NSString *preferredLang = [allLanguages objectAtIndex:0];
+    NSString *msg = @"";
+    if([preferredLang containsString:@"zh-Hans"]) {
+        msg = [self.configInfoModel.multiLanguage.cn valueForKey:@(errorCode).stringValue];
+    } else {
+        msg = [self.configInfoModel.multiLanguage.en valueForKey:@(errorCode).stringValue];
+    }
+    
+    if(msg == nil || msg.length == 0) {
+        msg = [NSString stringWithFormat:@"%@：%ld", NSLocalizedString(@"RequestFailedText", nil), (long)errorCode];
+    }
+    return msg;
 }
 
 - (void)showToast:(NSString *)title {
@@ -214,7 +240,7 @@
     [self.activityIndicator startAnimating];
     [self.joinButton setEnabled:YES];
     
-    NSString *url = [NSString stringWithFormat:HTTP_POST_ENTER_ROOM, [KeyCenter agoraAppid]];
+    NSString *url = [NSString stringWithFormat:HTTP_POST_ENTER_ROOM, HttpManager.getHttpBaseUrl, [KeyCenter agoraAppid]];
     
     NSDictionary *headers = @{
         @"Authorization" : self.configInfoModel.authorization,
@@ -249,10 +275,11 @@
             }
             
         } else {
-            
             [weakself.activityIndicator stopAnimating];
             [weakself.joinButton setEnabled:YES];
-            [weakself showToast:model.msg];
+            
+            NSString *msg = [weakself generateHttpErrorMessage: model.code];
+            [weakself showToast:msg];
         }
         
     } failure:^(NSError *error) {

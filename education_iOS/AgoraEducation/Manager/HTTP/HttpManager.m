@@ -12,7 +12,8 @@
 
 @interface HttpManager ()
 
-@property (nonatomic,strong) AFHTTPSessionManager *sessionManager;
+@property (nonatomic, copy) NSString *baseURL;
+@property (nonatomic, strong) AFHTTPSessionManager *sessionManager;
 
 @end
 
@@ -29,11 +30,29 @@ static HttpManager *manager = nil;
     }
 }
 
++ (void)setHttpBaseUrl:(NSString *)url {
+    if(url != nil && url.length > 0) {
+        
+        HttpManager.shareManager.baseURL = url;
+        NSString *lastString = [url substringFromIndex:url.length-1];
+        if([lastString isEqualToString:@"/"]) {
+            HttpManager.shareManager.baseURL = [url substringWithRange:NSMakeRange(0, [url length] - 1)];
+        }
+    }
+}
+
+
++ (NSString *)getHttpBaseUrl {
+    return HttpManager.shareManager.baseURL;
+}
+
 - (void)initSessionManager {
     self.sessionManager = [AFHTTPSessionManager manager];
     self.sessionManager.requestSerializer = [AFJSONRequestSerializer serializer];
     self.sessionManager.responseSerializer = [AFJSONResponseSerializer serializer];
     self.sessionManager.requestSerializer.timeoutInterval = 30;
+    
+    self.baseURL = HTTP_BASE_URL;
 }
 
 + (void)get:(NSString *)url params:(NSDictionary *)params headers:(NSDictionary<NSString*, NSString*> *)headers success:(void (^)(id))success failure:(void (^)(NSError *))failure {
@@ -113,7 +132,7 @@ static HttpManager *manager = nil;
             if (token) {
                 token(responseObj[@"msg"][@"roomToken"]);
             }
-        }else {
+        } else {
             if (failure) {
                 failure(@"Get roomToken error");
             }
@@ -144,7 +163,9 @@ static HttpManager *manager = nil;
         @"appVersion" : app_Version
     };
     
-    [HttpManager get:HTTP_GET_CONFIG params:params headers:nil success:^(id responseObj) {
+    NSString *url = HTTP_GET_CONFIG;
+    
+    [HttpManager get:url params:params headers:nil success:^(id responseObj) {
         
         if(success != nil){
             success(responseObj);
