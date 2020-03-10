@@ -64,14 +64,8 @@
     self.studentVideoView.delegate = self;
     self.navigationView.delegate = self;
     self.chatTextFiled.contentTextFiled.delegate = self;
-    
-    EduConfigModel *configModel = self.educationManager.eduConfigModel;
-    self.messageView.userToken = configModel.userToken;
-    self.messageView.roomId = configModel.roomId;
-    self.messageView.appId = configModel.appId;
-    self.messageView.baseURL = configModel.httpBaseURL;
-    
-    [self.navigationView updateClassName:configModel.className];
+
+    [self.navigationView updateClassName: EduConfigModel.shareInstance.className];
     
     // init signal & rtc & white -> init ui
     {
@@ -113,7 +107,7 @@
 
 - (void)setupRTC {
     
-    EduConfigModel *configModel = self.educationManager.eduConfigModel;
+    EduConfigModel *configModel = EduConfigModel.shareInstance;
     
     [self.educationManager initRTCEngineKitWithAppid:configModel.appId clientRole:RTCClientRoleBroadcaster dataSourceDelegate:self];
     
@@ -128,14 +122,14 @@
 
 - (void)setupSignalWithSuccessBolck:(void (^)(void))successBlock {
 
-    NSString *appid = self.educationManager.eduConfigModel.appId;
-    NSString *appToken = self.educationManager.eduConfigModel.rtmToken;
-    NSString *uid = @(self.educationManager.eduConfigModel.uid).stringValue;
+    NSString *appid = EduConfigModel.shareInstance.appId;
+    NSString *appToken = EduConfigModel.shareInstance.rtmToken;
+    NSString *uid = @(EduConfigModel.shareInstance.uid).stringValue;
     
     WEAK(self);
     [self.educationManager initSignalWithAppid:appid appToken:appToken userId:uid dataSourceDelegate:self completeSuccessBlock:^{
         
-        NSString *channelName = weakself.educationManager.eduConfigModel.channelName;
+        NSString *channelName = EduConfigModel.shareInstance.channelName;
         [weakself.educationManager joinSignalWithChannelName:channelName completeSuccessBlock:^{
             if(successBlock != nil){
                 successBlock();
@@ -177,8 +171,8 @@
 - (void)sendSignalWithType:(SignalValueType)type success:(void (^ _Nullable) (void))successBlock {
     
     SignalMessageInfoModel *model = [SignalMessageInfoModel new];
-    model.uid = self.educationManager.eduConfigModel.uid;
-    model.account = self.educationManager.eduConfigModel.userName;
+    model.uid = EduConfigModel.shareInstance.uid;
+    model.account = EduConfigModel.shareInstance.userName;
     model.signalValueType = type;
     
     WEAK(self);
@@ -240,7 +234,7 @@
                 
                 BOOL remote = NO;
                 if(filteredArray.count == 0){
-                    if (studentUid == self.educationManager.eduConfigModel.uid) {
+                    if (studentUid == EduConfigModel.shareInstance.uid) {
                         [self renderStudentCanvas:studentUid remoteVideo:remote];
                     } else {
                         remote = YES;
@@ -423,7 +417,7 @@
 - (IBAction)handUpEvent:(UIButton *)sender {
     if(self.educationManager.renderStudentModels != nil) {
         UserModel *renderModel = self.educationManager.renderStudentModels.firstObject;
-        if(renderModel.uid != self.educationManager.eduConfigModel.uid) {
+        if(renderModel.uid != EduConfigModel.shareInstance.uid) {
             return;
         }
     }
@@ -610,7 +604,7 @@
                     
                     [weakself.educationManager.rtcUids removeObject:@(model.uid).stringValue];
                 }
-                [weakself removeStudentCanvas: self.educationManager.eduConfigModel.uid];
+                [weakself removeStudentCanvas: EduConfigModel.shareInstance.uid];
             }
                 break;
             case SignalValueAcceptCoVideo:
@@ -803,7 +797,7 @@
     NSString *content = textField.text;
     if (content.length > 0) {
         MessageInfoModel *model = [MessageInfoModel new];
-        model.account = self.educationManager.eduConfigModel.userName;
+        model.account = EduConfigModel.shareInstance.userName;
         model.content = content;
         WEAK(self);
         [self.educationManager sendMessageWithModel:model completeSuccessBlock:^{

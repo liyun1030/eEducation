@@ -80,14 +80,8 @@
         [weakself.educationManager setWhiteStrokeColor:colorArray];
     }];
     
-    EduConfigModel *configModel = self.educationManager.eduConfigModel;
-    self.messageView.userToken = configModel.userToken;
-    self.messageView.roomId = configModel.roomId;
-    self.messageView.appId = configModel.appId;
-    self.messageView.baseURL = configModel.httpBaseURL;
-    
-    [self.navigationView updateClassName:configModel.className];
-    self.studentListView.uid = configModel.uid;
+    [self.navigationView updateClassName:EduConfigModel.shareInstance.className];
+    self.studentListView.uid = EduConfigModel.shareInstance.uid;
 
     // init signal & rtc & white -> init ui
     {
@@ -122,7 +116,7 @@
 
 - (void)setupRTC {
     
-    EduConfigModel *configModel = self.educationManager.eduConfigModel;
+    EduConfigModel *configModel = EduConfigModel.shareInstance;
     
     [self.educationManager initRTCEngineKitWithAppid:configModel.appId clientRole:RTCClientRoleBroadcaster dataSourceDelegate:self];
     
@@ -137,14 +131,14 @@
 
 - (void)setupSignalWithSuccessBolck:(void (^)(void))successBlock {
 
-    NSString *appid = self.educationManager.eduConfigModel.appId;
-    NSString *appToken = self.educationManager.eduConfigModel.rtmToken;
-    NSString *uid = @(self.educationManager.eduConfigModel.uid).stringValue;
+    NSString *appid = EduConfigModel.shareInstance.appId;
+    NSString *appToken = EduConfigModel.shareInstance.rtmToken;
+    NSString *uid = @(EduConfigModel.shareInstance.uid).stringValue;
     
     WEAK(self);
     [self.educationManager initSignalWithAppid:appid appToken:appToken userId:uid dataSourceDelegate:self completeSuccessBlock:^{
         
-        NSString *channelName = weakself.educationManager.eduConfigModel.channelName;
+        NSString *channelName = EduConfigModel.shareInstance.channelName;
         [weakself.educationManager joinSignalWithChannelName:channelName completeSuccessBlock:^{
             if(successBlock != nil){
                 successBlock();
@@ -273,7 +267,7 @@
         model.videoView = cell.videoCanvasView;
         model.renderMode = RTCVideoRenderModeHidden;
 
-        EduConfigModel *configModel = weakself.educationManager.eduConfigModel;
+        EduConfigModel *configModel = EduConfigModel.shareInstance;
         if (model.uid == configModel.uid) {
            model.canvasType = RTCVideoCanvasTypeLocal;
            [weakself.educationManager setupRTCVideoCanvas:model completeBlock:nil];
@@ -411,8 +405,8 @@
 - (void)sendSignalWithType:(SignalValueType)type success:(void (^ _Nullable) (void))successBlock {
     
     SignalMessageInfoModel *model = [SignalMessageInfoModel new];
-    model.uid = self.educationManager.eduConfigModel.uid;
-    model.account = self.educationManager.eduConfigModel.userName;
+    model.uid = EduConfigModel.shareInstance.uid;
+    model.account = EduConfigModel.shareInstance.userName;
     model.signalValueType = type;
     
     WEAK(self);
@@ -682,7 +676,7 @@
     NSString *content = textField.text;
     if (content.length > 0) {
         MessageInfoModel *model = [MessageInfoModel new];
-        model.account = self.educationManager.eduConfigModel.userName;
+        model.account = EduConfigModel.shareInstance.userName;
         model.content = content;
         WEAK(self);
         [self.educationManager sendMessageWithModel:model completeSuccessBlock:^{

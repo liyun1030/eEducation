@@ -8,7 +8,6 @@
 
 #import "BaseEducationManager.h"
 #import "RoomAllModel.h"
-#import "EduConfigModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

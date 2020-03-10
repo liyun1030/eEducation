@@ -12,8 +12,6 @@
 #import "EnterRoomAllModel.h"
 #import "CommonModel.h"
 
-static char kAssociatedConfig;
-
 @implementation BaseEducationManager (GlobalStates)
 
 - (void)getConfigWithSuccessBolck:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSString *errMessage))failBlock {
@@ -24,13 +22,13 @@ static char kAssociatedConfig;
         ConfigModel *model = [ConfigModel yy_modelWithDictionary:responseObj];
         if(model.code == 0) {
             
-            weakself.eduConfigModel.appId = model.data.configInfoModel.appId;
-            weakself.eduConfigModel.oneToOneStudentLimit = model.data.configInfoModel.oneToOneStudentLimit.integerValue;
-            weakself.eduConfigModel.smallClassStudentLimit = model.data.configInfoModel.smallClassStudentLimit.integerValue;
-            weakself.eduConfigModel.largeClassStudentLimit = model.data.configInfoModel.largeClassStudentLimit.integerValue;
+            EduConfigModel.shareInstance.appId = model.data.configInfoModel.appId;
+            EduConfigModel.shareInstance.oneToOneStudentLimit = model.data.configInfoModel.oneToOneStudentLimit.integerValue;
+            EduConfigModel.shareInstance.smallClassStudentLimit = model.data.configInfoModel.smallClassStudentLimit.integerValue;
+            EduConfigModel.shareInstance.largeClassStudentLimit = model.data.configInfoModel.largeClassStudentLimit.integerValue;
             
-            weakself.eduConfigModel.httpBaseURL = model.data.apiHost;
-            weakself.eduConfigModel.multiLanguage = model.data.configInfoModel.multiLanguage;
+            EduConfigModel.shareInstance.httpBaseURL = model.data.apiHost;
+            EduConfigModel.shareInstance.multiLanguage = model.data.configInfoModel.multiLanguage;
             
             if(successBlock != nil){
                 successBlock();
@@ -50,7 +48,7 @@ static char kAssociatedConfig;
 
 - (void)enterRoomWithUserName:(NSString *)userName roomName:(NSString *)roomName sceneType:(SceneType)sceneType successBolck:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSString *errMessage))failBlock {
     
-    NSString *url = [NSString stringWithFormat:HTTP_ENTER_ROOM, self.eduConfigModel.httpBaseURL, self.eduConfigModel.appId];
+    NSString *url = [NSString stringWithFormat:HTTP_ENTER_ROOM, EduConfigModel.shareInstance.httpBaseURL, EduConfigModel.shareInstance.appId];
     
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
     params[@"userName"] = userName;
@@ -66,8 +64,8 @@ static char kAssociatedConfig;
         EnterRoomAllModel *model = [EnterRoomAllModel yy_modelWithDictionary:responseObj];
         if(model.code == 0){
             
-            weakself.eduConfigModel.userToken = model.data.userToken;
-            weakself.eduConfigModel.roomId = model.data.roomId;
+            EduConfigModel.shareInstance.userToken = model.data.userToken;
+            EduConfigModel.shareInstance.roomId = model.data.roomId;
                     
             if(successBlock != nil){
                 successBlock();
@@ -111,24 +109,24 @@ static char kAssociatedConfig;
 
 - (void)getRoomInfoCompleteSuccessBlock:(void (^ _Nullable) (RoomInfoModel * roomInfoModel))successBlock completeFailBlock:(void (^ _Nullable) (NSString *errMessage))failBlock {
  
-    NSString *url = [NSString stringWithFormat:HTTP_ROOM_INFO, self.eduConfigModel.httpBaseURL, self.eduConfigModel.appId, self.eduConfigModel.roomId];
+    NSString *url = [NSString stringWithFormat:HTTP_ROOM_INFO, EduConfigModel.shareInstance.httpBaseURL, EduConfigModel.shareInstance.appId, EduConfigModel.shareInstance.roomId];
     
     NSMutableDictionary *headers = [NSMutableDictionary dictionary];
-    headers[@"token"] = self.eduConfigModel.userToken;
+    headers[@"token"] = EduConfigModel.shareInstance.userToken;
     WEAK(self);
     [HttpManager get:url params:nil headers:headers success:^(id responseObj) {
         
         RoomAllModel *model = [RoomAllModel yy_modelWithDictionary:responseObj];
         if(model.code == 0) {
             
-            weakself.eduConfigModel.uid = model.data.localUser.uid;
-            weakself.eduConfigModel.userId = model.data.localUser.userId;
-            weakself.eduConfigModel.channelName = model.data.room.channelName;
+            EduConfigModel.shareInstance.uid = model.data.localUser.uid;
+            EduConfigModel.shareInstance.userId = model.data.localUser.userId;
+            EduConfigModel.shareInstance.channelName = model.data.room.channelName;
             
-            weakself.eduConfigModel.rtcToken = model.data.localUser.rtcToken;
-            weakself.eduConfigModel.rtmToken = model.data.localUser.rtmToken;
-            weakself.eduConfigModel.boardId = model.data.room.boardId;
-            weakself.eduConfigModel.boardToken = model.data.room.boardToken;
+            EduConfigModel.shareInstance.rtcToken = model.data.localUser.rtcToken;
+            EduConfigModel.shareInstance.rtmToken = model.data.localUser.rtmToken;
+            EduConfigModel.shareInstance.boardId = model.data.room.boardId;
+            EduConfigModel.shareInstance.boardToken = model.data.room.boardToken;
             
             if(successBlock != nil) {
                 successBlock(model.data);
@@ -149,10 +147,10 @@ static char kAssociatedConfig;
 
 - (void)updateUserInfoWithParams:(NSDictionary*)params completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSString *errMessage))failBlock {
     
-    NSString *url = [NSString stringWithFormat:HTTP_UPDATE_USER_INFO, self.eduConfigModel.httpBaseURL, self.eduConfigModel.appId, self.eduConfigModel.roomId, self.eduConfigModel.userId];
+    NSString *url = [NSString stringWithFormat:HTTP_UPDATE_USER_INFO, EduConfigModel.shareInstance.httpBaseURL, EduConfigModel.shareInstance.appId, EduConfigModel.shareInstance.roomId, EduConfigModel.shareInstance.userId];
     
     NSMutableDictionary *headers = [NSMutableDictionary dictionary];
-    headers[@"token"] = self.eduConfigModel.userToken;
+    headers[@"token"] = EduConfigModel.shareInstance.userToken;
     
     WEAK(self);
     [HttpManager post:url params:params headers:headers success:^(id responseObj) {
@@ -179,18 +177,14 @@ static char kAssociatedConfig;
 #pragma mark Private
 - (NSString *)generateHttpErrorMessageWithDescribe:(NSString *)des errorCode:(NSInteger)errorCode {
     
-    if(self.eduConfigModel == nil) {
-        return des;
-    }
-    
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSArray<NSString*> *allLanguages = [defaults objectForKey:@"AppleLanguages"];
     NSString *preferredLang = [allLanguages objectAtIndex:0];
     NSString *msg = @"";
     if([preferredLang containsString:@"zh-Hans"]) {
-        msg = [self.eduConfigModel.multiLanguage.cn valueForKey:@(errorCode).stringValue];
+        msg = [EduConfigModel.shareInstance.multiLanguage.cn valueForKey:@(errorCode).stringValue];
     } else {
-        msg = [self.eduConfigModel.multiLanguage.en valueForKey:@(errorCode).stringValue];
+        msg = [EduConfigModel.shareInstance.multiLanguage.en valueForKey:@(errorCode).stringValue];
     }
     
     if(msg == nil || msg.length == 0) {
@@ -199,17 +193,5 @@ static char kAssociatedConfig;
     return msg;
 }
 
-- (void)setEduConfigModel:(EduConfigModel *)eduConfigModel {
-    objc_setAssociatedObject(self, &kAssociatedConfig, eduConfigModel, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (EduConfigModel *)eduConfigModel {
-    EduConfigModel *model = objc_getAssociatedObject(self, &kAssociatedConfig);
-    if(model == nil) {
-        model = [EduConfigModel new];
-        [self setEduConfigModel:model];
-    }
-    return model;
-}
 
 @end

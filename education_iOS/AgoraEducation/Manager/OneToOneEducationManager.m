@@ -129,7 +129,7 @@
     if(filteredArray > 0) {
         RTCVideoSessionModel *model = filteredArray.firstObject;
         model.videoCanvas.view = nil;
-        if(uid == self.eduConfigModel.uid) {
+        if(uid == EduConfigModel.shareInstance.uid) {
             [self.rtcManager setupLocalVideo:model.videoCanvas];
         } else {
             [self.rtcManager setupRemoteVideo:model.videoCanvas];

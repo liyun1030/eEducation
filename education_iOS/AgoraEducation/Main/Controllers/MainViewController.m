@@ -177,9 +177,9 @@
         return;
     }
     
-    self.educationManager.eduConfigModel.className = className;
-    self.educationManager.eduConfigModel.userName = userName;
-    self.educationManager.eduConfigModel.sceneType = sceneType;
+    EduConfigModel.shareInstance.className = className;
+    EduConfigModel.shareInstance.userName = userName;
+    EduConfigModel.shareInstance.sceneType = sceneType;
     
     WEAK(self);
     [self getConfigWithSuccessBolck:^{
@@ -271,9 +271,9 @@
     WEAK(self);
     [self setLoadingVisible:YES];
     
-    NSString *userName = self.educationManager.eduConfigModel.userName;
-    NSString *className = self.educationManager.eduConfigModel.className;
-    SceneType sceneType = self.educationManager.eduConfigModel.sceneType;
+    NSString *userName = EduConfigModel.shareInstance.userName;
+    NSString *className = EduConfigModel.shareInstance.className;
+    SceneType sceneType = EduConfigModel.shareInstance.sceneType;
     
     [self.educationManager enterRoomWithUserName:userName roomName:className sceneType:sceneType successBolck:^{
         
@@ -306,14 +306,14 @@
 
 - (void)setupSignalWithSuccessBolck:(void (^)(void))successBlock {
 
-    NSString *appid = self.educationManager.eduConfigModel.appId;
-    NSString *appToken = self.educationManager.eduConfigModel.rtmToken;
-    NSString *uid = @(self.educationManager.eduConfigModel.uid).stringValue;
+    NSString *appid = EduConfigModel.shareInstance.appId;
+    NSString *appToken = EduConfigModel.shareInstance.rtmToken;
+    NSString *uid = @(EduConfigModel.shareInstance.uid).stringValue;
     
     WEAK(self);
     [self.educationManager initSignalWithAppid:appid appToken:appToken userId:uid dataSourceDelegate:nil completeSuccessBlock:^{
         
-        NSString *channelName = weakself.educationManager.eduConfigModel.channelName;
+        NSString *channelName = EduConfigModel.shareInstance.channelName;
         [weakself.educationManager joinSignalWithChannelName:channelName completeSuccessBlock:^{
             if(successBlock != nil){
                 successBlock();

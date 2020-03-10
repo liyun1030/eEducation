@@ -10,7 +10,6 @@
 #import <AVKit/AVKit.h>
 
 #import "CombineReplayManager.h"
-#import "HttpManager.h"
 
 #import "ReplayControlView.h"
 #import "HttpManager.h"
@@ -19,6 +18,8 @@
 
 #import "UIView+Toast.h"
 #import "ReplayModel.h"
+#import "EduConfigModel.h"
+
 
 @interface ReplayViewController ()<ReplayControlViewDelegate, CombineReplayDelegate>
 
@@ -68,7 +69,7 @@
     self.combineReplayManager.delegate = self;
     
     WEAK(self);
-    [HttpManager getReplayInfoWithBaseURL:self.baseURL userToken:self.userToken appId:self.appId roomId:self.roomId recordId:self.recordId success:^(id responseObj) {
+    [HttpManager getReplayInfoWithBaseURL:EduConfigModel.shareInstance.httpBaseURL userToken:EduConfigModel.shareInstance.userToken appId:EduConfigModel.shareInstance.appId roomId:EduConfigModel.shareInstance.roomId recordId:self.recordId success:^(id responseObj) {
 
         ReplayModel *model = [ReplayModel yy_modelWithDictionary:responseObj];
         if(model.code == 0) {
@@ -89,12 +90,24 @@
             NSAssert(weakself.videoPath != nil, @"can't find record video");
             [weakself setupRTCReplay];
             [weakself setupWhiteReplay];
+            
         } else {
-            if(model.msg != nil) {
-                [weakself.view makeToast:model.msg];
+            
+            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+            NSArray<NSString*> *allLanguages = [defaults objectForKey:@"AppleLanguages"];
+            NSString *preferredLang = [allLanguages objectAtIndex:0];
+            NSString *msg = @"";
+            if([preferredLang containsString:@"zh-Hans"]) {
+                msg = [EduConfigModel.shareInstance.multiLanguage.cn valueForKey:@(model.code).stringValue];
             } else {
-                [weakself.view makeToast:NSLocalizedString(@"RequestReplayFailedText", nil)];
+                msg = [EduConfigModel.shareInstance.multiLanguage.en valueForKey:@(model.code).stringValue];
             }
+            
+            if(msg == nil || msg.length == 0) {
+                msg = [NSString stringWithFormat:@"%@：%ld", NSLocalizedString(@"RequestReplayFailedText", nil), (long)model.code];
+            }
+            [weakself.view makeToast:msg];
+  
         }
     } failure:^(NSError *error) {
         [weakself.view makeToast:error.description];

@@ -39,9 +39,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface BaseEducationManager : NSObject
 
-// Config info
-@property (nonatomic, strong) EduConfigModel * _Nullable eduConfigModel;
-
 // RTC
 @property (nonatomic, strong) RTCManager *rtcManager;
 @property (nonatomic, weak) id<RTCDelegate> rtcDelegate;

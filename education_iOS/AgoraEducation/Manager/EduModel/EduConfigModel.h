@@ -13,6 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface EduConfigModel : NSObject
 
++ (instancetype)shareInstance;
+
 // HTTP Config
 @property (nonatomic, strong) NSString *httpBaseURL;
 @property (nonatomic, strong) MultiLanguageModel *multiLanguage;
