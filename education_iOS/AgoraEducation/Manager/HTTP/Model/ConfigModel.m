@@ -15,6 +15,10 @@
              @"oneToOneTeacherLimit": @"1on1TeacherLimit"};
 }
 
++ (NSDictionary *)objectClassInArray {
+    return @{@"multiLanguage" : [MultiLanguageModel class]};
+}
+
 @end
 
 @implementation ConfigAllInfoModel

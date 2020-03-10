@@ -72,6 +72,7 @@
     self.messageListView.userToken = configModel.userToken;
     self.messageListView.roomId = configModel.roomId;
     self.messageListView.appId = configModel.appId;
+    self.messageListView.baseURL = configModel.httpBaseURL;
     
     NSString *className = configModel.className;
     [self.navigationView updateClassName:className];

@@ -137,12 +137,12 @@ static HttpManager *manager = nil;
     }];
 }
 
-+ (void)getReplayInfoWithUserToken:(NSString *)userToken appId:(NSString *)appId roomId:(NSString *)roomId recordId:(NSString *)recordId success:(void (^)(id responseObj))success failure:(void (^)(NSError *error))failure {
++ (void)getReplayInfoWithBaseURL:(NSString *)baseURL userToken:(NSString *)userToken appId:(NSString *)appId roomId:(NSString *)roomId recordId:(NSString *)recordId success:(void (^)(id responseObj))success failure:(void (^)(NSError *error))failure {
     
     NSMutableDictionary *headers = [NSMutableDictionary dictionary];
     headers[@"token"] = userToken;
 
-    NSString *url = [NSString stringWithFormat:HTTP_GET_REPLAY_INFO, appId, roomId, recordId];
+    NSString *url = [NSString stringWithFormat:HTTP_GET_REPLAY_INFO, baseURL, appId, roomId, recordId];
     [HttpManager get:url params:nil headers:headers success:^(id responseObj) {
         
         if(success != nil){

@@ -105,6 +105,7 @@
 		78D731BA23BB610400D2146C /* MinEducationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 78D731B923BB610400D2146C /* MinEducationManager.m */; };
 		78D731C023BB614D00D2146C /* OneToOneEducationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 78D731BF23BB614D00D2146C /* OneToOneEducationManager.m */; };
 		78D731C223BCE4EA00D2146C /* BCViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 78D731C123BCE4EA00D2146C /* BCViewController.m */; };
+		78FC86EA241793700083E364 /* MultiLanguageModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 78FC86E9241793700083E364 /* MultiLanguageModel.m */; };
 		933AE560CF5F0977F2647C18 /* Pods_AgoraEducation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76A4F1D25B13050F999DB322 /* Pods_AgoraEducation.framework */; };
 /* End PBXBuildFile section */
 
@@ -326,6 +327,8 @@
 		78D731BE23BB614D00D2146C /* OneToOneEducationManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OneToOneEducationManager.h; sourceTree = "<group>"; };
 		78D731BF23BB614D00D2146C /* OneToOneEducationManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OneToOneEducationManager.m; sourceTree = "<group>"; };
 		78D731C123BCE4EA00D2146C /* BCViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCViewController.m; sourceTree = "<group>"; };
+		78FC86E8241793700083E364 /* MultiLanguageModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MultiLanguageModel.h; sourceTree = "<group>"; };
+		78FC86E9241793700083E364 /* MultiLanguageModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MultiLanguageModel.m; sourceTree = "<group>"; };
 		A5BFF93D50503E0756F47D98 /* Pods-AgoraEducation.qarelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgoraEducation.qarelease.xcconfig"; path = "Target Support Files/Pods-AgoraEducation/Pods-AgoraEducation.qarelease.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -700,6 +703,8 @@
 				783FB700240D12BA007298C1 /* RoomAllModel.m */,
 				783FB6FD240D12BA007298C1 /* ConfigModel.h */,
 				783FB6FF240D12BA007298C1 /* ConfigModel.m */,
+				78FC86E8241793700083E364 /* MultiLanguageModel.h */,
+				78FC86E9241793700083E364 /* MultiLanguageModel.m */,
 				78A22C75240E0660003CEBBA /* ReplayModel.h */,
 				78A22C76240E0660003CEBBA /* ReplayModel.m */,
 			);
@@ -1181,6 +1186,7 @@
 				1A399E5423697E9000F5A40F /* OneToOneViewController.m in Sources */,
 				78D730F523B3889D00D2146C /* EEColorShowView.m in Sources */,
 				783FB6DD240D0746007298C1 /* JsonParseUtil.m in Sources */,
+				78FC86EA241793700083E364 /* MultiLanguageModel.m in Sources */,
 				78D730F223B3889D00D2146C /* EENavigationView.m in Sources */,
 				78D731C023BB614D00D2146C /* OneToOneEducationManager.m in Sources */,
 				78D730B223B383E600D2146C /* SignalModel.m in Sources */,

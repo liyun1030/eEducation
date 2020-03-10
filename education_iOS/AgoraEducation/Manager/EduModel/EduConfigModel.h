@@ -7,10 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "MultiLanguageModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface EduConfigModel : NSObject
+
+// HTTP Config
+@property (nonatomic, strong) NSString *httpBaseURL;
+@property (nonatomic, strong) MultiLanguageModel *multiLanguage;
 
 // user & room info
 @property (nonatomic, assign) NSInteger uid;//rtm&rtc

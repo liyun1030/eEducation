@@ -68,7 +68,7 @@
     self.combineReplayManager.delegate = self;
     
     WEAK(self);
-    [HttpManager getReplayInfoWithUserToken:self.userToken appId:self.appId roomId:self.roomId recordId:self.recordId success:^(id responseObj) {
+    [HttpManager getReplayInfoWithBaseURL:self.baseURL userToken:self.userToken appId:self.appId roomId:self.roomId recordId:self.recordId success:^(id responseObj) {
 
         ReplayModel *model = [ReplayModel yy_modelWithDictionary:responseObj];
         if(model.code == 0) {

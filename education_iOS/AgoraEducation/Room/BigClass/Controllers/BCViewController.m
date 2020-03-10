@@ -69,6 +69,7 @@
     self.messageView.userToken = configModel.userToken;
     self.messageView.roomId = configModel.roomId;
     self.messageView.appId = configModel.appId;
+    self.messageView.baseURL = configModel.httpBaseURL;
     
     [self.navigationView updateClassName:configModel.className];
     

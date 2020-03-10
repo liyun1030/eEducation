@@ -95,6 +95,7 @@
     }
     
     ReplayViewController *vc = [[ReplayViewController alloc] initWithNibName:@"ReplayViewController" bundle:nil];
+    vc.baseURL = self.baseURL;
     vc.appId = self.appId;
     vc.recordId = messageModel.recordId;
     vc.userToken = self.userToken;

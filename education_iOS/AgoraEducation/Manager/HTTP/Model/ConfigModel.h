@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "MultiLanguageModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -23,6 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSString* smallClassStudentLimit;
 @property (nonatomic, strong) NSString* largeClassStudentLimit;
 
+@property (nonatomic, strong) MultiLanguageModel* multiLanguage;
+
 @end
 
 @interface ConfigAllInfoModel : NSObject
@@ -37,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger forcedUpgrade;//1 no update 2update 3force update
 @property (nonatomic, strong) NSString *upgradeUrl;
 @property (nonatomic, assign) NSInteger reviewing;
+@property (nonatomic, strong) NSString *apiHost;
 @property (nonatomic, assign) NSInteger remindTimes;
 
 @property (nonatomic, strong) ConfigInfoModel *configInfoModel;

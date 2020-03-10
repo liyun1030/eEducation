@@ -25,9 +25,9 @@ MaterialsAreaText = "Materials area";
 ChatroomText = "Chatroom";
 StudentText = "Student";
 
-OneToOneText = "One-to-One";
-SmallClassText = "Small Class";
-LargeClassText = "Large Class";
+OneToOneText = "One to One Classroom";
+SmallClassText = "Small Classroom";
+LargeClassText = "Lecture Hall";
 
 UserNameVerifyText = "class name and user name must be within 20 characters";
 

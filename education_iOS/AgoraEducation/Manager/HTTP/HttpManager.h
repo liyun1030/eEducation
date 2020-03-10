@@ -10,28 +10,28 @@
 
 #ifdef DEBUG
 
-#define HTTP_BASE_URL @"http://115.231.168.26:8080/edu"
+#define HTTP_BASE_URL @"http://115.231.168.26:8080"
 
 #else
 
-#define HTTP_BASE_URL @"https://solutions-api.sh.agoralab.co/edu"
+#define HTTP_BASE_URL @"https://solutions-api.sh.agoralab.co"
 
 #endif
 
 // http: get app config
-#define HTTP_GET_CONFIG @""HTTP_BASE_URL"/v1/app/version"
+#define HTTP_GET_CONFIG @""HTTP_BASE_URL"/edu/v1/app/version"
 
 // http: get global state when enter room
-#define HTTP_ENTER_ROOM @""HTTP_BASE_URL"/v1/apps/%@/room/entry"
+#define HTTP_ENTER_ROOM @"%@/edu/v1/apps/%@/room/entry"
 
 // http: get or update global state
-#define HTTP_ROOM_INFO @""HTTP_BASE_URL"/v1/apps/%@/room/%@"
+#define HTTP_ROOM_INFO @"%@/edu/v1/apps/%@/room/%@"
 
 // http: update user info
-#define HTTP_UPDATE_USER_INFO @""HTTP_BASE_URL"/v1/apps/%@/room/%@/user/%@"
+#define HTTP_UPDATE_USER_INFO @"%@/edu/v1/apps/%@/room/%@/user/%@"
 
 // http: get replay info
-#define HTTP_GET_REPLAY_INFO @""HTTP_BASE_URL"/v1/apps/%@/room/%@/record/%@"
+#define HTTP_GET_REPLAY_INFO @"%@/edu/v1/apps/%@/room/%@/record/%@"
 
 @interface HttpManager : NSObject
 // common
@@ -40,6 +40,6 @@
 
 // service
 + (void)getAppConfigWithSuccess:(void (^)(id responseObj))success failure:(void (^)(NSError *error))failure;
-+ (void)getReplayInfoWithUserToken:(NSString *)userToken appId:(NSString *)appId roomId:(NSString *)roomId recordId:(NSString *)recordId success:(void (^)(id responseObj))success failure:(void (^)(NSError *error))failure;
++ (void)getReplayInfoWithBaseURL:(NSString *)baseURL userToken:(NSString *)userToken appId:(NSString *)appId roomId:(NSString *)roomId recordId:(NSString *)recordId success:(void (^)(id responseObj))success failure:(void (^)(NSError *error))failure;
 
 @end
