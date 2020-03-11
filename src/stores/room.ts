@@ -17,7 +17,6 @@ function canJoin({onlineStatus, roomType, channelCount, role}: {onlineStatus: an
     permitted: true,
     reason: ''
   }
-  return result
   const channelCountLimit = [2, 17, 32];
 
   let maximum = channelCountLimit[roomType];
