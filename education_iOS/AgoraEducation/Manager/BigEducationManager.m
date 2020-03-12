@@ -128,14 +128,17 @@
 }
 
 #pragma mark Signal
-- (void)sendPeerSignalWithModel:(SignalP2PType)type completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSInteger errorCode))failBlock {
+- (void)sendPeerSignalWithModel:(SignalP2PCmdType)type completeSuccessBlock:(void (^ _Nullable) (void))successBlock completeFailBlock:(void (^ _Nullable) (NSInteger errorCode))failBlock {
     
     NSString *msgText = @"";
     switch (type) {
-        case SignalP2PTypeApply: {
-            NSDictionary *dict = @{@"cmd" : @(SignalP2PTypeApply),
-                                   @"text" : @"co-video",
-                                   @"account" : self.studentModel.userName};
+        case SignalP2PCmdTypeApply: {
+            NSDictionary *dataDic = @{@"userId" : self.studentModel.userId,
+                                      @"account" : self.studentModel.userName,
+                                      @"operate" : @(SignalP2PCmdTypeApply)};
+            
+            NSDictionary *dict = @{@"cmd" : @(SignalP2PTypeHand),
+                                   @"data" : dataDic};
             msgText = [JsonParseUtil dictionaryToJson:dict];
         }
             break;

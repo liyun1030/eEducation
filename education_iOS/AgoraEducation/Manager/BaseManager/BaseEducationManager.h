@@ -20,9 +20,9 @@
 #import "RTCDelegate.h"
 
 typedef NS_ENUM(NSInteger, SceneType) {
-    SceneType1V1        = 1,
-    SceneTypeSmall      = 2,
-    SceneTypeBig        = 3,
+    SceneType1V1        = 0,
+    SceneTypeSmall      = 1,
+    SceneTypeBig        = 2,
 };
 
 typedef NS_ENUM(NSInteger, UserRoleType) {

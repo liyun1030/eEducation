@@ -141,11 +141,13 @@
     if(self.channelName != nil){
         AgoraRtmChannelAttributeOptions *options = [[AgoraRtmChannelAttributeOptions alloc] init];
         options.enableNotificationToChannelMembers = YES;
-        [self.agoraRtmKit deleteChannel:self.channelName AttributesByKeys:@[    self.messageModel.uid] Options:options completion:nil];
+        [self.agoraRtmKit deleteChannel:self.channelName AttributesByKeys:@[self.messageModel.uid] Options:options completion:nil];
         
         [self.agoraRtmChannel leaveWithCompletion:nil];
         self.channelName = nil;
     }
+    
+    [self.agoraRtmKit logoutWithCompletion:nil];
 }
 
 - (void)dealloc {

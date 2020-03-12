@@ -193,7 +193,7 @@
     if(roomModel.courseState == ClassStateInClass) {
         NSDate *currentDate = [NSDate dateWithTimeIntervalSinceNow:0];
         NSTimeInterval currenTimeInterval = [currentDate timeIntervalSince1970];
-        [self.navigationView initTimerCount:(NSInteger)currenTimeInterval - roomModel.startTime];
+        [self.navigationView initTimerCount:(NSInteger)((currenTimeInterval * 1000 - roomModel.startTime) * 0.001)];
         [self.navigationView startTimer];
     } else {
         [self.navigationView stopTimer];

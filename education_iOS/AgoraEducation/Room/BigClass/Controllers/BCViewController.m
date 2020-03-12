@@ -79,6 +79,7 @@
             UserModel *renderModel = self.educationManager.renderStudentModels.firstObject;
             [self.educationManager.rtcUids addObject:@(renderModel.uid).stringValue];
         }
+//        self.linkState = StudentLinkStateIdle;
         
         [self updateChatViews];
     }
@@ -415,12 +416,13 @@
 }
 
 - (IBAction)handUpEvent:(UIButton *)sender {
-    if(self.educationManager.renderStudentModels != nil) {
+    if(self.educationManager.renderStudentModels.firstObject != nil) {
         UserModel *renderModel = self.educationManager.renderStudentModels.firstObject;
         if(renderModel.uid != EduConfigModel.shareInstance.uid) {
             return;
         }
     }
+    
     
     switch (self.linkState) {
         case StudentLinkStateIdle:
@@ -430,7 +432,7 @@
             [self studentCancelLink];
             break;
         case StudentLinkStateApply:
-            [self studentApplyLink];
+//            [self studentApplyLink];
             break;
         case StudentLinkStateReject:
             [self studentApplyLink];
@@ -442,7 +444,7 @@
 
 - (void)studentApplyLink {
     WEAK(self);
-    [self.educationManager sendPeerSignalWithModel:SignalP2PTypeApply completeSuccessBlock:^{
+    [self.educationManager sendPeerSignalWithModel:SignalP2PCmdTypeApply completeSuccessBlock:^{
         weakself.linkState = StudentLinkStateApply;
     } completeFailBlock:^(NSInteger errorCode) {
         NSString *errMsg = [NSString stringWithFormat:@"%@:%ld", NSLocalizedString(@"SendPeerMessageFailedText", nil), (long)errorCode];
@@ -579,7 +581,7 @@
 #pragma mark SignalDelegate
 - (void)didReceivedPeerSignal:(SignalP2PModel *)model {
     switch (model.cmd) {
-        case SignalP2PTypeReject:
+        case SignalP2PCmdTypeReject:
         {
             self.linkState = StudentLinkStateReject;
         }

@@ -9,9 +9,14 @@
 #import "SignalMessageModel.h"
 
 @implementation SignalMessageInfoModel
-
++ (NSDictionary *)modelCustomPropertyMapper {
+    return @{@"signalValueType": @"operate"};
+}
 @end
 
 @implementation SignalMessageModel
++ (NSDictionary *)objectClassInArray {
+    return @{@"data" : [SignalMessageInfoModel class]};
+}
 
 @end
