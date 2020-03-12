@@ -52,11 +52,13 @@ interface HomePageProps {
 function HomePage({type: roomType, roomId, title, startTime, endTime, role}: HomePageProps) {
   const classes = useStyles();
 
-  if (GlobalStorage.isChinese() === 'zh-CN') {
-    document.title = '声网益课堂'
-  } else {
-    document.title = 'Agora Online Classroom'
-  }
+  document.title = t(`home.short_title.title`)
+
+  // if (GlobalStorage.isChinese() === 'zh-CN') {
+  //   document.title = t(`${}`)
+  // } else {
+  //   document.title = 'Agora Online Classroom'
+  // }
 
   const history = useHistory();
 
