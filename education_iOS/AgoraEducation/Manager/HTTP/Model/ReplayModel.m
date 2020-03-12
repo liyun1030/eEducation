@@ -14,7 +14,7 @@
 
 
 @implementation ReplayInfoModel
-+ (NSDictionary *)objectClassInArray {
++ (NSDictionary *)modelContainerPropertyGenericClass {
     return @{@"recordDetails" : [RecordDetailsModel class]};
 }
 @end

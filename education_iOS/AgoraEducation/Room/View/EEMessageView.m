@@ -94,13 +94,6 @@
         return;
     }
     
-    ReplayViewController *vc = [[ReplayViewController alloc] initWithNibName:@"ReplayViewController" bundle:nil];
-    vc.recordId = messageModel.recordId;
-    vc.modalPresentationStyle = UIModalPresentationFullScreen;
-    UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
-    UINavigationController *nvc = (UINavigationController*)window.rootViewController;
-    if(nvc != nil){
-        [nvc.visibleViewController presentViewController:vc animated:YES completion:nil];
-    }
+    [ReplayViewController enterReplayViewController:messageModel.recordId];
 }
 @end

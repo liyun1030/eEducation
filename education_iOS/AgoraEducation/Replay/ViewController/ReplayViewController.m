@@ -20,6 +20,13 @@
 #import "ReplayModel.h"
 #import "EduConfigModel.h"
 
+typedef NS_ENUM(NSInteger, RecordState) {
+    RecordStateRecording = 1,
+    RecordStateFinished = 2,
+    RecordStateWaitDownload = 3,
+    RecordStateWaitConvert = 4,
+    RecordStateWaitUpload = 5,
+};
 
 @interface ReplayViewController ()<ReplayControlViewDelegate, CombineReplayDelegate>
 
@@ -41,6 +48,8 @@
 // can seek when has buffer only for m3u8 video
 @property (nonatomic, assign) BOOL canSeek;
 
+@property (strong, nonatomic) NSString *recordId;
+
 @property (strong, nonatomic) NSString *boardId;
 @property (strong, nonatomic) NSString *boardToken;
 
@@ -48,9 +57,64 @@
 @property (nonatomic, assign) NSInteger startTime;
 @property (nonatomic, assign) NSInteger endTime;
 
+@property (nonatomic, strong) ReplayInfoModel *replayInfoModel;
+
 @end
 
 @implementation ReplayViewController
+
++ (void)enterReplayViewController:(NSString *)recordId {
+    
+      [HttpManager getReplayInfoWithBaseURL:EduConfigModel.shareInstance.httpBaseURL userToken:EduConfigModel.shareInstance.userToken appId:EduConfigModel.shareInstance.appId roomId:EduConfigModel.shareInstance.roomId recordId:recordId success:^(id responseObj) {
+
+          ReplayModel *model = [ReplayModel yy_modelWithDictionary:responseObj];
+          if(model.code == 0) {
+              NSInteger status = model.data.status;
+              if(status == RecordStateRecording
+                 || status == RecordStateFinished
+                 || status == RecordStateWaitDownload
+                 || status == RecordStateWaitConvert
+                 || status == RecordStateWaitUpload) {
+                  
+                  if(status != RecordStateFinished) {
+                      [UIApplication.sharedApplication.keyWindow makeToast:NSLocalizedString(@"QuaryReplayFailedText", nil)];
+                      return;
+                  }
+              }
+              
+              
+              ReplayViewController *vc = [[ReplayViewController alloc] initWithNibName:@"ReplayViewController" bundle:nil];
+              vc.replayInfoModel = model.data;
+              vc.recordId = recordId;
+              vc.modalPresentationStyle = UIModalPresentationFullScreen;
+              UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
+              UINavigationController *nvc = (UINavigationController*)window.rootViewController;
+              if(nvc != nil){
+                  [nvc.visibleViewController presentViewController:vc animated:YES completion:nil];
+              }
+
+          } else {
+              
+              NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+              NSArray<NSString*> *allLanguages = [defaults objectForKey:@"AppleLanguages"];
+              NSString *preferredLang = [allLanguages objectAtIndex:0];
+              NSString *msg = @"";
+              if([preferredLang containsString:@"zh-Hans"]) {
+                  msg = [EduConfigModel.shareInstance.multiLanguage.cn valueForKey:@(model.code).stringValue];
+              } else {
+                  msg = [EduConfigModel.shareInstance.multiLanguage.en valueForKey:@(model.code).stringValue];
+              }
+              
+              if(msg == nil || msg.length == 0) {
+                  msg = [NSString stringWithFormat:@"%@：%ld", NSLocalizedString(@"RequestReplayFailedText", nil), (long)model.code];
+              }
+              [UIApplication.sharedApplication.keyWindow makeToast:msg];
+    
+          }
+      } failure:^(NSError *error) {
+          [UIApplication.sharedApplication.keyWindow makeToast:error.description];
+      }];
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -68,50 +132,71 @@
     self.combineReplayManager = [CombineReplayManager new];
     self.combineReplayManager.delegate = self;
     
+    
+    self.boardId = self.replayInfoModel.boardId;
+    self.boardToken = self.replayInfoModel.boardToken;
+
+    self.startTime = self.replayInfoModel.startTime;
+    self.endTime = self.replayInfoModel.endTime;
+
+    for(RecordDetailsModel *detailModel in self.replayInfoModel.recordDetails) {
+      // teacher
+      if(detailModel.role == 1) {
+          self.videoPath = detailModel.url;
+          break;
+      }
+    }
+    NSAssert(self.videoPath != nil, @"can't find record video");
+    [self setupRTCReplay];
+    [self setupWhiteReplay];
+}
+
+- (void)getReplayInfoWithBaseURL {
+    
     WEAK(self);
-    [HttpManager getReplayInfoWithBaseURL:EduConfigModel.shareInstance.httpBaseURL userToken:EduConfigModel.shareInstance.userToken appId:EduConfigModel.shareInstance.appId roomId:EduConfigModel.shareInstance.roomId recordId:self.recordId success:^(id responseObj) {
+      [HttpManager getReplayInfoWithBaseURL:EduConfigModel.shareInstance.httpBaseURL userToken:EduConfigModel.shareInstance.userToken appId:EduConfigModel.shareInstance.appId roomId:EduConfigModel.shareInstance.roomId recordId:self.recordId success:^(id responseObj) {
 
-        ReplayModel *model = [ReplayModel yy_modelWithDictionary:responseObj];
-        if(model.code == 0) {
-            
-            weakself.boardId = model.data.boardId;
-            weakself.boardToken = model.data.boardToken;
-            
-            weakself.startTime = model.data.startTime;
-            weakself.endTime = model.data.endTime;
+          ReplayModel *model = [ReplayModel yy_modelWithDictionary:responseObj];
+          if(model.code == 0) {
+              
+              weakself.boardId = model.data.boardId;
+              weakself.boardToken = model.data.boardToken;
+              
+              weakself.startTime = model.data.startTime;
+              weakself.endTime = model.data.endTime;
 
-            for(RecordDetailsModel *detailModel in model.data.recordDetails) {
-                // teacher
-                if(detailModel.role == 1) {
-                    weakself.videoPath = detailModel.url;
-                    break;
-                }
-            }
-            NSAssert(weakself.videoPath != nil, @"can't find record video");
-            [weakself setupRTCReplay];
-            [weakself setupWhiteReplay];
-            
-        } else {
-            
-            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-            NSArray<NSString*> *allLanguages = [defaults objectForKey:@"AppleLanguages"];
-            NSString *preferredLang = [allLanguages objectAtIndex:0];
-            NSString *msg = @"";
-            if([preferredLang containsString:@"zh-Hans"]) {
-                msg = [EduConfigModel.shareInstance.multiLanguage.cn valueForKey:@(model.code).stringValue];
-            } else {
-                msg = [EduConfigModel.shareInstance.multiLanguage.en valueForKey:@(model.code).stringValue];
-            }
-            
-            if(msg == nil || msg.length == 0) {
-                msg = [NSString stringWithFormat:@"%@：%ld", NSLocalizedString(@"RequestReplayFailedText", nil), (long)model.code];
-            }
-            [weakself.view makeToast:msg];
-  
-        }
-    } failure:^(NSError *error) {
-        [weakself.view makeToast:error.description];
-    }];
+              for(RecordDetailsModel *detailModel in model.data.recordDetails) {
+                  // teacher
+                  if(detailModel.role == 1) {
+                      weakself.videoPath = detailModel.url;
+                      break;
+                  }
+              }
+              NSAssert(weakself.videoPath != nil, @"can't find record video");
+              [weakself setupRTCReplay];
+              [weakself setupWhiteReplay];
+              
+          } else {
+              
+              NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+              NSArray<NSString*> *allLanguages = [defaults objectForKey:@"AppleLanguages"];
+              NSString *preferredLang = [allLanguages objectAtIndex:0];
+              NSString *msg = @"";
+              if([preferredLang containsString:@"zh-Hans"]) {
+                  msg = [EduConfigModel.shareInstance.multiLanguage.cn valueForKey:@(model.code).stringValue];
+              } else {
+                  msg = [EduConfigModel.shareInstance.multiLanguage.en valueForKey:@(model.code).stringValue];
+              }
+              
+              if(msg == nil || msg.length == 0) {
+                  msg = [NSString stringWithFormat:@"%@：%ld", NSLocalizedString(@"RequestReplayFailedText", nil), (long)model.code];
+              }
+              [weakself.view makeToast:msg];
+    
+          }
+      } failure:^(NSError *error) {
+          [weakself.view makeToast:error.description];
+      }];
 }
 
 - (void)setupRTCReplay {

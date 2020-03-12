@@ -59,6 +59,7 @@
     
     self.isRenderShare = NO;
     self.hasSignalReconnect = NO;
+    self.linkState = StudentLinkStateIdle;
     
     self.segmentedView.delegate = self;
     self.studentVideoView.delegate = self;
@@ -73,14 +74,6 @@
         
         [self setupRTC];
         [self setupWhiteBoard];
-
-        // link
-        if(self.educationManager.renderStudentModels.count > 0) {
-            UserModel *renderModel = self.educationManager.renderStudentModels.firstObject;
-            [self.educationManager.rtcUids addObject:@(renderModel.uid).stringValue];
-        }
-//        self.linkState = StudentLinkStateIdle;
-        
         [self updateChatViews];
     }
 }
@@ -110,7 +103,7 @@
     
     EduConfigModel *configModel = EduConfigModel.shareInstance;
     
-    [self.educationManager initRTCEngineKitWithAppid:configModel.appId clientRole:RTCClientRoleBroadcaster dataSourceDelegate:self];
+    [self.educationManager initRTCEngineKitWithAppid:configModel.appId clientRole:RTCClientRoleAudience dataSourceDelegate:self];
     
     WEAK(self);
     [self.educationManager joinRTCChannelByToken:configModel.rtcToken channelId:configModel.channelName info:nil uid:configModel.uid joinSuccess:^(NSString * _Nonnull channel, NSUInteger uid, NSInteger elapsed) {
@@ -432,7 +425,7 @@
             [self studentCancelLink];
             break;
         case StudentLinkStateApply:
-//            [self studentApplyLink];
+            [self studentApplyLink];
             break;
         case StudentLinkStateReject:
             [self studentApplyLink];

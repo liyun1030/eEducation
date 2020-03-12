@@ -28,6 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSString *roomId;
 @property (nonatomic, strong) NSString *boardId;
 @property (nonatomic, strong) NSString *boardToken;
+@property (nonatomic, assign) NSInteger status;
+
 @property (nonatomic, strong) NSArray<RecordDetailsModel*> *recordDetails;
 
 @end

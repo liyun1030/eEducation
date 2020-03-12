@@ -42,6 +42,7 @@ SendMessageFailedText = "消息发送失败";
 SendPeerMessageFailedText = "点对点消息发送失败";
 InitSignalFailedText = "初始化信令失败";
 JoinSignalFailedText = "加入信令失败";
+QuaryReplayFailedText = "生成回放还没有完成，过会儿再来看下";
 
 MuteBoardText = "老师已回收了你的白板权限";
 UnMuteBoardText = "老师已授权了你的白板权限";

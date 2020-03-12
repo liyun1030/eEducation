@@ -43,6 +43,7 @@ SendMessageFailedText = "send message failed";
 SendPeerMessageFailedText = "send peer message failed";
 InitSignalFailedText = "init signal failed";
 JoinSignalFailedText = "join signal failed";
+QuaryReplayFailedText = "Generated playback is not complete yet. Check back later!";
 
 MuteBoardText = "teacher has revoked your whiteboard permissions";
 UnMuteBoardText = "teacher has authorized your whiteboard permissions";

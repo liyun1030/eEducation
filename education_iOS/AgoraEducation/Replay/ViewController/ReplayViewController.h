@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ReplayViewController : UIViewController
 
-@property (strong, nonatomic) NSString *recordId;
++ (void)enterReplayViewController:(NSString *)recordId;
 
 @end
 
