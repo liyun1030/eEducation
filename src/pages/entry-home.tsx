@@ -54,12 +54,6 @@ function HomePage({type: roomType, roomId, title, startTime, endTime, role}: Hom
 
   document.title = t(`home.short_title.title`)
 
-  // if (GlobalStorage.isChinese() === 'zh-CN') {
-  //   document.title = t(`${}`)
-  // } else {
-  //   document.title = 'Agora Online Classroom'
-  // }
-
   const history = useHistory();
 
   const handleSetting = (evt: any) => {
