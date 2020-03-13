@@ -28,12 +28,13 @@ export default function () {
         <RootProvider>
           <Loading />
           <Toast />
-          <Route exact path="/entry/:roomId/:role">
+          <Route path="/entry/:roomId/:role">
             <EntryHome />
           </Route>
-          {/* <Route exact path="/">
-            <Home />
-          </Route> */}
+          <Route exact path="/">
+            {/* <Home /> */}
+            <PageNotFound />
+          </Route>
           <Route exact path="/device_test">
             <DeviceTest />
           </Route>

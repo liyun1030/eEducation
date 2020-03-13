@@ -77,7 +77,9 @@ REACT_APP_AGORA_OSS_BUCKET_NAME=your_oss_bucket_name
 REACT_APP_AGORA_OSS_BUCKET_FOLDER=your_oss_folder
 REACT_APP_AGORA_OSS_BUCKET_REGION=your_oss_region
 REACT_APP_AGORA_OSS_BUCKET_KEY=your_oss_bucket_ak
-REACT_APP_AGORA_OSS_BUCKET_SECRET=your_oss_bucket_sk
+REACT_APP_AGORA_OSS_BUCKET_SECRET=your_bucket_sk
+REACT_APP_AGORA_EDU_ENDPOINT_PREFIX=agora_open_edu_api_prefix
+REACT_APP_AGORA_EDU_ENDPOINT=agora_open_edu_proxy_api
 ```
 
 # Build Web 

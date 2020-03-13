@@ -65,7 +65,7 @@ const en = {
     'class_start': 'Class start'
   },
   'home': {
-    'entry-home': 'Enter in Home',
+    'entry-home': 'Join Classroom',
     'teacher': 'teacher',
     'student': 'student',
     'cover_class': 'cover-en',
