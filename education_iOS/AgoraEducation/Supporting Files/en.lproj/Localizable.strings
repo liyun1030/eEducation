@@ -26,8 +26,8 @@ ChatroomText = "Chatroom";
 StudentText = "Student";
 
 OneToOneText = "One-to-One";
-SmallClassText = "Small Class";
-LargeClassText = "Large Class";
+SmallClassText = "Classroom";
+LargeClassText = "Lecture Hall";
 
 UserNameVerifyText = "User name must be within 11 digits or English characters";
 RoomTypeVerifyText = "can not find the room type";

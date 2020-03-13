@@ -17,23 +17,19 @@ import io.agora.base.Callback;
 import io.agora.base.ToastManager;
 import io.agora.base.network.RetrofitManager;
 import io.agora.education.base.BaseActivity;
+import io.agora.education.base.BaseCallback;
 import io.agora.education.broadcast.DownloadReceiver;
 import io.agora.education.classroom.BaseClassActivity;
 import io.agora.education.classroom.LargeClassActivity;
 import io.agora.education.classroom.OneToOneClassActivity;
 import io.agora.education.classroom.SmallClassActivity;
 import io.agora.education.classroom.annotation.ClassType;
-import io.agora.education.classroom.bean.channel.ChannelInfo;
 import io.agora.education.classroom.bean.user.Student;
 import io.agora.education.classroom.strategy.context.ClassContext;
 import io.agora.education.classroom.strategy.context.ClassContextFactory;
 import io.agora.education.service.CommonService;
 import io.agora.education.service.RoomService;
-import io.agora.education.service.bean.ResponseBody;
 import io.agora.education.service.bean.request.RoomEntryReq;
-import io.agora.education.service.bean.response.AppConfig;
-import io.agora.education.service.bean.response.AppVersion;
-import io.agora.education.service.bean.response.RoomEntryRes;
 import io.agora.education.service.bean.response.RoomInfo;
 import io.agora.education.service.bean.response.UserInfo;
 import io.agora.education.util.AppUtil;
@@ -85,24 +81,14 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         unregisterReceiver(receiver);
-        ChannelInfo.CONFIG = null;
         RtmManager.instance().reset();
         super.onDestroy();
     }
 
     private void checkVersion() {
-        service.appVersion("edu-saas").enqueue(new RetrofitManager.Callback<>(0, new Callback<ResponseBody<AppVersion>>() {
-            @Override
-            public void onSuccess(ResponseBody<AppVersion> res) {
-                AppVersion version = res.data;
-                if (version.forcedUpgrade != 0) {
-                    showAppUpgradeDialog(version.upgradeUrl, version.forcedUpgrade == 2);
-                }
-            }
-
-            @Override
-            public void onFailure(Throwable throwable) {
-
+        service.appVersion("edu-saas").enqueue(new BaseCallback<>(data -> {
+            if (data != null && data.forcedUpgrade != 0) {
+                showAppUpgradeDialog(data.upgradeUrl, data.forcedUpgrade == 2);
             }
         }));
     }
@@ -110,19 +96,13 @@ public class MainActivity extends BaseActivity {
     private void showAppUpgradeDialog(String url, boolean isForce) {
         this.url = url;
         String content = getString(R.string.app_upgrade);
-        ConfirmDialog.DialogClickListener listener = new ConfirmDialog.DialogClickListener() {
-            @Override
-            public void clickConfirm() {
+        ConfirmDialog.DialogClickListener listener = confirm -> {
+            if (confirm) {
                 if (AppUtil.checkAndRequestAppPermission(MainActivity.this, new String[]{
                         Manifest.permission.WRITE_EXTERNAL_STORAGE
                 }, REQUEST_CODE_DOWNLOAD)) {
                     receiver.downloadApk(MainActivity.this, url);
                 }
-            }
-
-            @Override
-            public void clickCancel() {
-
             }
         };
         ConfirmDialog dialog;
@@ -136,19 +116,10 @@ public class MainActivity extends BaseActivity {
     }
 
     private void getConfig() {
-        service.config().enqueue(new RetrofitManager.Callback<>(0, new Callback<ResponseBody<AppConfig>>() {
-            @Override
-            public void onSuccess(ResponseBody<AppConfig> res) {
-                AppConfig config = res.data;
-                RtcManager.instance().init(getApplicationContext(), config.appId);
-                RtmManager.instance().init(getApplicationContext(), config.appId);
-                ChannelInfo.CONFIG = config;
-            }
-
-            @Override
-            public void onFailure(Throwable throwable) {
-
-            }
+        service.config().enqueue(new BaseCallback<>(data -> {
+            RtcManager.instance().init(getApplicationContext(), data.appId);
+            RtmManager.instance().init(getApplicationContext(), data.appId);
+            EduApplication.instance.config = data;
         }));
     }
 
@@ -167,7 +138,7 @@ public class MainActivity extends BaseActivity {
             return;
         }
 
-        if (ChannelInfo.CONFIG == null) {
+        if (EduApplication.instance.config == null) {
             ToastManager.showShort(R.string.configuration_load_failed);
             getConfig();
             return;
@@ -175,37 +146,28 @@ public class MainActivity extends BaseActivity {
 
         isJoining = true;
         RetrofitManager.instance().getService(BuildConfig.API_BASE_URL, RoomService.class)
-                .roomEntry(ChannelInfo.CONFIG.authorization, ChannelInfo.CONFIG.appId, new RoomEntryReq() {{
+                .roomEntry(EduApplication.instance.config.authorization, EduApplication.instance.config.appId, new RoomEntryReq() {{
                     userName = yourName;
                     password = pwd;
                     uuid = UUIDUtil.getUUID();
                 }})
-                .enqueue(new RetrofitManager.Callback<>(0, new Callback<ResponseBody<RoomEntryRes>>() {
-                    @Override
-                    public void onSuccess(ResponseBody<RoomEntryRes> res) {
-                        UserInfo user = res.data.user;
-                        RoomInfo room = res.data.room;
-                        RtmManager.instance().login(user.rtmToken, user.uid, new Callback<Void>() {
-                            @Override
-                            public void onSuccess(Void res) {
-                                Intent intent = createIntent(room, user);
-                                checkChannelEnterable(intent);
-                            }
+                .enqueue(new BaseCallback<>(data -> {
+                    UserInfo user = data.user;
+                    RoomInfo room = data.room;
+                    RtmManager.instance().login(user.rtmToken, user.uid, new Callback<Void>() {
+                        @Override
+                        public void onSuccess(Void res) {
+                            Intent intent = createIntent(room, user);
+                            checkChannelEnterable(intent);
+                        }
 
-                            @Override
-                            public void onFailure(Throwable throwable) {
-                                ToastManager.showShort(throwable.getMessage());
-                                isJoining = false;
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onFailure(Throwable throwable) {
-                        ToastManager.showShort(throwable.getMessage());
-                        isJoining = false;
-                    }
-                }));
+                        @Override
+                        public void onFailure(Throwable throwable) {
+                            ToastManager.showShort(throwable.getMessage());
+                            isJoining = false;
+                        }
+                    });
+                }, throwable -> isJoining = false));
     }
 
     private Intent createIntent(RoomInfo room, UserInfo user) {
