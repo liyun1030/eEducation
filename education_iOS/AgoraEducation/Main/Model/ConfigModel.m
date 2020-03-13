@@ -12,7 +12,11 @@
 
 + (NSDictionary *)modelCustomPropertyMapper {
     return @{@"oneToOneStudentLimit": @"1on1StudentLimit",
-             @"oneToOneTeacherLimit": @"1on1TeacherLimit"};
+             @"oneToOneTeacherLimit": @"1on1TeacherLimit",};
+}
+
++ (NSDictionary *)objectClassInArray {
+    return @{@"multiLanguage" : [MultiLanguageModel class]};
 }
 
 @end
