@@ -87,7 +87,7 @@ export class AgoraEduApi {
   // 配置入口
   async config() {
     let data = await AgoraFetchJson({
-      url: `/v1/config?platform=0&device=0&version=5.2.0`,
+      url: `/v1/config`,
       method: 'GET',
     });
 
@@ -165,6 +165,20 @@ export class AgoraEduApi {
     });
     return {
       data,
+    }
+  }
+
+  // 公益demo房间信息
+  // demo room info
+  async roomInfo(roomId: string) {
+    const {appId} = await this.config();
+    this.appID = appId;
+    let data = await AgoraFetchJson({
+      url: `/v2/apps/${this.appID}/room/${roomId}`,
+      method: 'GET',
+    });
+    return {
+      data
     }
   }
 

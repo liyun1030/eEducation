@@ -4,7 +4,7 @@ import { ChatMessage, AgoraStream } from '../utils/types';
 import { Subject } from 'rxjs';
 import { Map, Set, List } from 'immutable';
 import AgoraRTMClient, { RoomMessage, ChatCmdType } from '../utils/agora-rtm-client';
-import { globalStore } from './global';
+import { globalStore, roomTypes } from './global';
 import AgoraWebClient from '../utils/agora-rtc-client';
 import { get, set, isEmpty } from 'lodash';
 import { isElectron } from '../utils/platform';

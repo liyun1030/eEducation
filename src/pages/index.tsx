@@ -2,7 +2,7 @@ import React from 'react';
 import { Route } from 'react-router-dom';
 import CustomBrowserRouter from '../containers/custom-browser-router';
 import ThemeContainer from '../containers/theme-container';
-import Home from './home';
+import EntryHome from './entry-home';
 import DeviceTest from './device-test';
 import { RoomPage } from './classroom';
 import Loading from '../components/loading';
@@ -28,9 +28,12 @@ export default function () {
         <RootProvider>
           <Loading />
           <Toast />
-          <Route exact path="/">
-            <Home />
+          <Route exact path="/entry/:roomId/:role">
+            <EntryHome />
           </Route>
+          {/* <Route exact path="/">
+            <Home />
+          </Route> */}
           <Route exact path="/device_test">
             <DeviceTest />
           </Route>

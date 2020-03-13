@@ -140,11 +140,11 @@ export default function Control({
         }
         {+role === 1 ?
           <>
-            <ControlItem
+            {/* <ControlItem
               name={roomStore.state.course.isRecording ? 'stop_recording' : 'recording'}
               onClick={onRecordButtonClick}
               active={false}
-            />
+            /> */}
             <ControlItem
               name={sharing ? 'quit_screen_sharing' : 'screen_sharing'}
               onClick={(evt: any) => {

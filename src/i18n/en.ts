@@ -74,7 +74,7 @@ const en = {
     'room_type': 'Room Type',
     'room_join': 'Join',
     'short_title': {
-      'title': 'Agora Cloud Class',
+      'title': 'Agora Online Classroom',
       'subtitle': 'Powered by agora.io, a leading online learning engagement platform',
     },
     'name_too_long': 'name too long, should <= 20 characters',
@@ -85,8 +85,8 @@ const en = {
     'missing_your_name': 'missing your name',
     'missing_password': 'missing password',
     'missing_role': 'missing role',
-    'account': 'nickname',
-    'password': 'password',
+    'account': 'Name',
+    'password': 'Password',
   },
   'room': {
     'chat_room': 'Chat Room',
