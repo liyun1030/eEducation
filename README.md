@@ -80,6 +80,7 @@ REACT_APP_AGORA_OSS_BUCKET_KEY=your_oss_bucket_ak
 REACT_APP_AGORA_OSS_BUCKET_SECRET=your_bucket_sk
 REACT_APP_AGORA_EDU_ENDPOINT_PREFIX=agora_open_edu_api_prefix
 REACT_APP_AGORA_EDU_ENDPOINT=agora_open_edu_proxy_api
+REACT_APP_AGORA_OSS_CDN_ACCELERATE=cdn_accelerate
 ```
 
 # Build Web 
