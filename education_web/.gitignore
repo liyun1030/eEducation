@@ -10,3 +10,4 @@ build
 src/assets/.DS_Store
 !src/assets/
 *.json
+node_modules
