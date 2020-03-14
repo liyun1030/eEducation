@@ -3,6 +3,7 @@ import { ClassState, AgoraUser, Me } from "../stores/room";
 import {Map} from 'immutable'
 import { getIntlError, setIntlError } from "./intl-error-helper";
 import { globalStore } from "../stores/global";
+import { set, get } from "lodash";
 
 export interface UserAttrsParams {
   userId: string
@@ -61,7 +62,9 @@ const AgoraFetchJson = async ({url, method, data, token, authorization}:{url: st
 }
 
 export interface EntryParams {
+  roomId: string
   userName: string
+  password: string
   roomName: string
   type: number
   role: number
@@ -104,18 +107,38 @@ export class AgoraEduApi {
 
   // room entry
   // 房间入口
+  // async entry(params: EntryParams) {
+  //   let data = await AgoraFetchJson({
+  //     url: `/v1/apps/${this.appID}/room/entry`,
+  //     method: 'POST',
+  //     data: params,
+  //     authorization: this.authorization,
+  //   });
+    
+  //   this.roomId = data.roomId;
+  //   this.userToken = data.userToken;
+  //   return {
+  //     data
+  //   }
+  // }
+
+  // 公益room entry
+  // 公益房间入口
   async entry(params: EntryParams) {
     let data = await AgoraFetchJson({
-      url: `/v1/apps/${this.appID}/room/entry`,
+      url: `/v2/apps/${this.appID}/room/entry`,
       method: 'POST',
       data: params,
       authorization: this.authorization,
     });
     
-    this.roomId = data.roomId;
-    this.userToken = data.userToken;
+    this.roomId = data.room.roomId;
+    this.userToken = data.user.userToken;
     return {
-      data
+      data: {
+        roomId: data.room.roomId,
+        userToken: data.user.userToken,
+      }
     }
   }
 
@@ -362,10 +385,14 @@ export class AgoraEduApi {
       course.teacherId = me.uid
     }
 
-    if (params.uuid) {
-      me.uuid = params.uuid
-    }
+    const keyAttrs = ['uuid', 'roomName', 'password', 'roomType', 'userName']
 
+    for (let key of keyAttrs) {
+      if (params.hasOwnProperty(key)) {
+        set(me, `${key}`, get(params, key))
+      }
+    }
+    
     const coVideoUids = userList.map((it: any) => `${it.uid}`)
 
     if (course.teacherId && coVideoUids.length) {

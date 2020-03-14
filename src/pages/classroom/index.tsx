@@ -37,10 +37,12 @@ export function RoomPage({ children }: any) {
 
     const sessionInfo = {
       userName: me.account,
-      roomName: course.roomName,
+      roomName: me.roomName,
+      password: me.password,
       role: me.role,
       type: course.roomType,
-      uuid: genUUID()
+      uuid: genUUID(),
+      roomId: course.roomId,
     }
     lock.current = true;
     if (roomStore.state.rtm.joined) return;
