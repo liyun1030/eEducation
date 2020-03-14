@@ -98,7 +98,8 @@ const DialogContainer = () => {
   const onConfirm = (type: string) => {
     if (type === 'exitRoom') {
       globalStore.removeDialog();
-      history.push('/');
+      history.goBack();
+      // history.push('/');
     }
     else if (type === 'apply') {
       // p2p message accept coVideo
