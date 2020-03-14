@@ -46,10 +46,8 @@ interface HomePageProps {
 }
 
 function HomePage({type: roomType, roomId, title, startTime, endTime, role}: HomePageProps) {
-  const classes = useStyles();
-
   document.title = t(`home.short_title.title`)
-
+  const classes = useStyles();
   const history = useHistory();
 
   const handleSetting = (evt: any) => {
