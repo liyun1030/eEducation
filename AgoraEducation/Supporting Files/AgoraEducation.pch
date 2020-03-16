@@ -1,0 +1,31 @@
+//
+//  AgoraSmallClass.pch
+//  AgoraSmallClass
+//
+//  Created by yangmoumou on 2019/6/13.
+//  Copyright © 2019 Agora. All rights reserved.
+//
+
+#ifndef AgoraSmallClass_pch
+#define AgoraSmallClass_pch
+
+#import <YYModel.h>
+#import "UIColor+Addition.h"
+#import "AlertViewUtil.h"
+
+#define kScreenHeight [UIScreen mainScreen].bounds.size.height
+#define kScreenWidth [UIScreen mainScreen].bounds.size.width
+#define WEAK(object) __weak typeof(object) weak##object = object
+
+#ifdef DEBUG
+#define AgoraLog(fmt, ...) NSLog((@"%s [Line %d] " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__);
+#else
+#define AgoraLog(...)
+#endif
+
+
+#endif /* AgoraSmallClass_pch */
+
+
+
+
