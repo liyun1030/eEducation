@@ -74,6 +74,7 @@ public abstract class ChannelStrategy<T> {
         }
     }
 
+    @Nullable
     public User getTeacher() {
         return channelInfo.teacher;
     }
@@ -163,17 +164,23 @@ public abstract class ChannelStrategy<T> {
     private RtcEventListener rtcEventListener = new RtcEventListener() {
         @Override
         public void onUserJoined(int uid, int elapsed) {
-            if (uid != ChannelInfo.SHARE_UID) {
-                rtcUsers.add(uid);
-                checkStudentsRtcOnline();
+            User teacher = getTeacher();
+            if (teacher != null) {
+                if (uid != teacher.screenId) {
+                    rtcUsers.add(uid);
+                    checkStudentsRtcOnline();
+                }
             }
         }
 
         @Override
         public void onUserOffline(int uid, int reason) {
-            if (uid != ChannelInfo.SHARE_UID) {
-                rtcUsers.remove(Integer.valueOf(uid));
-                checkStudentsRtcOnline();
+            User teacher = getTeacher();
+            if (teacher != null) {
+                if (uid != teacher.screenId) {
+                    rtcUsers.remove(Integer.valueOf(uid));
+                    checkStudentsRtcOnline();
+                }
             }
         }
     };
