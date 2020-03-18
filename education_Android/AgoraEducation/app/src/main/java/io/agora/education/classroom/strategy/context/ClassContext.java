@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 
 import io.agora.base.Callback;
-import io.agora.education.classroom.bean.channel.ChannelInfo;
 import io.agora.education.classroom.bean.channel.Room;
 import io.agora.education.classroom.bean.channel.User;
 import io.agora.education.classroom.bean.msg.ChannelMsg;
@@ -185,15 +184,21 @@ public abstract class ClassContext implements ChannelEventListener {
 
         @Override
         public void onUserJoined(int uid, int elapsed) {
-            if (uid == ChannelInfo.SHARE_UID) {
-                runListener(() -> classEventListener.onScreenShareJoined(uid));
+            User teacher = channelStrategy.getTeacher();
+            if (teacher != null) {
+                if (uid == teacher.screenId) {
+                    runListener(() -> classEventListener.onScreenShareJoined(uid));
+                }
             }
         }
 
         @Override
         public void onUserOffline(int uid, int reason) {
-            if (uid == ChannelInfo.SHARE_UID) {
-                runListener(() -> classEventListener.onScreenShareOffline(uid));
+            User teacher = channelStrategy.getTeacher();
+            if (teacher != null) {
+                if (uid == teacher.screenId) {
+                    runListener(() -> classEventListener.onScreenShareOffline(uid));
+                }
             }
         }
     };
