@@ -116,7 +116,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       stream.play(`${domId}`, { fit: 'cover' }, (err: any) => {
         lockPlay.current = false;
         console.warn('[video-player] ', JSON.stringify(err), id, stream.isPaused(), stream.isPlaying(), ' isLocal: ', local);
-        if (err && err.status !== 'aborted' && !local) {
+        if (err && err.audio && err.audio.status !== "aborted" && !local) {
           stream.isPaused() && setResume(true);
           console.warn('[video-player] play failed ', JSON.stringify(err), id, stream.isPaused(), stream.isPlaying());
         }
