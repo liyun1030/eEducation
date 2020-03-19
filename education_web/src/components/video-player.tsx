@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import Icon from './icon';
 import './video-player.scss';
 import { AgoraElectronStream, StreamType, AgoraRtcEngine } from '../utils/agora-electron-client';
@@ -24,6 +24,7 @@ interface VideoPlayerProps {
   handleClick?: (type: string, streamID: number, uid: string) => Promise<any>
   close?: boolean
   handleClose?: (uid: string, streamID: number) => void
+  autoplay?: boolean
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
@@ -40,7 +41,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   handleClick,
   local,
   handleClose,
-  close
+  close,
+  autoplay
 }) => {
   const loadVideo = useRef<boolean>(false);
   const loadAudio = useRef<boolean>(false);
@@ -48,6 +50,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const lockPlay = useRef<boolean>(false);
 
   const [resume, setResume] = useState<boolean>(false);
+
+  // TODO: 根据组件autoplay属性，仅判断远端流autoplay失败时触发
+  // TODO: only trigger resume when play remote stream
+  const needResume = useMemo(() => {
+    return resume === true &&
+      autoplay === false &&
+      local === false
+  }, [resume, autoplay, local])
 
   useEffect(() => {
     if (!domId || !stream || !AgoraRtcEngine) return;
@@ -116,7 +126,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       stream.play(`${domId}`, { fit: 'cover' }, (err: any) => {
         lockPlay.current = false;
         console.warn('[video-player] ', JSON.stringify(err), id, stream.isPaused(), stream.isPlaying(), ' isLocal: ', local);
-        if (err && err.status !== 'aborted' && !local) {
+        if (!autoplay && err && err.audio && err.audio.status !== "aborted" && !local) {
           stream.isPaused() && setResume(true);
           console.warn('[video-player] play failed ', JSON.stringify(err), id, stream.isPaused(), stream.isPlaying());
         }
@@ -255,7 +265,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           : null
       }
       <div id={`${domId}`} className={`agora-rtc-video ${local ? 'rotateY180deg' : ''}`}></div>
-      {resume ? <div className="clickable" onClick={() => {
+      {needResume ? <div className="clickable" onClick={() => {
         stream.resume().then(() => {
           setResume(false);
           console.log("clickable");

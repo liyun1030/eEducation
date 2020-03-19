@@ -190,6 +190,7 @@ export default function BigClass() {
               video={currentHost.video}
               audio={currentHost.audio}
               local={currentHost.local}
+              autoplay={false}
             /> :
             null
           }
@@ -210,6 +211,7 @@ export default function BigClass() {
               audio={Boolean(teacher.audio)}
               video={Boolean(teacher.video)}
               local={Boolean(teacher.local)}
+              autoplay={false}
               /> :
             <VideoPlayer
               role="teacher"
