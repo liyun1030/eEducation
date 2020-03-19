@@ -23,13 +23,9 @@ export default function (props: any) {
   const classes = useStyles();
 
   const onChange = (evt: any) => {
-    if (props.pattern) {
-      const val = evt.target.value.match(props.pattern)[0];
-      props.onChange(val ? val : '');
-    } else {
-      const val = evt.target.value;
-      props.onChange(val ? val: '');
-    }
+    const val = evt.target.value
+    // const val = evt.target.value.match(ALPHABETICAL)[0];
+    props.onChange(val ? val : '');
   }
   return (
     <>

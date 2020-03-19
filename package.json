@@ -2,7 +2,7 @@
   "name": "Agora-Edu-Web",
   "version": "5.2.0",
   "private": true,
-  "homepage": "/",
+  "homepage": "/live_education",
   "main": "./src/index.tsx",
   "agora_electron": {
     "electron_version": "5.0.8",
