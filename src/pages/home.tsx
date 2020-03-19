@@ -84,7 +84,7 @@ function HomePage() {
     
     if (!roomTypes[session.roomType]) return;
     const path = roomTypes[session.roomType].path
-    globalStore.showLoading();
+    globalStore.showLoading()
     roomStore.LoginToRoom({
       userName: session.yourName,
       roomName: session.roomName,
