@@ -6,21 +6,19 @@ import uuidv4 from 'uuid/v4';
 export interface OSSConfig {
   accessKeyId: string,
   accessKeySecret: string,
-  endpoint: string,
   // region: string,
+  endpoint: string,
   bucket: string,
-  folder: string,
-  cname: boolean,
+  folder: string
 }
 
 export const ossConfig: OSSConfig = {
   "accessKeyId": process.env.REACT_APP_AGORA_OSS_BUCKET_KEY as string,
   "accessKeySecret": process.env.REACT_APP_AGORA_OSS_BUCKET_SECRET as string,
   "bucket": process.env.REACT_APP_AGORA_OSS_BUCKET_NAME as string,
-  "endpoint": process.env.REACT_APP_AGORA_OSS_CDN_ACCELERATE as string,
   // "region": process.env.REACT_APP_AGORA_OSS_BUCKET_REGION as string,
-  "folder": process.env.REACT_APP_AGORA_OSS_BUCKET_FOLDER as string,
-  "cname": false,
+  "endpoint": process.env.REACT_APP_AGORA_OSS_CDN_ACCELERATE as string,
+  "folder": process.env.REACT_APP_AGORA_OSS_BUCKET_FOLDER as string
 }
 
 export const ossClient = new OSS(ossConfig);

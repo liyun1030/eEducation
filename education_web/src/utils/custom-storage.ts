@@ -5,7 +5,7 @@ export class CustomStorage {
 
   private storage: Storage;
 
-  private languageKey: string = 'demo_language'
+  languageKey: string = 'demo_language'
 
   constructor() {
     this.storage = window.sessionStorage;
