@@ -8,15 +8,17 @@
 
 #import <Foundation/Foundation.h>
 
-#ifdef DEBUG
+//#ifdef DEBUG
+//
+//#define HTTP_BASE_URL @"http://115.231.168.26:8080"
+//
+//#else
 
-#define HTTP_BASE_URL @"http://115.231.168.26:8080"
-
-#else
+//#define HTTP_BASE_URL @"https://solutions-api-pre.sh.agoralab.co"
 
 #define HTTP_BASE_URL @"https://solutions-api.sh.agoralab.co"
 
-#endif
+//#endif
 
 // http: get app config
 #define HTTP_GET_CONFIG @""HTTP_BASE_URL"/edu/v1/app/version"
