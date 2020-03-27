@@ -3,6 +3,9 @@ import { ClassState, AgoraUser, Me } from "../stores/room";
 import {Map} from 'immutable'
 import { getIntlError, setIntlError } from "./intl-error-helper";
 import { globalStore } from "../stores/global";
+import OSS from "ali-oss";
+import axios from 'axios';
+import Log from '../utils/LogUploader';
 
 export interface UserAttrsParams {
   userId: string
@@ -75,6 +78,39 @@ export type RoomParams = Partial<{
   [key: string]: any
 }>
 
+type FileParams = {
+  file: any,
+  key: string,
+  host: string,
+  policy: any,
+  signature: any,
+  callback: any,
+  accessid: string
+}
+
+const uploadLogToOSS = async ({
+  file,
+  key,
+  host,
+  policy,
+  signature,
+  callback,
+  accessid
+}: FileParams) => {
+  const formData = new FormData()
+  formData.append('name', 'test.log')
+  formData.append('key', key)
+  formData.append('file', file)
+  formData.append('policy',policy)
+  formData.append('OSSAccessKeyId',accessid)
+  formData.append('success_action_status','200')
+  formData.append('callback',callback)
+  formData.append('signature',encodeURIComponent(signature).replace(/%20/g,'+'))
+  return await axios.post(host, formData, {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded'}
+  })
+}
+
 export class AgoraEduApi {
 
   appID: string = '';
@@ -82,6 +118,85 @@ export class AgoraEduApi {
   roomId: string = '';
   public userToken: string = '';
   recordId: string = '';
+
+  // fetch stsToken
+  // 获取 stsToken
+  async fetchUploadSignature(roomId: string) {
+    let data = await AgoraFetchJson({
+      url: `/v1/apps/${this.appID}/log/params`,
+      method: 'GET',
+    })
+
+    // let resp = await fetch(`https://webdemo.agora.io/edu/v1/sts/test`, {
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   method: 'GET'
+    // });
+
+    console.log("data", data)
+    return {
+      AccessKeyId: data.AccessKeyId as string,
+      AccessKeySecret: data.AccessKeySecret as string,
+      SecurityToken: data.SecurityToken as string,
+    }
+  }
+
+  // upload log
+  // 上报日志
+  async uploadLog(params: any) {
+    let data = await AgoraFetchJson({
+      url: `/v1/log/room/${params.roomId}`,
+      method: 'POST',
+    })
+  }
+
+  async uploadLogFile(
+    roomId: string,
+    userId: string,
+    platform: string,
+    appVersion: string,
+    ua: string,
+    file: any
+    ) {
+    let {
+      AccessKeyId,
+      AccessKeySecret,
+      SecurityToken,
+    } = await this.fetchUploadSignature(roomId);
+    const ossParams = {
+      AccessKeyId,
+      AccessKeySecret,
+      SecurityToken,
+    }
+    const ossClient = new OSS({
+      accessKeyId: AccessKeyId,
+      accessKeySecret: AccessKeySecret,
+      stsToken: SecurityToken,
+      bucket: 'agora-adc-artifacts',
+      endpoint: 'oss-cn-beijing.aliyuncs.com',
+    })
+
+    // ossClient.putBucket()
+    await ossClient.put('sts/test/1585215812244', file);
+    // await uploadLogToOSS({
+    //   file,
+    //   key,
+    //   host,
+    //   policy,
+    //   accessid,
+    //   signature,
+    //   callback
+    // })
+    await this.uploadLog({
+      key: '',
+      policy: '',
+      host: '',
+      signature: '',
+      expire: ''
+    });
+    return
+  }
 
   // app config
   // 配置入口

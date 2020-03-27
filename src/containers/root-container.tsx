@@ -9,6 +9,7 @@ import GlobalStorage from '../utils/custom-storage';
 import {eduApi} from '../services/edu-api';
 import { t } from '../i18n';
 import { ChatCmdType } from '../utils/agora-rtm-client';
+import Log from '../utils/LogUploader';
 export type IRootProvider = {
   globalState: GlobalState
   roomState: RoomState
@@ -63,6 +64,12 @@ export const useErrorState = () => {
   return useStore().errorState;
 }
 
+const initLogWorker = () => {
+  //@ts-ignore
+  window.Log = Log
+  Log.init();
+};
+
 export const RootProvider: React.FC<any> = ({children}) => {
   const globalState = useObserver<GlobalState>(globalStore);
   const roomState = useObserver<RoomState>(roomStore);
@@ -84,6 +91,10 @@ export const RootProvider: React.FC<any> = ({children}) => {
     whiteboardState,
     errorState,
   }
+
+  useEffect(() => {
+    initLogWorker()
+  }, [])
 
   useEffect(() => {
     if (!roomStore.state.rtm.joined) return;

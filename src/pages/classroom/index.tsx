@@ -14,6 +14,7 @@ import { AgoraElectronClient } from '../../utils/agora-electron-client';
 import { t } from '../../i18n';
 import { eduApi } from '../../services/edu-api';
 import { genUUID } from '../../utils/api';
+import { useInterval } from 'react-use';
 
 export const roomTypes = [
   {value: 0, path: 'one-to-one'},
@@ -21,11 +22,17 @@ export const roomTypes = [
   {value: 2, path: 'big-class'},
 ];
 
+const delay = 5000
+
 export function RoomPage({ children }: any) {
 
   const history = useHistory();
 
   const lock = useRef<boolean>(false);
+
+  useInterval(() => {
+    roomStore.fetchRoomState()
+  }, delay)
 
   useEffect(() => {
     const me = roomStore.state.me;
