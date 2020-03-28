@@ -1,3 +1,4 @@
+import { BUILD_VERSION } from './../i18n';
 import { AgoraFetch } from "../utils/fetch";
 import { ClassState, AgoraUser, Me } from "../stores/room";
 import {Map} from 'immutable'
@@ -121,79 +122,65 @@ export class AgoraEduApi {
 
   // fetch stsToken
   // 获取 stsToken
-  async fetchUploadSignature(roomId: string) {
+  async fetchStsToken(roomId: string) {
+    // NOTE: demo feedback only
+    const appCode = 'edu-demo'
+    const _roomId = roomId ? roomId : 0;
     let data = await AgoraFetchJson({
-      url: `/v1/apps/${this.appID}/log/params`,
+      url: `/v1/apps/${this.appID}/log/params?appCode=${appCode}&osType=${3}&terminalType=${3}&appVersion=${BUILD_VERSION}&roomId=${_roomId}`,
       method: 'GET',
     })
 
-    // let resp = await fetch(`https://webdemo.agora.io/edu/v1/sts/test`, {
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   method: 'GET'
-    // });
-
     console.log("data", data)
     return {
-      AccessKeyId: data.AccessKeyId as string,
-      AccessKeySecret: data.AccessKeySecret as string,
-      SecurityToken: data.SecurityToken as string,
+      bucketName: data.bucketName as string,
+      callbackBody: data.callbackBody as string,
+      callbackContentType: data.callbackContentType as string,
+      accessKeyId: data.accessKeyId as string,
+      accessKeySecret: data.accessKeySecret as string,
+      securityToken: data.securityToken as string,
+      ossKey: data.ossKey as string,
     }
-  }
-
-  // upload log
-  // 上报日志
-  async uploadLog(params: any) {
-    let data = await AgoraFetchJson({
-      url: `/v1/log/room/${params.roomId}`,
-      method: 'POST',
-    })
   }
 
   async uploadLogFile(
     roomId: string,
-    userId: string,
-    platform: string,
     appVersion: string,
     ua: string,
     file: any
     ) {
     let {
-      AccessKeyId,
-      AccessKeySecret,
-      SecurityToken,
-    } = await this.fetchUploadSignature(roomId);
+      bucketName,
+      callbackBody,
+      callbackContentType,
+      accessKeyId,
+      accessKeySecret,
+      securityToken,
+      ossKey
+    } = await this.fetchStsToken(roomId);
     const ossParams = {
-      AccessKeyId,
-      AccessKeySecret,
-      SecurityToken,
+      bucketName,
+      callbackBody,
+      callbackContentType,
+      accessKeyId,
+      accessKeySecret,
+      securityToken,
     }
     const ossClient = new OSS({
-      accessKeyId: AccessKeyId,
-      accessKeySecret: AccessKeySecret,
-      stsToken: SecurityToken,
-      bucket: 'agora-adc-artifacts',
-      endpoint: 'oss-cn-beijing.aliyuncs.com',
+      accessKeyId: ossParams.accessKeyId,
+      accessKeySecret: ossParams.accessKeySecret,
+      stsToken: ossParams.securityToken,
+      bucket: ossParams.bucketName,
+      endpoint: 'oss-accelerate.aliyuncs.com',
     })
 
-    // ossClient.putBucket()
-    await ossClient.put('sts/test/1585215812244', file);
-    // await uploadLogToOSS({
-    //   file,
-    //   key,
-    //   host,
-    //   policy,
-    //   accessid,
-    //   signature,
-    //   callback
-    // })
-    await this.uploadLog({
-      key: '',
-      policy: '',
-      host: '',
-      signature: '',
-      expire: ''
+    const url = `${PREFIX}/v1/log/sts/callback`
+    await ossClient.put(ossKey, file, {
+      callback: {
+        url: `${PREFIX}/v1/log/sts/callback`,
+        body: callbackBody,
+        contentType: callbackContentType,
+      }
     });
     return
   }

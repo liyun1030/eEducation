@@ -105,8 +105,6 @@ export default class Log {
 
     await eduApi.uploadLogFile(
       roomId,
-      userId,
-      'web',
       '5.2.0',
       ua,
       file,
