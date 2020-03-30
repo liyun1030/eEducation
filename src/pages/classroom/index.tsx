@@ -146,8 +146,8 @@ export function RoomPage({ children }: any) {
       if (!webClient.published) return;
       Promise.all([
         webClient
-        .unpublishLocalStream(),
-        roomStore.deleteKey(+me.uid)
+        .unpublishLocalStream()
+        // roomStore.deleteKey(+me.uid)
       ])
         .then(() => {
           console.log("[agora-web] unpublish local stream");
@@ -158,8 +158,8 @@ export function RoomPage({ children }: any) {
       const nativeClient = rtcClient as AgoraElectronClient;
       if (!nativeClient.published) return;
       nativeClient.unpublish();
-      roomStore.deleteKey(+me.uid).then(() => {
-      }).catch(console.warn)
+      // roomStore.deleteKey(+me.uid).then(() => {
+      // }).catch(console.warn)
     }
 
   }, [me.role, location.pathname, canPublish]);
@@ -207,7 +207,7 @@ export function RoomPage({ children }: any) {
         publishLock.current = true;
         roomStore.updateLocalMe({broad: true})
           .then(() => {
-            console.log("broad updateLocal")
+            console.log("board updateLocal")
             nativeClient.publish();
           }).catch(console.warn)
           .finally(() => {

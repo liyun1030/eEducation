@@ -12,6 +12,7 @@ import { usePlatform } from '../containers/platform-container';
 import {useHistory} from 'react-router-dom';
 import { roomStore } from '../stores/room';
 import { genUid } from '../utils/helper';
+import {GithubIcon} from '../components/github-icon';
 import MD5 from 'js-md5';
 import { globalStore, roomTypes } from '../stores/global';
 import { t } from '../i18n';
@@ -145,6 +146,7 @@ function HomePage() {
       </div>
       }
       <div className="custom-card">
+        <GithubIcon />
         <div className="flex-item cover">
           {isElectron ? 
           <>

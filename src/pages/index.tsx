@@ -9,16 +9,13 @@ import Loading from '../components/loading';
 import Toast from '../components/toast';
 import '../icons.scss';
 import { PlatformContainer } from '../containers/platform-container';
-import ReplayContainer from './replay';
+import ReplayContainer from './replay/replay';
+import AgoraReplayContainer from './replay/agora-replay';
 import { RootProvider } from '../containers/root-container';
 import SmallClass from './classroom/small-class';
 import OneToOne from './classroom/one-to-one';
 import BigClass from './classroom/big-class';
 import { PageNotFound } from './404';
-import {eduApi} from '../services/edu-api';
-
-//@ts-ignore
-window.eduApi = eduApi
 
 export default function () {
   return (
@@ -51,6 +48,9 @@ export default function () {
           </Route>
           <Route path="/replay/record/:recordId">
             <ReplayContainer />
+          </Route>
+          <Route path="/replay/agora_record/:recordId">
+            <AgoraReplayContainer />
           </Route>
           {/* <Route path="/error">
             <ErrorPage />

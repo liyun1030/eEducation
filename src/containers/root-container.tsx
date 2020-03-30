@@ -1,20 +1,23 @@
 import React, { useEffect, useRef } from 'react';
+import {historyStore} from '../stores/history';
 import { GlobalState, globalStore} from '../stores/global';
 import { RoomState, roomStore} from '../stores/room';
 import {ErrorState, errorStore} from '../pages/error-page/state';
 import { WhiteboardState, whiteboard } from '../stores/whiteboard';
 import { useHistory, useLocation } from 'react-router-dom';
-import { resolveMessage, resolvePeerMessage, jsonParse } from '../utils/helper';
+import { resolvePeerMessage, jsonParse } from '../utils/helper';
 import GlobalStorage from '../utils/custom-storage';
-import {eduApi} from '../services/edu-api';
+import {fetchI18n} from '../services/edu-api';
 import { t } from '../i18n';
 import { ChatCmdType } from '../utils/agora-rtm-client';
 import Log from '../utils/LogUploader';
+
 export type IRootProvider = {
   globalState: GlobalState
   roomState: RoomState
   whiteboardState: WhiteboardState
   errorState: ErrorState
+  historyState: any
 }
 
 export interface IObserver<T> {
@@ -67,7 +70,7 @@ export const useErrorState = () => {
 const initLogWorker = () => {
   //@ts-ignore
   window.Log = Log
-  Log.init();
+  // Log.init();
 };
 
 export const RootProvider: React.FC<any> = ({children}) => {
@@ -75,6 +78,7 @@ export const RootProvider: React.FC<any> = ({children}) => {
   const roomState = useObserver<RoomState>(roomStore);
   const whiteboardState = useObserver<WhiteboardState>(whiteboard);
   const errorState = useObserver<ErrorState>(errorStore);
+  const historyState = useObserver<any>(historyStore);
   const history = useHistory();
 
   const ref = useRef<boolean>(false);
@@ -90,10 +94,13 @@ export const RootProvider: React.FC<any> = ({children}) => {
     roomState,
     whiteboardState,
     errorState,
+    historyState,
   }
 
   useEffect(() => {
     initLogWorker()
+    fetchI18n()
+    historyStore.setHistory(history)
   }, [])
 
   useEffect(() => {
@@ -206,7 +213,8 @@ export const RootProvider: React.FC<any> = ({children}) => {
       applyUser: room.applyUser,
     });
     GlobalStorage.setLanguage(value.globalState.language);
-    // WARN: DEBUG ONLY MUST REMOVED IN PRODUCTION
+    // TODO: Please remove it before release in production
+    // 备注：请在正式发布时删除操作的window属性
     //@ts-ignore
     window.errorState = errorState;
     //@ts-ignore

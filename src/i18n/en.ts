@@ -2,6 +2,10 @@ const BUILD_VERSION = process.env.REACT_APP_BUILD_VERSION as string;
 const build_version = BUILD_VERSION ? BUILD_VERSION : '0.0.1';
 
 const en = {
+  'upload_picture': 'Upload Picture',
+  'convert_webpage': 'Dynamic PPT',
+  'convert_to_picture': 'Static PPT',
+  'upload_audio_video': 'Upload Audio/Video',
   'return': {
     'home': 'Back To Home',
   },

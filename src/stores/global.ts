@@ -254,5 +254,7 @@ export class Root {
 
 export const globalStore = new Root();
 
+// TODO: Please remove it before release in production
+// 备注：请在正式发布时删除操作的window属性
 // @ts-ignore
 window.globalStore = globalStore;

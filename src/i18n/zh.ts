@@ -2,6 +2,10 @@ const BUILD_VERSION = process.env.REACT_APP_BUILD_VERSION as string;
 const build_version = BUILD_VERSION ? BUILD_VERSION : '0.0.1';
 
 const zhCN: any = {
+  'upload_picture': '上传图片',
+  'convert_webpage': '转换动态PPT',
+  'convert_to_picture': 'PPT转图片',
+  'upload_audio_video': '上传音视频',
   'return': {
     'home': '返回主页',
   },

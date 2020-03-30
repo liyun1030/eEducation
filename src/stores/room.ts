@@ -118,6 +118,7 @@ export type UserParams = {
 export type RoomState = {
   rtmLock: boolean
   rtmToken: string
+  recordLock: boolean
   rtcToken: string
   appID: string
   me: Me
@@ -152,6 +153,7 @@ export class RoomStore {
     rtcToken: '',
     rtmToken: '',
     appID: '',
+    recordLock: false,
     me: {
       account: "",
       uid: "",
@@ -651,10 +653,6 @@ export class RoomStore {
     this.commit(this.state);
   }
 
-  async deleteKey(uid: number) {
-    this.rtmClient.deleteAttributesByKey(uid)
-  }
-
   updateChannelMessage(msg: ChatMessage) {
     this.state = {
       ...this.state,
@@ -971,6 +969,10 @@ export class RoomStore {
     this.commit(this.state)
   }
 
+  async exitRoom() {
+    return await eduApi.exitRoom(this.state.course.roomId)
+  }
+
   async exitAll() {
     try {
       try {
@@ -1095,7 +1097,25 @@ export class RoomStore {
     }
   }
 
+  lockRecording() {
+    if (!this.state) return
+    this.state={
+      ...this.state,
+      recordLock: true
+    }
+    this.commit(this.state)
+  }
+
+  unlockRecording() {
+    if (!this.state) return
+    this.state={
+      ...this.state,
+      recordLock: false
+    }
+    this.commit(this.state)
+  }
   async startRecording () {
+    this.lockRecording()
     const {data: recordId} = await eduApi.startRecording()
     this.state = {
       ...this.state,
@@ -1106,9 +1126,11 @@ export class RoomStore {
       }
     }
     this.commit(this.state)
+    this.unlockRecording()
   }
 
   async stopRecording () {
+    this.lockRecording()
     const {data} = await eduApi.stopRecording(this.state.course.recordId)
     const roomId = this.state.course.roomId
     const {data: roomInfo} = await eduApi.getRoomInfoBy(roomId)
@@ -1122,6 +1144,7 @@ export class RoomStore {
       }
     }
     this.commit(this.state)
+    this.unlockRecording()
     await this.rtmClient.sendRecordMessage({
       account: `${this.state.me.account}`,
       recordId: `${recordId}`
@@ -1140,5 +1163,7 @@ export class RoomStore {
 
 export const roomStore = new RoomStore();
 
+// TODO: Please remove it before release in production
+// 备注：请在正式发布时删除操作的window属性
 //@ts-ignore
 window.roomStore = roomStore;

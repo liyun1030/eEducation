@@ -12,6 +12,10 @@ const isElectron = process.env.BROWSER === 'none';
 const isProd = process.env.ENV === 'production';
 
 const webWorkerConfig = () => config => {
+  config.optimization = {
+    ...config.optimization,
+    noEmitOnErrors: false,
+  }
   config.output = {
     ...config.output,
     globalObject: 'this'
@@ -29,6 +33,10 @@ const sourceMap = () => config => {
 module.exports = override(
   sourceMap(),
   webWorkerConfig(),
+  addWebpackModuleRule({
+    test: /\.worker\.js$/,
+    use: { loader: 'worker-loader' },
+  }),
   isElectron && addWebpackExternals({
     "agora-electron-sdk": "commonjs2 agora-electron-sdk"
   }),

@@ -11,6 +11,7 @@ interface ControlItemProps {
   onClick: (evt: any, name: string) => void
   active: boolean
   text?: string
+  loading?: boolean
 }
 
 const ControlItem = (props: ControlItemProps) => {
@@ -19,13 +20,14 @@ const ControlItem = (props: ControlItemProps) => {
   }
   return (
     props.text ?
-      <div className={`control-btn control-${props.name}`} onClick={onClick}>
+      <div className={`control-btn control-${props.name} ${props.loading ? 'btn-loading' : ''}`} onClick={onClick}>
         <div className={`btn-icon ${props.name} ${props.active ? 'active' : ''}`}
           data-name={props.name} />
         <div className="control-text">{props.text}</div>
       </div>
       :
       <Icon
+        loading={props.loading}
         data={props.name}
         onClick={onClick}
         className={`items ${props.name} ${props.active ? 'active' : ''}`}
@@ -141,7 +143,8 @@ export default function Control({
         {+role === 1 ?
           <>
             <ControlItem
-              name={roomStore.state.course.isRecording ? 'stop_recording' : 'recording'}
+              loading={Boolean(roomStore.state.recordLock)}
+              name={Boolean(roomStore.state.recordLock) ? 'btn-loading ' : (roomStore.state.course.isRecording ? 'stop_recording' : 'recording')}
               onClick={onRecordButtonClick}
               active={false}
             />

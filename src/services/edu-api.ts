@@ -4,6 +4,7 @@ import { ClassState, AgoraUser, Me } from "../stores/room";
 import {Map} from 'immutable'
 import { getIntlError, setIntlError } from "./intl-error-helper";
 import { globalStore } from "../stores/global";
+import { historyStore } from './../stores/history';
 import OSS from "ali-oss";
 import axios from 'axios';
 import Log from '../utils/LogUploader';
@@ -17,27 +18,15 @@ export interface UserAttrsParams {
   coVideo?: number
 }
 
+const APP_ID: string = process.env.REACT_APP_AGORA_APP_ID as string;
 const PREFIX: string = process.env.REACT_APP_AGORA_EDU_ENDPOINT_PREFIX as string;
 
-const AUTHORIZATION_KEY: string = process.env.REACT_APP_AGORA_ENDPOINT_AK as string;
-
-const AgoraFetchJson = async ({url, method, data, token, authorization}:{url: string, method: string, data?: any, token?: string, authorization?: string}) => {
-
-  let authKey: string = AUTHORIZATION_KEY
-
-  if (authorization) {
-    authKey = authorization
-  }
-  
+const AgoraFetchJson = async ({url, method, data, token}:{url: string, method: string, data?: any, token?: string}) => {  
   const opts: any = {
     method,
     headers: {
       'Content-Type': 'application/json',
     }
-  }
-
-  if (authKey) {
-    opts.headers['Authorization'] = `Basic ${authKey}`
   }
 
   if (token) {
@@ -58,6 +47,10 @@ const AgoraFetchJson = async ({url, method, data, token, authorization}:{url: st
       type: 'eduApiError',
       message: isErrorCode ? `ErrorCode: ${code}` : error
     })
+    if (code === 401) {
+      historyStore.state.history.goBack()
+      return
+    }
     throw {api_error: error, isErrorCode}
   }
 
@@ -114,8 +107,7 @@ const uploadLogToOSS = async ({
 
 export class AgoraEduApi {
 
-  appID: string = '';
-  authorization: string = '';
+  appID: string = APP_ID;
   roomId: string = '';
   public userToken: string = '';
   recordId: string = '';
@@ -185,6 +177,15 @@ export class AgoraEduApi {
     return
   }
 
+  static async fetchI18n() {
+    let data = await AgoraFetchJson({
+      url: `/v1/multi/language`,
+      method: 'GET',
+    });
+
+    setIntlError(data || {})
+  }
+
   // app config
   // 配置入口
   async config() {
@@ -199,7 +200,6 @@ export class AgoraEduApi {
 
     return {
       appId: data.appId,
-      authorization: data.authorization,
       room: data.room,
     }
   }
@@ -211,7 +211,6 @@ export class AgoraEduApi {
       url: `/v1/apps/${this.appID}/room/entry`,
       method: 'POST',
       data: params,
-      authorization: this.authorization,
     });
     
     this.roomId = data.roomId;
@@ -228,7 +227,6 @@ export class AgoraEduApi {
       url: `/v1/apps/${this.appID}/room/${this.roomId}/token/refresh`,
       method: 'POST',
       token: this.userToken,
-      authorization: this.authorization,
     });
     return {
       rtcToken: data.rtcToken,
@@ -246,7 +244,6 @@ export class AgoraEduApi {
       method: 'POST',
       data: room,
       token: this.userToken,
-      authorization: this.authorization
     });
     return {
       data,
@@ -263,7 +260,6 @@ export class AgoraEduApi {
       method: 'POST',
       data: userAttrs,
       token: this.userToken,
-      authorization: this.authorization
     });
     return {
       data,
@@ -278,7 +274,6 @@ export class AgoraEduApi {
       method: 'POST',
       data: {},
       token: this.userToken,
-      authorization: this.authorization,
     });
     this.recordId = data.recordId
     return {
@@ -293,7 +288,6 @@ export class AgoraEduApi {
       url: `/v1/apps/${this.appID}/room/${this.roomId}/record/${recordId}/stop`,
       method: 'POST',
       token: this.userToken,
-      authorization: this.authorization,
     })
     return {
       data
@@ -307,7 +301,6 @@ export class AgoraEduApi {
       url: `/v1/apps/${this.appID}/room/${this.roomId}/records`,
       method: 'GET',
       token: this.userToken,
-      authorization: this.authorization,
     })
     return {
       data
@@ -321,7 +314,6 @@ export class AgoraEduApi {
       url: `/v1/apps/${this.appID}/room/${roomId}`,
       method: 'GET',
       token: this.userToken,
-      authorization: this.authorization,
     });
     return {
       data: {
@@ -411,11 +403,6 @@ export class AgoraEduApi {
 
   // login 登录教室
   async Login(params: EntryParams) {
-    if (!this.appID) {
-      let {appId, authorization} = await this.config()
-      this.appID = appId
-      this.authorization = authorization
-    }
     if (!this.appID) throw `appId is empty: ${this.appID}`
     let {data: {roomId, userToken}} = await this.entry(params)
 
@@ -472,17 +459,11 @@ export class AgoraEduApi {
   }
 
   async getCourseRecordBy(recordId: string, roomId: string, token: string) {
-    if (!this.appID) {
-      let {appId, authorization} = await this.config()
-      this.appID = appId
-      this.authorization = authorization
-    }
     this.userToken = token
     let data = await AgoraFetchJson({
       url: `/v1/apps/${this.appID}/room/${roomId}/record/${recordId}`,
       method: 'GET',
       token: this.userToken,
-      authorization: this.authorization,
     });
     const teacherRecord = data.recordDetails.find((it:any) => it.role === 1)
 
@@ -505,6 +486,23 @@ export class AgoraEduApi {
     }
     return result
   }
+
+  async exitRoom(roomId: string) {
+    let data = await AgoraFetchJson({
+      url: `/v1/apps/${this.appID}/room/${roomId}/exit`,
+      method: 'POST',
+      token: this.userToken,
+      data: {
+        appId: this.appID,
+        roomId: roomId
+      }
+    })
+    return
+  }
 }
 
 export const eduApi = new AgoraEduApi();
+
+export const fetchI18n = async () => {
+  await AgoraEduApi.fetchI18n();
+}

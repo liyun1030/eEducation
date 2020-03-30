@@ -303,16 +303,7 @@ export default class AgoraRTMClient {
     this._channelAttrsKey = null;
     return;
   }
-
-  async deleteAttributesByKey(uid: number) {
-    console.log("deleteAttributesByKey", uid, this._currentChannelName)
-    await this._client.deleteChannelAttributesByKeys(
-      this._currentChannelName,
-      [`${uid}`],
-      {enableNotificationToChannelMembers: true}
-    );
-  }
-
+  
   async getChannelAttrs (): Promise<string> {
     let json = await this._client.getChannelAttributes(this._currentChannelName);
     return JSON.stringify(json);
