@@ -402,6 +402,8 @@ class Whiteboard extends EventEmitter {
             height: 180,
             bitrate: 120,
             fps: 15,
+            subscribeVideoUids: ['7'],
+            subscribeAudioUids: ['7'],
             // "mixedVideoLayout": 1,
             // "maxResolutionUid": "1",
         },

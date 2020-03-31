@@ -90,9 +90,19 @@ export class RecordOperator {
         cname: this.channelName,
         uid: this.uid,
         clientRequest: {
+          mixedVideoLayout: 3,
           token: this.token,
           recordingConfig: this.recordingConfig,
           storageConfig: this.storageConfig,
+          layoutConfig: [{
+            uid: '7', // 因为demo里默认使用7作为屏幕共享uid，请按照您自己的修改
+            x_axis: 0.0,
+            y_axis: 1.0,
+            width: 1.0,
+            height: 1.0,
+            alpha: 1.0,
+            render_mode: 0
+          }],
         },
       })
     });

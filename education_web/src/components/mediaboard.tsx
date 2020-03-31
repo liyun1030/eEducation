@@ -565,7 +565,7 @@ const items = [
   
   return (
     <div className={`media-board ${drawable}`}>
-      {sharedStream ? 
+      {/* {sharedStream ? 
         <VideoPlayer
           id={`${sharedStream.streamID}`}
           domId={`shared-${sharedStream.streamID}`}
@@ -576,15 +576,15 @@ const items = [
           audio={true}
           local={sharedStream.local}
         />
-        :
+        : */}
         <Whiteboard
           loading={whiteboardState.loading}
           className={selector}
           room={room}
         />
-      }
+      {/* } */}
       <div className="layer">
-        {!sharedStream ? 
+        {/* {!sharedStream ?  */}
         <>
           {showTools ? <Tools
           items={toolItems}
@@ -595,7 +595,8 @@ const items = [
               color={strokeColor}
               onChangeComplete={onColorChanged} />
           : null}
-        </> : null}
+        </> 
+        {/* : null} */}
         <UploadPanel />
         {children ? children : null}
       </div>
@@ -622,6 +623,7 @@ const items = [
       <Control
         notice={globalState.notice}
         role={role}
+        // sharing={false}
         sharing={Boolean(sharedStream)}
         current={pageTool}
         currentPage={currentPage}

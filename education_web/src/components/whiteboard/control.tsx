@@ -136,7 +136,7 @@ export default function Control({
         : null}
       </div>
       <div className="controls">
-        {!sharing && role === 'teacher' ?
+        {role === 'teacher' ?
           <>
             <ControlItem name={`first_page`}
               active={'first_page' === current}
