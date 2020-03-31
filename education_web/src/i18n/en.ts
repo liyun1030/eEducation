@@ -64,7 +64,7 @@ const en = {
     'class_start': 'Class start'
   },
   'home': {
-    'entry-home': 'Enter in Home',
+    'entry-home': 'Join Room',
     'teacher': 'teacher',
     'student': 'student',
     'cover_class': 'cover-en',
@@ -73,7 +73,7 @@ const en = {
     'room_type': 'Room Type',
     'room_join': 'Join',
     'short_title': {
-      'title': 'Agora Education',
+      'title': 'Web Screen Share Special Version',
       'subtitle': 'Powered by agora.io',
     },
     'name_too_long': 'name too long, should <= 20 characters',
