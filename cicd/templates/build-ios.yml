@@ -30,7 +30,7 @@ jobs:
           provProfileSecureFile: 'AgoraAppsDevProfile.mobileprovision'
 
       
-      - script: cd ${{ parameters.workingDirectory }} && chmod +x build-dev.sh && ./build-dev.sh
+      - script: cd ${{ parameters.workingDirectory }} && chmod +x build-dev.sh && ./build-qa.sh agora.pgyer_iOS_welfare_uKey agora.pgyer_iOS_welfare_apiKey
 
       - script: cd ${{ parameters.workingDirectory }} && mkdir app && mv AgoraEducationDev.ipa app && mv AgoraEducationDev.xcarchive app
 
@@ -39,9 +39,9 @@ jobs:
           PathtoPublish: ${{ parameters.workingDirectory }}/app
           ArtifactName: ${{ parameters.devDisplayName }}
 
-      - template: github-release.yml
-        parameters:
-          displayName: ${{ parameters.devDisplayName }}
+#      - template: github-release.yml
+#        parameters:
+#          displayName: ${{ parameters.devDisplayName }}
 
                 
   - job: ${{ parameters.qaDisplayName }}Build
@@ -69,7 +69,7 @@ jobs:
           provProfileSecureFile:
               'AgoraIOTest2019.mobileprovision'
       
-      - script: cd ${{ parameters.workingDirectory }} && chmod +x build-qa.sh && ./build-qa.sh agora.agora.pgyer_iOS_welfare_uKey agora.agora.pgyer_iOS_welfare_apiKey
+      - script: cd ${{ parameters.workingDirectory }} && chmod +x build-qa.sh && ./build-qa.sh agora.pgyer_iOS_welfare_uKey agora.pgyer_iOS_welfare_apiKey
 
       - script: cd ${{ parameters.workingDirectory }} && mkdir app && mv AgoraEducationQA.ipa app && mv AgoraEducationQA.xcarchive app
 
