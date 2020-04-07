@@ -49,7 +49,7 @@ public class TimeView extends AppCompatTextView {
     }
 
     public void setTime(long time) {
-        this.time = time;
+        this.time = time / 1000;
     }
 
     public boolean isStarted() {

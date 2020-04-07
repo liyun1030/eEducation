@@ -13,8 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.agora.education.R;
-import io.agora.education.classroom.bean.user.Teacher;
-import io.agora.education.classroom.bean.user.User;
+import io.agora.education.classroom.bean.channel.User;
 import io.agora.education.classroom.mediator.VideoMediator;
 import io.agora.education.classroom.widget.RtcVideoView;
 
@@ -33,17 +32,17 @@ public class ClassVideoAdapter extends BaseQuickAdapter<User, ClassVideoAdapter.
 
             @Override
             public boolean areContentsTheSame(@NonNull User oldItem, @NonNull User newItem) {
-                return oldItem.video == newItem.video
-                        && oldItem.audio == newItem.audio
-                        && oldItem.account.equals(newItem.account);
+                return oldItem.enableVideo == newItem.enableVideo
+                        && oldItem.enableAudio == newItem.enableAudio
+                        && oldItem.userName.equals(newItem.userName);
             }
 
             @Nullable
             @Override
             public Object getChangePayload(@NonNull User oldItem, @NonNull User newItem) {
-                if (oldItem.video != newItem.video
-                        || oldItem.audio != newItem.audio
-                        || !oldItem.account.equals(newItem.account)) {
+                if (oldItem.enableVideo != newItem.enableVideo
+                        || oldItem.enableAudio != newItem.enableAudio
+                        || !oldItem.userName.equals(newItem.userName)) {
                     return true;
                 } else {
                     return null;
@@ -55,7 +54,7 @@ public class ClassVideoAdapter extends BaseQuickAdapter<User, ClassVideoAdapter.
     public void setUsers(List<User> users) {
         List<User> userList = new ArrayList<>();
         for (User user : users) {
-            if (user instanceof Teacher || user.uid == localUid || user.isRtcOnline) {
+            if (user.isTeacher() || user.uid == localUid || user.isCoVideoEnable()) {
                 userList.add(user);
             }
         }
@@ -92,7 +91,7 @@ public class ClassVideoAdapter extends BaseQuickAdapter<User, ClassVideoAdapter.
         }
     }
 
-    class ViewHolder extends BaseViewHolder {
+    static class ViewHolder extends BaseViewHolder {
         private RtcVideoView view;
 
         ViewHolder(RtcVideoView view) {
@@ -101,9 +100,9 @@ public class ClassVideoAdapter extends BaseQuickAdapter<User, ClassVideoAdapter.
         }
 
         void convert(User user) {
-            view.muteVideo(user.video == 0);
-            view.muteAudio(user.audio == 0);
-            view.setName(user.account);
+            view.muteVideo(!user.isVideoEnable());
+            view.muteAudio(!user.isAudioEnable());
+            view.setName(user.userName);
         }
     }
 

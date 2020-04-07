@@ -2,20 +2,22 @@ package io.agora.education.classroom.strategy;
 
 import java.util.List;
 
+import io.agora.education.classroom.bean.channel.Room;
+import io.agora.education.classroom.bean.channel.User;
 import io.agora.education.classroom.bean.msg.ChannelMsg;
 import io.agora.education.classroom.bean.msg.PeerMsg;
-import io.agora.education.classroom.bean.user.Student;
-import io.agora.education.classroom.bean.user.Teacher;
 
 public interface ChannelEventListener {
 
     void onChannelInfoInit();
 
-    void onLocalChanged(Student local);
+    void onRoomChanged(Room room);
 
-    void onTeacherChanged(Teacher teacher);
+    void onTeacherChanged(User teacher);
 
-    void onStudentsChanged(List<Student> students);
+    void onLocalChanged(User local);
+
+    void onStudentsChanged(List<User> students);
 
     void onChannelMsgReceived(ChannelMsg msg);
 
