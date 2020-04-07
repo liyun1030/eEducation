@@ -69,7 +69,7 @@ jobs:
           provProfileSecureFile:
               'AgoraIOTest2019.mobileprovision'
       
-      - script: cd ${{ parameters.workingDirectory }} && chmod +x build-qa.sh && ./build-qa.sh
+      - script: cd ${{ parameters.workingDirectory }} && chmod +x build-qa.sh && ./build-qa.sh agora.agora.pgyer_iOS_welfare_uKey agora.agora.pgyer_iOS_welfare_apiKey
 
       - script: cd ${{ parameters.workingDirectory }} && mkdir app && mv AgoraEducationQA.ipa app && mv AgoraEducationQA.xcarchive app
 
