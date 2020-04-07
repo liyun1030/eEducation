@@ -1,0 +1,43 @@
+parameters:
+  displayName: ''
+  workingDirectory: ''
+
+jobs:
+  - job: ${{ parameters.displayName }}_Build
+    displayName: ${{ parameters.displayName }}
+
+    pool:
+      vmImage: 'macOS-latest'
+
+    variables:
+      - group: AgoraKeys
+
+    steps:
+      - bash: python ci.env.py
+        workingDirectory: ${{ parameters.workingDirectory }}
+
+      - bash: |
+          echo 'storeFile=xxx' >> local.properties
+          echo 'storePassword=xxx' >> local.properties
+          echo 'keyAlias=xxx' >> local.properties
+          echo 'keyPassword=xxx' >> local.properties
+          cat local.properties
+        workingDirectory: ${{ parameters.workingDirectory }}
+
+      - task: Gradle@2
+        inputs:
+          gradleWrapperFile: ${{ parameters.workingDirectory }}/gradlew
+          workingDirectory: ${{ parameters.workingDirectory }}
+          tasks: 'assembleDebug'
+          publishJUnitResults: false
+          gradleOptions: '-Xmx3072m'
+
+      - task: CopyFiles@2
+        inputs:
+          contents: '**/*.apk'
+          targetFolder: '$(build.artifactStagingDirectory)'
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathtoPublish: '$(build.artifactStagingDirectory)'
+          artifactName: ${{ parameters.displayName }}
