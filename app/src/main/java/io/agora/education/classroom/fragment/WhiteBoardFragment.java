@@ -20,7 +20,6 @@ import com.herewhite.sdk.domain.SceneState;
 
 import butterknife.BindView;
 import butterknife.OnTouch;
-import io.agora.base.Callback;
 import io.agora.base.ToastManager;
 import io.agora.education.R;
 import io.agora.education.base.BaseFragment;
@@ -30,7 +29,6 @@ import io.agora.education.classroom.widget.whiteboard.PageControlView;
 import io.agora.education.util.ColorUtil;
 import io.agora.whiteboard.netless.listener.BoardEventListener;
 import io.agora.whiteboard.netless.manager.BoardManager;
-import io.agora.whiteboard.netless.service.bean.response.RoomJoin;
 
 public class WhiteBoardFragment extends BaseFragment implements RadioGroup.OnCheckedChangeListener, PageControlView.PageControlListener, BoardEventListener {
 
@@ -74,25 +72,15 @@ public class WhiteBoardFragment extends BaseFragment implements RadioGroup.OnChe
         page_control_view.setListener(this);
     }
 
-    public void initBoard(String uuid, String token) {
+    public void initBoardWithRoomToken(String uuid, String roomToken) {
         if (TextUtils.isEmpty(uuid)) return;
         boardManager.getRoomPhase(new Promise<RoomPhase>() {
             @Override
             public void then(RoomPhase phase) {
                 if (phase != RoomPhase.connected) {
                     pb_loading.setVisibility(View.VISIBLE);
-                    boardManager.roomJoin(uuid, token, new Callback<RoomJoin>() {
-                        @Override
-                        public void onSuccess(RoomJoin res) {
-                            RoomParams params = new RoomParams(uuid, res.roomToken);
-                            boardManager.init(whiteSdk, params);
-                        }
-
-                        @Override
-                        public void onFailure(Throwable throwable) {
-                            ToastManager.showShort(throwable.getMessage());
-                        }
-                    });
+                    RoomParams params = new RoomParams(uuid, roomToken);
+                    boardManager.init(whiteSdk, params);
                 }
             }
 
@@ -112,6 +100,10 @@ public class WhiteBoardFragment extends BaseFragment implements RadioGroup.OnChe
 
     public void disableCameraTransform(boolean disabled) {
         boardManager.disableCameraTransform(disabled);
+    }
+
+    public void setWritable(boolean writable) {
+        boardManager.setWritable(writable);
     }
 
     public void releaseBoard() {

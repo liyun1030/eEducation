@@ -14,18 +14,19 @@ import com.herewhite.sdk.domain.RoomState;
 import com.herewhite.sdk.domain.SDKError;
 import com.herewhite.sdk.domain.SceneState;
 
-import io.agora.base.LogManager;
+import io.agora.log.LogManager;
 import io.agora.whiteboard.netless.annotation.Appliance;
 import io.agora.whiteboard.netless.listener.BoardEventListener;
 
 public class BoardManager extends NetlessManager<Room> implements RoomCallbacks {
 
-    private final LogManager log = new LogManager(this.getClass().getName());
+    private final LogManager log = new LogManager(this.getClass().getSimpleName());
 
     private String appliance;
     private int[] strokeColor;
     private Boolean disableDeviceInputs;
     private Boolean disableCameraTransform;
+    private Boolean writable;
 
     private Handler handler = new Handler(Looper.getMainLooper());
     private BoardEventListener listener;
@@ -78,12 +79,10 @@ public class BoardManager extends NetlessManager<Room> implements RoomCallbacks 
             t.setSceneIndex(index, new Promise<Boolean>() {
                 @Override
                 public void then(Boolean aBoolean) {
-
                 }
 
                 @Override
                 public void catchEx(SDKError t) {
-
                 }
             });
         }
@@ -132,6 +131,10 @@ public class BoardManager extends NetlessManager<Room> implements RoomCallbacks 
         }
     }
 
+    public boolean isDisableDeviceInputs() {
+        return disableDeviceInputs == null ? false : disableDeviceInputs;
+    }
+
     public void disableCameraTransform(boolean disabled) {
         if (t != null) {
             t.disableCameraTransform(disabled);
@@ -140,8 +143,20 @@ public class BoardManager extends NetlessManager<Room> implements RoomCallbacks 
         }
     }
 
-    public boolean isDisableDeviceInputs() {
-        return disableDeviceInputs == null ? false : disableDeviceInputs;
+    public void setWritable(boolean writable) {
+        if (t != null) {
+            t.setWritable(writable, new Promise<Boolean>() {
+                @Override
+                public void then(Boolean aBoolean) {
+                }
+
+                @Override
+                public void catchEx(SDKError t) {
+                }
+            });
+        } else {
+            this.writable = writable;
+        }
     }
 
     public void disconnect() {
@@ -205,6 +220,9 @@ public class BoardManager extends NetlessManager<Room> implements RoomCallbacks 
         }
         if (disableCameraTransform != null) {
             disableCameraTransform(disableCameraTransform);
+        }
+        if (writable != null) {
+            setWritable(writable);
         }
         if (listener != null) {
             listener.onSceneStateChanged(room.getSceneState());
