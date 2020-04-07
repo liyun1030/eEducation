@@ -78,6 +78,6 @@ jobs:
           PathtoPublish: ${{ parameters.workingDirectory }}/app
           ArtifactName: ${{ parameters.qaDisplayName }}
 
-      - template: github-release.yml
-        parameters:
-          displayName: ${{ parameters.qaDisplayName }}
+#      - template: github-release.yml
+#        parameters:
+#          displayName: ${{ parameters.qaDisplayName }}
