@@ -29,7 +29,7 @@ jobs:
         inputs:
           provProfileSecureFile: 'AgoraAppsDevProfile.mobileprovision'
 
-      - script: cd ${{ parameters.workingDirectory }} && chmod +x build-dev.sh && ./build-dev.sh agora.pgyer_iOS_uKey agora.pgyer_iOS_apiKey
+      - script: cd ${{ parameters.workingDirectory }} && chmod +x build-dev.sh && ./build-dev.sh $(agora.pgyer_iOS_uKey) $(agora.pgyer_iOS_apiKey)
 
       - script: cd ${{ parameters.workingDirectory }} && mkdir app && mv AgoraEducationDev.ipa app && mv AgoraEducationDev.xcarchive app
 
@@ -68,7 +68,7 @@ jobs:
           provProfileSecureFile:
               'AgoraIOTest2019.mobileprovision'
       
-      - script: cd ${{ parameters.workingDirectory }} && chmod +x build-qa.sh && ./build-qa.sh agora.pgyer_iOS_uKey agora.pgyer_iOS_apiKey
+      - script: cd ${{ parameters.workingDirectory }} && chmod +x build-qa.sh && ./build-qa.sh $(agora.pgyer_iOS_uKey) $(agora.pgyer_iOS_apiKey)
 
       - script: cd ${{ parameters.workingDirectory }} && mkdir app && mv AgoraEducationQA.ipa app && mv AgoraEducationQA.xcarchive app
 
