@@ -15,7 +15,7 @@ jobs:
       - group: AgoraKeys
 
     steps:
-      - script: cd ${{ parameters.workingDirectory }} && ls && python ci.env.py
+      - script: cd ${{ parameters.workingDirectory }} && ls
         env:
           AGORA_APP_ID: $(agora.premiumBroadAppId)
           WHITE_BOARD_TOKEN: $(agora.whiteBoardToken)
@@ -44,39 +44,39 @@ jobs:
 #          displayName: ${{ parameters.devDisplayName }}
 
                 
-  - job: ${{ parameters.qaDisplayName }}Build
-    displayName: ${{ parameters.qaDisplayName }}
-
-    pool:
-      vmImage: 'macos-latest'
-
-    variables:
-      - group: AgoraKeys
-
-    steps:
-      - script: cd ${{ parameters.workingDirectory }} && ls && python ci.env.py
-        env:
-          AGORA_APP_ID: $(agora.premiumBroadAppId)
-          WHITE_BOARD_TOKEN: $(agora.whiteBoardToken)
-
-      - task: InstallAppleCertificate@2
-        inputs:
-          certSecureFile: 'TestCertificates2019.p12'
-          certPwd: $(agora.passWord)
-          
-      - task: InstallAppleProvisioningProfile@1
-        inputs:
-          provProfileSecureFile:
-              'AgoraIOTest2019.mobileprovision'
-      
-      - script: cd ${{ parameters.workingDirectory }} && chmod +x build-qa.sh && ./build-qa.sh agora.pgyer_iOS_welfare_uKey agora.pgyer_iOS_welfare_apiKey
-
-      - script: cd ${{ parameters.workingDirectory }} && mkdir app && mv AgoraEducationQA.ipa app && mv AgoraEducationQA.xcarchive app
-
-      - task: PublishBuildArtifacts@1
-        inputs:
-          PathtoPublish: ${{ parameters.workingDirectory }}/app
-          ArtifactName: ${{ parameters.qaDisplayName }}
+#  - job: ${{ parameters.qaDisplayName }}Build
+#    displayName: ${{ parameters.qaDisplayName }}
+#
+#    pool:
+#      vmImage: 'macos-latest'
+#
+#    variables:
+#      - group: AgoraKeys
+#
+#    steps:
+#      - script: cd ${{ parameters.workingDirectory }} && ls && python ci.env.py
+#        env:
+#          AGORA_APP_ID: $(agora.premiumBroadAppId)
+#          WHITE_BOARD_TOKEN: $(agora.whiteBoardToken)
+#
+#      - task: InstallAppleCertificate@2
+#        inputs:
+#          certSecureFile: 'TestCertificates2019.p12'
+#          certPwd: $(agora.passWord)
+#
+#      - task: InstallAppleProvisioningProfile@1
+#        inputs:
+#          provProfileSecureFile:
+#              'AgoraIOTest2019.mobileprovision'
+#
+#      - script: cd ${{ parameters.workingDirectory }} && chmod +x build-qa.sh && ./build-qa.sh agora.pgyer_iOS_welfare_uKey agora.pgyer_iOS_welfare_apiKey
+#
+#      - script: cd ${{ parameters.workingDirectory }} && mkdir app && mv AgoraEducationQA.ipa app && mv AgoraEducationQA.xcarchive app
+#
+#      - task: PublishBuildArtifacts@1
+#        inputs:
+#          PathtoPublish: ${{ parameters.workingDirectory }}/app
+#          ArtifactName: ${{ parameters.qaDisplayName }}
 
 #      - template: github-release.yml
 #        parameters:
