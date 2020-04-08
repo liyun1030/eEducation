@@ -120,7 +120,7 @@ static HttpManager *manager = nil;
     NSString *app_Version = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
     
     NSDictionary *params = @{
-        @"appCode" : @"edu-demo",//
+        @"appCode" : @"edu-saas",//
         @"osType" : @(1),// 1.ios 2.android
         @"terminalType" : @(deviceType),//1.phone 2.pad
         @"appVersion" : app_Version
