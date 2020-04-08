@@ -15,7 +15,7 @@ jobs:
       - group: AgoraKeys
 
     steps:
-      - script: cd ${{ parameters.workingDirectory }} && ls
+      - script: cd ${{ parameters.workingDirectory }} && ls && python ci.env.py
         env:
           AGORA_APP_ID: $(agora.premiumBroadAppId)
           WHITE_BOARD_TOKEN: $(agora.whiteBoardToken)
