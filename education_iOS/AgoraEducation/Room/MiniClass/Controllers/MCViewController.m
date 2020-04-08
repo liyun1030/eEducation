@@ -682,6 +682,7 @@
         MessageInfoModel *model = [MessageInfoModel new];
         model.account = EduConfigModel.shareInstance.userName;
         model.content = content;
+        model.isSelfSend = YES;
         WEAK(self);
         [self.educationManager sendMessageWithModel:model completeSuccessBlock:^{
             [weakself.messageView addMessageModel:model];
