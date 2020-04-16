@@ -170,14 +170,14 @@ export class AgoraEduApi {
     })
 
     const url = `${PREFIX}/v1/log/sts/callback`
-    await ossClient.put(ossKey, file, {
+    let res = await ossClient.put(ossKey, file, {
       callback: {
         url: `${PREFIX}/v1/log/sts/callback`,
         body: callbackBody,
         contentType: callbackContentType,
       }
     });
-    return
+    return res;
   }
 
   static async fetchI18n() {

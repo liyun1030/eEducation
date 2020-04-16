@@ -4,6 +4,11 @@ html, body, #root {
   overflow: hidden;
 }
 
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
 .draggable {
   -webkit-app-region: drag;
   -webkit-user-select: none;

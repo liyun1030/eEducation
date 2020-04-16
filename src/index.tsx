@@ -5,6 +5,15 @@ import App from './pages/index';
 import * as serviceWorker from './serviceWorker';
 import TagManager from 'react-gtm-module';
 import Eruda from 'eruda';
+import UAParser from 'ua-parser-js';
+
+const parser = new UAParser();
+
+const userAgentInfo = parser.getResult();
+
+const isMobile = () => {
+  return userAgentInfo.device.type === 'mobile';
+};
  
 TagManager.initialize({
   gtmId: process.env.REACT_APP_AGORA_GTM_ID
@@ -19,10 +28,12 @@ ReactDOM.render(
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();
 
-const el = document.createElement('div');
-document.body.appendChild(el);
-
-Eruda.init({
-  container: el,
-  tool: ['console', 'elements']
-});
+if (isMobile()) {
+  const el = document.createElement('div');
+  document.body.appendChild(el);
+  
+  Eruda.init({
+    container: el,
+    tool: ['console', 'elements']
+  });
+}

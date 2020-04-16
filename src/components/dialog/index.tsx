@@ -73,8 +73,6 @@ const DialogContainer = () => {
       globalStore.removeDialog();
     }
     else if (type === 'apply') {
-      // p2p message rejectCoVideo
-      // 老师拒绝学生连麦申请
       roomStore.rtmClient.sendPeerMessage(
         `${roomStore.state.applyUser.uid}`,
         {
@@ -92,17 +90,16 @@ const DialogContainer = () => {
       }).catch((err) => {
         console.warn(err)
       })
+    } else if (type === 'uploadLog') {
+      globalStore.removeDialog()
     }
   }
 
   const onConfirm = (type: string) => {
     if (type === 'exitRoom') {
-      globalStore.showLoading()
-      roomStore.exitRoom().finally(() => {
-        globalStore.removeDialog();
-        globalStore.stopLoading()
-        history.push('/');
-      })
+      globalStore.removeDialog();
+      history.goBack();
+      // history.push('/');
     }
     else if (type === 'apply') {
       // p2p message accept coVideo
@@ -115,6 +112,9 @@ const DialogContainer = () => {
         globalStore.removeNotice();
         globalStore.removeDialog();
       }).catch(console.warn);
+    }
+    else if (type === 'uploadLog') {
+      globalStore.removeDialog()
     }
 
     return;

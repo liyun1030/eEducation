@@ -5,6 +5,7 @@ import Dexie from 'dexie';
 import LogWorker from 'worker-loader!./log.worker';
 import db from './db';
 import UAParser from 'ua-parser-js';
+import {get} from 'lodash';
 
 const parser = new UAParser();
 
@@ -102,9 +103,9 @@ export default class Log {
     //@ts-ignore
     window.file = file
 
-    await eduApi.uploadLogFile(
+   let res = await eduApi.uploadLogFile(
       roomId,
-      '5.2.0',
+      '5.3.0',
       ua,
       file,
     )
@@ -115,5 +116,6 @@ export default class Log {
       });
     }
     await db.open();
+    return get(res, 'data.data', -1);
   }
 }

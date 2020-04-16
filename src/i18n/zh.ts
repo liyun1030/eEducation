@@ -2,10 +2,6 @@ const BUILD_VERSION = process.env.REACT_APP_BUILD_VERSION as string;
 const build_version = BUILD_VERSION ? BUILD_VERSION : '0.0.1';
 
 const zhCN: any = {
-  'upload_picture': '上传图片',
-  'convert_webpage': '转换动态PPT',
-  'convert_to_picture': 'PPT转图片',
-  'upload_audio_video': '上传音视频',
   'return': {
     'home': '返回主页',
   },
@@ -19,6 +15,7 @@ const zhCN: any = {
     'loading': '加载中...',
   },
   'toast': {
+    'show_log_id': `请提供你的日志ID: {no}`,
     'api_login_failured': '房间加入失败, 原因: {reason}',
     'confirm': '确定',
     'cancel': '取消',
@@ -78,7 +75,7 @@ const zhCN: any = {
     'room_type': '房间类型',
     'room_join': '加入房间',
     'short_title': {
-      'title': '声网云课堂',
+      'title': '声网益课堂',
       'subtitle': '由声网提供',
     },
     'name_too_long': '名字过长，不得超过20个字符',

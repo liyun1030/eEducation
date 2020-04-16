@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import Nav from '../../components/nav';
-import RoomDialog from '../../components/dialog/room';
+import RoomDialog from '../../components/dialog';
 import { AgoraStream } from '../../utils/types';
 import './room.scss';
 import NativeSharedWindow from '../../components/native-shared-window';
