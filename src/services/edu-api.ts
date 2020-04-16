@@ -20,12 +20,14 @@ export interface UserAttrsParams {
 
 const APP_ID: string = process.env.REACT_APP_AGORA_APP_ID as string;
 const PREFIX: string = process.env.REACT_APP_AGORA_EDU_ENDPOINT_PREFIX as string;
+const AUTHORIZATION: string = process.env.REACT_APP_AGORA_GATEWAY_TOKEN as string;
 
 const AgoraFetchJson = async ({url, method, data, token}:{url: string, method: string, data?: any, token?: string}) => {  
   const opts: any = {
     method,
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Basic ${AUTHORIZATION}`
     }
   }
 
@@ -60,9 +62,10 @@ const AgoraFetchJson = async ({url, method, data, token}:{url: string, method: s
 export interface EntryParams {
   userName: string
   roomName: string
+  roomUuid: string
+  userUuid: string
   type: number
   role: number
-  uuid: string
 }
 
 export type RoomParams = Partial<{
@@ -307,6 +310,18 @@ export class AgoraEduApi {
     }
   }
 
+  async getWhiteboardBy(roomId: string): Promise<any> {
+    let boardData = await AgoraFetchJson({
+      url: `/v1/apps/${this.appID}/room/${roomId}/board`,
+      method: 'GET',
+      token: this.userToken,
+    })
+    return {
+      boardId: boardData.boardId,
+      boardToken: boardData.boardToken,
+    };
+  }
+
   // get room info
   // 获取房间信息
   async getRoomInfoBy(roomId: string): Promise<{data: any}> {
@@ -315,9 +330,14 @@ export class AgoraEduApi {
       method: 'GET',
       token: this.userToken,
     });
+    let boardData = await this.getWhiteboardBy(roomId);
     return {
       data: {
-        room: data.room,
+        room: {
+          ...data.room,
+          boardId: boardData.boardId,
+          boardToken: boardData.boardToken,
+        },
         users: data.room.coVideoUsers,
         user: data.user
       }
@@ -437,8 +457,8 @@ export class AgoraEduApi {
       course.teacherId = me.uid
     }
 
-    if (params.uuid) {
-      me.uuid = params.uuid
+    if (params.userUuid) {
+      me.uuid = params.userUuid
     }
 
     const coVideoUids = userList.map((it: any) => `${it.uid}`)
@@ -465,6 +485,8 @@ export class AgoraEduApi {
       method: 'GET',
       token: this.userToken,
     });
+
+    const boardData = await this.getWhiteboardBy(roomId);
     const teacherRecord = data.recordDetails.find((it:any) => it.role === 1)
 
     const recordStatus = [
@@ -476,8 +498,8 @@ export class AgoraEduApi {
     ]
 
     const result = {
-      boardId: data.boardId,
-      boardToken: data.boardToken,
+      boardId: boardData.boardId,
+      boardToken: boardData.boardToken,
       startTime: data.startTime,
       endTime: data.endTime,
       url: teacherRecord?.url,

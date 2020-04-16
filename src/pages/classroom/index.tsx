@@ -229,21 +229,24 @@ export function RoomPage({ children }: any) {
       if (platform === 'web') {
         const webClient = roomStore.rtcClient as AgoraWebClient;
         if (webClient.joined || rtc.current) {
-          console.log("joined, ", webClient.joined)
           return;
         }
         console.log("[agora-rtc] add event listener");
         webClient.rtc.on('onTokenPrivilegeWillExpire', (evt: any) => {
           // you need obtain the `newToken` token from server side 
-          const newToken = '';
-          webClient.rtc.renewToken(newToken);
-          console.log('[agora-web] onTokenPrivilegeWillExpire', evt);
+          eduApi.refreshToken().then((res: any) => {
+            const newToken = res.rtcToken
+            webClient.rtc.renewToken(newToken);
+            console.log('[agora-web] onTokenPrivilegeWillExpire', evt);
+          })
         });
         webClient.rtc.on('onTokenPrivilegeDidExpire', (evt: any) => {
           // you need obtain the `newToken` token from server side 
-          const newToken = '';
-          webClient.rtc.renewToken(newToken);
-          console.log('[agora-web] onTokenPrivilegeDidExpire', evt);
+          eduApi.refreshToken().then((res: any) => {
+            const newToken = res.rtcToken
+            webClient.rtc.renewToken(newToken);
+            console.log('[agora-web] onTokenPrivilegeDidExpire', evt);
+          })
         });
         webClient.rtc.on('error', (evt: any) => {
           console.log('[agora-web] error evt', evt);
@@ -314,7 +317,7 @@ export function RoomPage({ children }: any) {
           .joinChannel({
             uid: +roomState.me.uid, 
             channel: roomState.course.rid,
-            token: '',
+            token: roomState.me.rtcToken,
             dual: isSmallClass,
             appId: roomState.appID,
           }).then(() => {
@@ -396,7 +399,7 @@ export function RoomPage({ children }: any) {
         nativeClient.joinChannel({
           uid: +roomState.me.uid, 
           channel: roomState.course.rid,
-          token: '',
+          token: roomState.me.rtcToken,
           dual: isSmallClass
         });
         roomStore.setRTCJoined(true);

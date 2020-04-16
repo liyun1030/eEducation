@@ -3,6 +3,12 @@ import ReactDOM from 'react-dom';
 import './index.scss';
 import App from './pages/index';
 import * as serviceWorker from './serviceWorker';
+import TagManager from 'react-gtm-module';
+import Eruda from 'eruda';
+ 
+TagManager.initialize({
+  gtmId: process.env.REACT_APP_AGORA_GTM_ID
+})
 
 ReactDOM.render(
   <App />,
@@ -12,3 +18,11 @@ ReactDOM.render(
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();
+
+const el = document.createElement('div');
+document.body.appendChild(el);
+
+Eruda.init({
+  container: el,
+  tool: ['console', 'elements']
+});

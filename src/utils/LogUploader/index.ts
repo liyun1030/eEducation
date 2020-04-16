@@ -52,7 +52,6 @@ export default class Log {
     if (!this.thread) {
       //@ts-ignore
       this.thread = new LogWorker()
-      // this.thread = new Worker('./log.worker')
       this.debugLog();
     }
   }
