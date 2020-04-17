@@ -20,7 +20,7 @@ const ControlItem = (props: ControlItemProps) => {
   }
   return (
     props.text ?
-      <div className={`control-btn control-${props.name} ${props.loading ? 'btn-loading' : ''}`} onClick={onClick}>
+      <div className={`control-btn control-${props.name} ${props.loading ? 'icon-loading' : ''}`} onClick={onClick}>
         <div className={`btn-icon ${props.name} ${props.active ? 'active' : ''}`}
           data-name={props.name} />
         <div className="control-text">{props.text}</div>

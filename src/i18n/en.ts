@@ -2,6 +2,10 @@ const BUILD_VERSION = process.env.REACT_APP_BUILD_VERSION as string;
 const build_version = BUILD_VERSION ? BUILD_VERSION : '0.0.1';
 
 const en = {
+  'upload_picture': 'Upload Picture',
+  'convert_webpage': 'Dynamic PPT',
+  'convert_to_picture': 'Static PPT',
+  'upload_audio_video': 'Upload Audio/Video',
   'return': {
     'home': 'Back To Home',
   },
@@ -75,7 +79,7 @@ const en = {
     'room_type': 'Room Type',
     'room_join': 'Join',
     'short_title': {
-      'title': 'Agora Online Classroom',
+      'title': 'Agora Cloud Class',
       'subtitle': 'Powered by agora.io, a leading online learning engagement platform',
     },
     'name_too_long': 'name too long, should <= 20 characters',
