@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="whiteboard_sdk_token" translatable="false"><#YOUR WHITEBOARD SDK TOKEN#></string>
+    <string name="netless_board_host" translatable="false">http://115.231.168.26:8088/</string>
 </resources>

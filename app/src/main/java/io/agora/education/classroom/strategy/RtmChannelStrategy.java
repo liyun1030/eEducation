@@ -14,10 +14,10 @@ import java.util.Map;
 import java.util.Set;
 
 import io.agora.base.Callback;
+import io.agora.education.classroom.bean.channel.Room;
+import io.agora.education.classroom.bean.channel.User;
 import io.agora.education.classroom.bean.msg.ChannelMsg;
 import io.agora.education.classroom.bean.msg.PeerMsg;
-import io.agora.education.classroom.bean.user.Student;
-import io.agora.education.classroom.bean.user.Teacher;
 import io.agora.rtm.RtmChannelAttribute;
 import io.agora.rtm.RtmChannelMember;
 import io.agora.rtm.RtmMessage;
@@ -28,7 +28,7 @@ import io.agora.sdk.manager.SdkManager;
 
 public class RtmChannelStrategy extends ChannelStrategy<List<RtmChannelAttribute>> {
 
-    public RtmChannelStrategy(String channelId, Student local) {
+    public RtmChannelStrategy(String channelId, User local) {
         super(channelId, local);
         RtmManager.instance().registerListener(rtmEventListener);
     }
@@ -40,14 +40,14 @@ public class RtmChannelStrategy extends ChannelStrategy<List<RtmChannelAttribute
     }
 
     @Override
-    public void joinChannel(String rtcToken) {
+    public void joinChannel() {
         RtmManager.instance().joinChannel(new HashMap<String, String>() {{
             put(SdkManager.CHANNEL_ID, getChannelId());
         }});
         RtcManager.instance().joinChannel(new HashMap<String, String>() {{
-            put(SdkManager.TOKEN, rtcToken);
+            put(SdkManager.TOKEN, null);
             put(SdkManager.CHANNEL_ID, getChannelId());
-            put(SdkManager.USER_ID, getLocal().getUserId());
+            put(SdkManager.USER_ID, getLocal().getUid());
         }});
     }
 
@@ -59,10 +59,10 @@ public class RtmChannelStrategy extends ChannelStrategy<List<RtmChannelAttribute
 
     @Override
     public void queryOnlineStudentNum(@NonNull Callback<Integer> callback) {
-        List<Student> students = getStudents();
+        List<User> students = getStudents();
         Set<String> set = new HashSet<>();
-        for (Student student : students) {
-            set.add(student.getUserId());
+        for (User student : students) {
+            set.add(student.getUid());
         }
 
         if (students.size() == 0) {
@@ -108,22 +108,23 @@ public class RtmChannelStrategy extends ChannelStrategy<List<RtmChannelAttribute
 
     @Override
     public void parseChannelInfo(List<RtmChannelAttribute> data) {
-        List<Student> students = new ArrayList<>();
+        List<User> students = new ArrayList<>();
         boolean hasMyself = false;
         for (RtmChannelAttribute attribute : data) {
             String value = attribute.getValue();
-            if (TextUtils.equals(attribute.getKey(), "teacher")) {
-                setTeacher(Teacher.fromJson(value, Teacher.class));
-            } else if (TextUtils.equals(attribute.getKey(), getLocal().getUserId())) {
+            if (TextUtils.equals(attribute.getKey(), "room")) {
+                setRoom(Room.fromJson(value, Room.class));
+            } else if (TextUtils.equals(attribute.getKey(), "teacher")) {
+                setTeacher(User.fromJson(value, User.class));
+            } else if (TextUtils.equals(attribute.getKey(), getLocal().getUid())) {
                 hasMyself = true;
-                Student local = Student.fromJson(value, Student.class);
-                setLocal(local);
+                setLocal(User.fromJson(value, User.class));
             } else {
-                students.add(Student.fromJson(value, Student.class));
+                students.add(User.fromJson(value, User.class));
             }
         }
         if (!hasMyself) {
-            Student local = getLocal();
+            User local = getLocal();
             local.isGenerate = true;
             setLocal(local);
         }
@@ -131,14 +132,14 @@ public class RtmChannelStrategy extends ChannelStrategy<List<RtmChannelAttribute
     }
 
     @Override
-    public void updateLocalAttribute(Student local, @Nullable Callback<Void> callback) {
+    public void updateLocalAttribute(User local, @Nullable Callback<Void> callback) {
         RtmChannelAttribute attribute = new RtmChannelAttribute(String.valueOf(local.uid), local.toJsonString());
         RtmManager.instance().addOrUpdateChannelAttributes(getChannelId(), Collections.singletonList(attribute), callback);
     }
 
     @Override
     public void clearLocalAttribute(@Nullable Callback<Void> callback) {
-        String key = getLocal().getUserId();
+        String key = getLocal().getUid();
         RtmManager.instance().deleteChannelAttributesByKeys(getChannelId(), Collections.singletonList(key), callback);
     }
 
@@ -155,7 +156,6 @@ public class RtmChannelStrategy extends ChannelStrategy<List<RtmChannelAttribute
 
                 @Override
                 public void onFailure(Throwable throwable) {
-
                 }
             });
         }
@@ -169,7 +169,6 @@ public class RtmChannelStrategy extends ChannelStrategy<List<RtmChannelAttribute
         public void onMessageReceived(RtmMessage rtmMessage, RtmChannelMember rtmChannelMember) {
             if (channelEventListener != null) {
                 ChannelMsg msg = ChannelMsg.fromJson(rtmMessage.getText(), ChannelMsg.class);
-                msg.isMe = TextUtils.equals(rtmChannelMember.getUserId(), getLocal().getUserId());
                 channelEventListener.onChannelMsgReceived(msg);
             }
         }

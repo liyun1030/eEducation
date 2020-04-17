@@ -34,6 +34,7 @@ public class ConfirmDialog extends DialogFragment {
     private String cancelText;
     private String confirmText;
     private boolean isSingle;
+    @Nullable
     protected DialogClickListener listener;
 
     public static ConfirmDialog normal(String content, DialogClickListener listener) {
@@ -66,7 +67,8 @@ public class ConfirmDialog extends DialogFragment {
 
     @Override
     public void onCancel(@NonNull DialogInterface dialog) {
-        listener.onClick(false);
+        if (listener != null)
+            listener.onClick(false);
     }
 
     @NonNull
@@ -99,10 +101,12 @@ public class ConfirmDialog extends DialogFragment {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.tv_dialog_cancel:
-                listener.onClick(false);
+                if (listener != null)
+                    listener.onClick(false);
                 break;
             case R.id.tv_dialog_confirm:
-                listener.onClick(true);
+                if (listener != null)
+                    listener.onClick(true);
                 break;
         }
         if (isCancelable()) {

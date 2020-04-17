@@ -3,4 +3,7 @@
     <string name="app_name">声网益课堂</string>
     <string name="hint_pwd">密码</string>
     <string name="password_should_not_be_empty">密码不能为空</string>
+    <string name="upload_log">上传日志</string>
+    <string name="upload_success">上传成功，请保存日志编号帮助我们排查问题！</string>
+    <string name="clipboard">日志编号已保存到剪切板</string>
 </resources>

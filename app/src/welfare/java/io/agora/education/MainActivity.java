@@ -23,20 +23,16 @@ import io.agora.education.classroom.BaseClassActivity;
 import io.agora.education.classroom.LargeClassActivity;
 import io.agora.education.classroom.OneToOneClassActivity;
 import io.agora.education.classroom.SmallClassActivity;
-import io.agora.education.classroom.annotation.ClassType;
-import io.agora.education.classroom.bean.user.Student;
-import io.agora.education.classroom.strategy.context.ClassContext;
-import io.agora.education.classroom.strategy.context.ClassContextFactory;
+import io.agora.education.classroom.bean.channel.Room;
+import io.agora.education.classroom.bean.channel.User;
 import io.agora.education.service.CommonService;
 import io.agora.education.service.RoomService;
 import io.agora.education.service.bean.request.RoomEntryReq;
-import io.agora.education.service.bean.response.RoomInfo;
-import io.agora.education.service.bean.response.UserInfo;
+import io.agora.education.service.bean.response.RoomEntryRes;
 import io.agora.education.util.AppUtil;
 import io.agora.education.util.UUIDUtil;
 import io.agora.education.widget.ConfirmDialog;
 import io.agora.education.widget.PolicyDialog;
-import io.agora.rtc.Constants;
 import io.agora.sdk.manager.RtcManager;
 import io.agora.sdk.manager.RtmManager;
 
@@ -51,7 +47,8 @@ public class MainActivity extends BaseActivity {
     protected EditText et_password;
 
     private DownloadReceiver receiver;
-    private CommonService service;
+    private CommonService commonService;
+    private RoomService roomService;
     private String url;
     private boolean isJoining;
 
@@ -68,7 +65,8 @@ public class MainActivity extends BaseActivity {
         filter.setPriority(IntentFilter.SYSTEM_LOW_PRIORITY);
         registerReceiver(receiver, filter);
 
-        service = RetrofitManager.instance().getService(BuildConfig.API_BASE_URL, CommonService.class);
+        commonService = RetrofitManager.instance().getService(BuildConfig.API_BASE_URL, CommonService.class);
+        roomService = RetrofitManager.instance().getService(BuildConfig.API_BASE_URL, RoomService.class);
         checkVersion();
         getConfig();
     }
@@ -76,6 +74,10 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void initView() {
         new PolicyDialog().show(getSupportFragmentManager(), null);
+        if (BuildConfig.DEBUG) {
+            et_your_name.setText("123");
+            et_password.setText("2Rn98F");
+        }
     }
 
     @Override
@@ -86,7 +88,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void checkVersion() {
-        service.appVersion("edu-saas").enqueue(new BaseCallback<>(data -> {
+        commonService.appVersion(BuildConfig.CODE).enqueue(new BaseCallback<>(data -> {
             if (data != null && data.forcedUpgrade != 0) {
                 showAppUpgradeDialog(data.upgradeUrl, data.forcedUpgrade == 2);
             }
@@ -116,104 +118,82 @@ public class MainActivity extends BaseActivity {
     }
 
     private void getConfig() {
-        service.config().enqueue(new BaseCallback<>(data -> {
-            RtcManager.instance().init(getApplicationContext(), data.appId);
-            RtmManager.instance().init(getApplicationContext(), data.appId);
-            EduApplication.instance.config = data;
-        }));
+        commonService.language().enqueue(new BaseCallback<>(EduApplication::setMultiLanguage));
     }
 
     private void joinRoom() {
-        if (isJoining) return;
-
-        String yourName = et_your_name.getText().toString();
-        if (TextUtils.isEmpty(yourName)) {
+        String yourNameStr = et_your_name.getText().toString();
+        if (TextUtils.isEmpty(yourNameStr)) {
             ToastManager.showShort(R.string.your_name_should_not_be_empty);
             return;
         }
 
-        String pwd = et_password.getText().toString();
-        if (TextUtils.isEmpty(pwd)) {
+        String passwordStr = et_password.getText().toString();
+        if (TextUtils.isEmpty(passwordStr)) {
             ToastManager.showShort(R.string.password_should_not_be_empty);
             return;
         }
 
-        if (EduApplication.instance.config == null) {
+        if (EduApplication.getMultiLanguage() == null) {
             ToastManager.showShort(R.string.configuration_load_failed);
             getConfig();
             return;
         }
 
+        roomEntry(yourNameStr, passwordStr);
+    }
+
+    private void roomEntry(String yourNameStr, String passwordStr) {
+        if (isJoining) return;
         isJoining = true;
-        RetrofitManager.instance().getService(BuildConfig.API_BASE_URL, RoomService.class)
-                .roomEntry(EduApplication.instance.config.authorization, EduApplication.instance.config.appId, new RoomEntryReq() {{
-                    userName = yourName;
-                    password = pwd;
-                    uuid = UUIDUtil.getUUID();
-                }})
-                .enqueue(new BaseCallback<>(data -> {
-                    UserInfo user = data.user;
-                    RoomInfo room = data.room;
-                    RtmManager.instance().login(user.rtmToken, user.uid, new Callback<Void>() {
-                        @Override
-                        public void onSuccess(Void res) {
-                            Intent intent = createIntent(room, user);
-                            checkChannelEnterable(intent);
-                        }
-
-                        @Override
-                        public void onFailure(Throwable throwable) {
-                            ToastManager.showShort(throwable.getMessage());
-                            isJoining = false;
-                        }
-                    });
-                }, throwable -> isJoining = false));
+        roomService.roomEntry(new RoomEntryReq() {{
+            userName = yourNameStr;
+            password = passwordStr;
+            userUuid = UUIDUtil.getUUID();
+        }}).enqueue(new BaseCallback<>(data -> {
+            RetrofitManager.instance().addHeader("x-agora-token", data.user.rtmToken);
+            RetrofitManager.instance().addHeader("x-agora-uid", String.valueOf(data.user.uid));
+            RetrofitManager.instance().addHeader("token", data.user.userToken);
+            String appId = data.room.appId;
+            if (!TextUtils.equals(EduApplication.getAppId(), appId)) {
+                EduApplication.setAppId(appId);
+                RtcManager.instance().init(getApplicationContext(), appId);
+                RtmManager.instance().init(getApplicationContext(), appId);
+            }
+            room(data);
+        }, throwable -> isJoining = false));
     }
 
-    private Intent createIntent(RoomInfo room, UserInfo user) {
-        Intent intent = new Intent();
-        if (room.type == ClassType.ONE2ONE) {
-            intent.setClass(this, OneToOneClassActivity.class);
-        } else if (room.type == ClassType.SMALL) {
-            intent.setClass(this, SmallClassActivity.class);
-        } else {
-            intent.setClass(this, LargeClassActivity.class);
-        }
-        intent.putExtra(BaseClassActivity.ROOM_NAME, room.roomName)
-                .putExtra(BaseClassActivity.CHANNEL_ID, room.channelName)
-                .putExtra(BaseClassActivity.USER_NAME, user.userName)
-                .putExtra(BaseClassActivity.USER_ID, user.uid)
-                .putExtra(BaseClassActivity.CLASS_TYPE, room.type)
-                .putExtra(BaseClassActivity.WHITEBOARD_SDK_TOKEN, getString(R.string.whiteboard_sdk_token));
-        return intent;
-    }
-
-    private void checkChannelEnterable(Intent intent) {
-        int classType = intent.getIntExtra(BaseClassActivity.CLASS_TYPE, 0);
-        String channelId = intent.getStringExtra(BaseClassActivity.CHANNEL_ID);
-        String userName = intent.getStringExtra(BaseClassActivity.USER_NAME);
-        int userId = intent.getIntExtra(BaseClassActivity.USER_ID, 0);
-        ClassContext classContext = new ClassContextFactory(this)
-                .getClassContext(classType, channelId, new Student(userId, userName, Constants.CLIENT_ROLE_AUDIENCE));
-        classContext.checkChannelEnterable(new Callback<Boolean>() {
+    private void room(RoomEntryRes data) {
+        User user = data.user;
+        Room room = data.room;
+        RtmManager.instance().login(user.rtmToken, user.uid, new Callback<Void>() {
             @Override
-            public void onSuccess(Boolean aBoolean) {
-                classContext.release();
-                if (aBoolean) {
-                    startActivity(intent);
-                } else {
-                    ToastManager.showShort(R.string.the_room_is_full);
-                }
+            public void onSuccess(Void res) {
+                startActivity(createIntent(room, user));
                 isJoining = false;
             }
 
             @Override
             public void onFailure(Throwable throwable) {
-                classContext.release();
-                ToastManager.showShort(R.string.get_channel_attr_failed);
+                ToastManager.showShort(throwable.getMessage());
                 isJoining = false;
             }
         });
+    }
+
+    private Intent createIntent(Room room, User user) {
+        Intent intent = new Intent();
+        if (room.type == Room.Type.ONE2ONE) {
+            intent.setClass(this, OneToOneClassActivity.class);
+        } else if (room.type == Room.Type.SMALL) {
+            intent.setClass(this, SmallClassActivity.class);
+        } else {
+            intent.setClass(this, LargeClassActivity.class);
+        }
+        intent.putExtra(BaseClassActivity.ROOM, room)
+                .putExtra(BaseClassActivity.USER, user);
+        return intent;
     }
 
     @Override

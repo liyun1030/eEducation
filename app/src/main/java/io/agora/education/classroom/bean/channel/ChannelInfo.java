@@ -4,18 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.agora.education.classroom.bean.JsonBean;
-import io.agora.education.classroom.bean.user.Student;
-import io.agora.education.classroom.bean.user.Teacher;
 
 public class ChannelInfo extends JsonBean {
 
-    public static int SHARE_UID = 7;
+    public volatile Room room;
+    public volatile User local;
+    public volatile User teacher;
+    public volatile List<User> students;
 
-    public volatile Student local;
-    public volatile Teacher teacher;
-    public volatile List<Student> students;
-
-    public ChannelInfo(Student local) {
+    public ChannelInfo(User local) {
         this.local = local;
         this.students = new ArrayList<>();
     }

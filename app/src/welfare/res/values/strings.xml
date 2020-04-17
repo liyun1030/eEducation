@@ -3,4 +3,7 @@
     <string name="app_name">Agora Online Classroom</string>
     <string name="hint_pwd">Password</string>
     <string name="password_should_not_be_empty">Password should not be empty.</string>
+    <string name="upload_log">Upload log</string>
+    <string name="upload_success">Upload success, please save the log number to help our troubleshooting!</string>
+    <string name="clipboard">The log number has been saved to the clipboard</string>
 </resources>
