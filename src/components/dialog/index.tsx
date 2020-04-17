@@ -71,33 +71,50 @@ const DialogContainer = () => {
   const onClose = (type: string) => {
     if (type === 'exitRoom') {
       globalStore.removeDialog();
-      // history.push('/');
     }
     else if (type === 'apply') {
       roomStore.rtmClient.sendPeerMessage(
-        `${roomStore.applyUid}`, {cmd: RoomMessage.rejectCoVideo}
+        `${roomStore.state.applyUser.uid}`,
+        {
+          cmd: 1,
+          data: {
+            operate: RoomMessage.rejectCoVideo,
+            userId: `${roomStore.state.applyUser.userId}`,
+            uid: `${roomStore.state.applyUser.uid}`,
+            account: `${roomStore.state.applyUser.account}`,
+          }
+        }
       ).then(() => {
+        globalStore.removeNotice();
         globalStore.removeDialog();
-      }).catch(console.warn);
+      }).catch((err) => {
+        console.warn(err)
+      })
+    } else if (type === 'uploadLog') {
+      globalStore.removeDialog()
     }
   }
 
   const onConfirm = (type: string) => {
     if (type === 'exitRoom') {
       globalStore.removeDialog();
-      history.push('/');
+      history.goBack();
+      // history.push('/');
     }
     else if (type === 'apply') {
+      // p2p message accept coVideo
+      // 老师同意学生连麦申请
       Promise.all([
-        roomStore.rtmClient.sendPeerMessage(
-          `${roomStore.applyUid}`, {cmd: RoomMessage.acceptCoVideo}
-        ),
-        roomStore.updateCourseLinkUid(roomStore.applyUid)
+        roomStore.updateCoVideoUserBy(roomStore.state.applyUser, {
+          coVideo: 1
+        })
       ]).then(() => {
-        console.log("applyUid");
         globalStore.removeNotice();
         globalStore.removeDialog();
       }).catch(console.warn);
+    }
+    else if (type === 'uploadLog') {
+      globalStore.removeDialog()
     }
 
     return;

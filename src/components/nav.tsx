@@ -14,12 +14,14 @@ import { useRoomState } from '../containers/root-container';
 import { roomStore } from '../stores/room';
 import { globalStore } from '../stores/global';
 import { t } from '../i18n';
+import { eduApi } from '../services/edu-api';
+import Log from '../utils/LogUploader';
 
 interface NavProps {
   delay: string
   network: string
   cpu: string
-  role: string
+  role: number
   roomName: string
   time: number
   showSetting: boolean
@@ -62,7 +64,7 @@ export function Nav ({
     <div className={`nav-container ${isElectron ? 'draggable' : ''}`}>
       <div className="class-title">
         <span className="room-name">{roomName}</span>
-        {role === 'teacher' ? 
+        {+role === 1 ? 
           <Button className={`nav-button ${classState ? "stop" : "start"}`} name={classState ? t('nav.class_end') : t('nav.class_start')} onClick={(evt: any) => {
             handleClick("classState")
           }} /> : null}
@@ -75,7 +77,7 @@ export function Nav ({
           <span className={`net-field-value ${networkQualityIcon[network]}`} style={{marginLeft: '.2rem'}}>
           </span>
         </span>
-        {platform === 'electron' ? <span className="net-field">{t('nav.network')}<span className="net-field-value">{cpu}</span></span> : null}
+        {platform === 'electron' ? <span className="net-field">{t('nav.cpu')}<span className="net-field-value">{cpu}</span></span> : null}
       </div>
       <div className="menu">
         <div className="timer">
@@ -89,8 +91,8 @@ export function Nav ({
             <Icon className="icon-setting" onClick={(evt: any) => {
               handleClick("setting");
             }}/>
-            <Icon className="i18n-lang" onClick={(evt: any) => {
-              handleClick("i18n");
+            <Icon className={globalStore.state.lock ? "icon-loading" : "icon-upload"} onClick={(evt: any) => {
+              handleClick('uploadLog')
             }}></Icon>
             </> : null
           }
@@ -214,7 +216,7 @@ export default function NavContainer() {
   const updateClassState = () => {
     if (!lock.current) {
       lock.current = true;
-      roomStore.updateMe({
+      roomStore.updateCourse({
         courseState: +!Boolean(roomStore.state.course.courseState)
       }).then(() => {
         console.log("update success");
@@ -235,8 +237,16 @@ export default function NavContainer() {
       });
     } else if (type === 'classState') {
       updateClassState();
-    } else if (type === 'i18n-lang') {
-      // globalStore.setLanguage()
+    } else if (type === 'uploadLog') {
+      globalStore.lock()
+      Log.doUpload().then((resultCode: any) => {
+        globalStore.showDialog({
+          type: 'uploadLog',
+          message: t('toast.show_log_id', {reason: `${resultCode}`})
+        });
+      }).finally(() => {
+        globalStore.unlock()
+      })
     }
   }
 

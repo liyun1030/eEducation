@@ -1,31 +1,44 @@
 import { RoomMessage } from './agora-rtm-client';
 import * as _ from 'lodash';
 import OSS from 'ali-oss';
+import uuidv4 from 'uuid/v4';
 
 export interface OSSConfig {
   accessKeyId: string,
   accessKeySecret: string,
-  region: string,
+  // region: string,
+  endpoint: string,
   bucket: string,
-  folder: string,
+  folder: string
 }
 
 export const ossConfig: OSSConfig = {
   "accessKeyId": process.env.REACT_APP_AGORA_OSS_BUCKET_KEY as string,
   "accessKeySecret": process.env.REACT_APP_AGORA_OSS_BUCKET_SECRET as string,
   "bucket": process.env.REACT_APP_AGORA_OSS_BUCKET_NAME as string,
-  "region": process.env.REACT_APP_AGORA_OSS_BUCKET_REGION as string,
+  // "region": process.env.REACT_APP_AGORA_OSS_BUCKET_REGION as string,
+  "endpoint": process.env.REACT_APP_AGORA_OSS_CDN_ACCELERATE as string,
   "folder": process.env.REACT_APP_AGORA_OSS_BUCKET_FOLDER as string
 }
 
 export const ossClient = new OSS(ossConfig);
 
-const OSS_PREFIX = process.env.REACT_APP_AGORA_RECORDING_OSS_URL as string;
+const OSS_PREFIX = process.env.REACT_APP_AGORA_OSS_CDN_DOMAIN as string;
 
 export function getOSSUrl (mediaUrl: string): string {
   const res = `${OSS_PREFIX}/${mediaUrl}`;
   console.log("resolve: ", res, OSS_PREFIX);
   return res;
+}
+
+export function genUUID (): string {
+  let uuid = localStorage.getItem('edu_uuid');
+  if (uuid) {
+    return uuid;
+  }
+  uuid = uuidv4();
+  localStorage.setItem('edu_uuid', uuid);
+  return uuid;
 }
 
 export const handleRegion = (region: string): number => {
@@ -220,6 +233,73 @@ export const resolveFileInfo = (file: any) => {
     fileName,
     fileType
   }
+}
+
+export function resolveChannelAttrs(json: object) {
+  const teacherJson = jsonParse(_.get(json, 'teacher.value'));
+  const room: any = {
+    class_state: 0,
+    link_uid: 0,
+    shared_uid: 0,
+    mute_chat: 0,
+    whiteboard_uid: 0,
+    lock_board: 0,
+    grant_board: 0,
+  }
+  if (teacherJson) {
+    for (let key of Object.keys(teacherJson)) {
+      if (['class_state', 'link_uid', 'shared_uid', 'mute_chat', 'whiteboard_uid', 'lock_board'].indexOf(key) !== -1
+        && teacherJson[key] !== undefined
+        && teacherJson[key] !== '') {
+        room[key] = teacherJson[key];
+      }
+    }
+  }
+  const students = [];
+  for (let key of Object.keys(json)) {
+    if (key === 'teacher') continue;
+    const student = jsonParse(_.get(json, `${key}.value`));
+    if (student && Object.keys(student).length) {
+      student.uid = key;
+      students.push(student);
+    }
+  }
+  const accounts = [];
+  if (teacherJson && Object.keys(teacherJson).length) {
+    accounts.push({
+      role: 'teacher',
+      account: teacherJson.account,
+      uid: teacherJson.uid,
+      video: +teacherJson.video,
+      audio: +teacherJson.audio,
+      chat: +teacherJson.chat,
+      link_uid: teacherJson.link_uid,
+      shared_uid: teacherJson.shared_uid,
+      whiteboard_uid: teacherJson.whiteboard_uid,
+      lock_board: teacherJson.lock_board,
+      grant_board: +teacherJson.grant_board,
+    });
+  }
+  for (let student of students) {
+    accounts.push({
+      role: 'student',
+      account: student.account,
+      uid: student.uid,
+      video: +student.video,
+      audio: +student.audio,
+      chat: +student.chat,
+      link_uid: student.link_uid,
+      shared_uid: student.shared_uid,
+      whiteboard_uid: student.whiteboard_uid,
+      grant_board: +student.grant_board,
+    });
+  }
+  return {
+    teacher: teacherJson,
+    students: students,
+    accounts,
+    room,
+  };
 }
 
 const level = [

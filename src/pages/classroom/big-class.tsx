@@ -6,7 +6,7 @@ import ChatBoard from '../../components/chat/board';
 import MediaBoard from '../../components/mediaboard';
 import useStream from '../../hooks/use-streams';
 import useChatText from '../../hooks/use-chat-text';
-import { RoomMessage } from '../../utils/agora-rtm-client';
+import { RoomMessage, ChatCmdType } from '../../utils/agora-rtm-client';
 import { AgoraElectronClient } from '../../utils/agora-electron-client';
 import AgoraWebClient from '../../utils/agora-rtc-client';
 import { useRoomState } from '../../containers/root-container';
@@ -48,8 +48,16 @@ export default function BigClass() {
     if (type === 'hands_up') {
       if (roomStore.state.course.teacherId) {
         rtmLock.current = true;
-        roomStore.rtmClient.sendPeerMessage(roomStore.state.course.teacherId,
-          {cmd: RoomMessage.applyCoVideo})
+        roomStore.rtmClient.sendPeerMessage(`${roomStore.state.course.teacherId}`,
+          {
+            cmd: 1,
+            data: {
+              userId: `${roomStore.state.me.userId}`,
+              uid: `${roomStore.state.me.uid}`,
+              account: `${roomStore.state.me.account}`,
+              operate: RoomMessage.applyCoVideo,
+            }
+          })
           .then((result: any) => {
             console.log("peerMessage result ", result);
           })
@@ -61,18 +69,17 @@ export default function BigClass() {
     }
   
     if (type === 'hands_up_end') {
-      if (roomStore.state.course.teacherId) {
-        rtmLock.current = true;
-        roomStore.rtmClient.sendPeerMessage(roomStore.state.course.teacherId,
-          {cmd: RoomMessage.cancelCoVideo})
-          .then((result: any) => {
-            console.log("peerMessage result ", result);
-          })
-          .catch(console.warn)
-          .finally(() => {
-            rtmLock.current = false;
-          })
-      }
+      rtmLock.current = true;
+      roomStore.updateCoVideoUserBy({
+        userId: `${roomStore.state.me.userId}`,
+        uid: `${roomStore.state.me.uid}`,
+        account: `${roomStore.state.me.account}`,
+      }, {
+        coVideo: 0
+      }).catch(console.warn)
+      .finally(() => {
+        rtmLock.current = false;
+      })
     }
   }
 
@@ -115,8 +122,12 @@ export default function BigClass() {
         closeLock.current = true;
         rtmLock.current = true;
         Promise.all([
-          rtmClient.sendPeerMessage(`${teacherUid}`,{
-            cmd: RoomMessage.cancelCoVideo
+          roomStore.updateCoVideoUserBy({
+            userId: `${roomStore.state.users.get(`${streamID}`)?.userId}`,
+            uid: `${streamID}`,
+            account: `${roomStore.state.users.get(`${streamID}`)?.account}`,
+          }, {
+            coVideo: 0
           }),
           quitClient
         ]).then(() => {
@@ -130,15 +141,23 @@ export default function BigClass() {
         })
       }
 
-      if (teacherUid && teacherUid === me.uid) {
+      if (`${teacherUid}` && `${teacherUid}` === `${me.uid}`) {
         rtmLock.current = true;
         closeLock.current = true;
         Promise.all([
-          rtmClient.sendPeerMessage(`${streamID}`, {
-            cmd: RoomMessage.cancelCoVideo,
+          roomStore.updateCoVideoUserBy({
+            userId: `${roomStore.state.users.get(`${streamID}`)?.userId}`,
+            uid: `${streamID}`,
+            account: `${roomStore.state.users.get(`${streamID}`)?.account}`,
+          }, {
+            coVideo: 0
           }),
-          roomStore.updateCourseLinkUid(0)
         ]).then(() => {
+          roomStore.updateApplyUser({
+            uid: '',
+            account: '',
+            userId: '',
+          })
           rtmLock.current = false;
         }).catch((err: any) => {
           rtmLock.current = false;
@@ -166,11 +185,12 @@ export default function BigClass() {
               id={`${currentHost.streamID}`}
               account={currentHost.account}
               handleClick={onPlayerClick}
-              close={me.role === 'teacher' || +me.uid === currentHost.streamID}
+              close={me.role === 1 || +me.uid === currentHost.streamID}
               handleClose={handleClose}
               video={currentHost.video}
               audio={currentHost.audio}
               local={currentHost.local}
+              autoplay={false}
             /> :
             null
           }
@@ -191,6 +211,7 @@ export default function BigClass() {
               audio={Boolean(teacher.audio)}
               video={Boolean(teacher.video)}
               local={Boolean(teacher.local)}
+              autoplay={false}
               /> :
             <VideoPlayer
               role="teacher"
@@ -202,7 +223,7 @@ export default function BigClass() {
         </div>
         <ChatBoard
           name={roomName}
-          teacher={role === 'teacher'}
+          teacher={role === 1}
           messages={messages}
           mute={Boolean(roomState.course.muteChat)}
           value={value}

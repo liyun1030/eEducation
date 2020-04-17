@@ -2,7 +2,7 @@ import React from 'react';
 import { Route } from 'react-router-dom';
 import CustomBrowserRouter from '../containers/custom-browser-router';
 import ThemeContainer from '../containers/theme-container';
-import Home from './home';
+import EntryHome from './entry-home';
 import DeviceTest from './device-test';
 import { RoomPage } from './classroom';
 import Loading from '../components/loading';
@@ -15,7 +15,7 @@ import SmallClass from './classroom/small-class';
 import OneToOne from './classroom/one-to-one';
 import BigClass from './classroom/big-class';
 import { PageNotFound } from './404';
-// import ErrorPage from './error-page/error-page';
+import RoomDialog from '../components/dialog'
 
 export default function () {
   return (
@@ -25,8 +25,13 @@ export default function () {
         <RootProvider>
           <Loading />
           <Toast />
+          <RoomDialog />
+          <Route path="/entry/:roomId/:role">
+            <EntryHome />
+          </Route>
           <Route exact path="/">
-            <Home />
+            {/* <Home /> */}
+            <PageNotFound />
           </Route>
           <Route exact path="/device_test">
             <DeviceTest />
@@ -46,7 +51,7 @@ export default function () {
               <BigClass />
             </RoomPage>
           </Route>
-          <Route exact path="/replay/:uuid/:startTime/:endTime/:mediaUrl">
+          <Route path="/replay/record/:recordId">
             <ReplayContainer />
           </Route>
           {/* <Route path="/error">

@@ -44,7 +44,7 @@ interface ControlProps {
   current: string
   currentPage: number
   totalPage: number
-  role: string
+  role: number
   notice?: NoticeProps
   onClick: (evt: any, type: string) => void
 }
@@ -84,33 +84,15 @@ export default function Control({
       const me = roomState.me;
       if (lock.current || !me.uid) return;
   
-      if (whiteboard.state.recording) {
+      if (roomState.course.isRecording) {
         if (!canStop()) return;
-        let mediaUrl = await whiteboard.stopRecording();
+        await roomStore.stopRecording();
         globalStore.showToast({
           type: 'recording',
           message: t('toast.stop_recording'),
         });
-        if (whiteboard.state.endTime 
-          && whiteboard.state.startTime) {
-          const {endTime, startTime, roomUUID} = whiteboard.clearRecording();
-          await roomStore.rtmClient.sendChannelMessage(JSON.stringify({
-            account: me.account,
-            url: getOSSUrl(mediaUrl),
-            link: `/replay/${roomUUID}/${startTime}/${endTime}/${mediaUrl}`
-          }));
-          const message = {
-            account: me.account,
-            id: me.uid,
-            link: `/replay/${roomUUID}/${startTime}/${endTime}/${mediaUrl}`,
-            text: '',
-            ts: +Date.now()
-          }
-          roomStore.updateChannelMessage(message);
-          return;
-        }
       } else {
-        await whiteboard.startRecording();
+        await roomStore.startRecording();
         globalStore.showToast({
           type: 'recording',
           message: t('toast.start_recording'),
@@ -136,7 +118,7 @@ export default function Control({
         : null}
       </div>
       <div className="controls">
-        {!sharing && role === 'teacher' ?
+        {!sharing && role === 1 ?
           <>
             <ControlItem name={`first_page`}
               active={'first_page' === current}
@@ -156,21 +138,33 @@ export default function Control({
             <div className="menu-split" style={{ marginLeft: '7px', marginRight: '7px' }}></div>
           </> : null
         }
-        {role === 'teacher' ?
+        {+role === 1 ?
           <>
-            <ControlItem
-              name={whiteboard.state.recording ? 'stop_recording' : 'recording'}
+            {/* <ControlItem
+              name={roomStore.state.course.isRecording ? 'stop_recording' : 'recording'}
               onClick={onRecordButtonClick}
               active={false}
-            />
+            /> */}
             <ControlItem
               name={sharing ? 'quit_screen_sharing' : 'screen_sharing'}
-              onClick={onClick}
+              onClick={(evt: any) => {
+                if (sharing) {
+                  roomStore.stopScreenShare()
+                  .then(() => {
+                    console.log("stop screen share")
+                  }).catch(console.warn)
+                } else {
+                  roomStore.startScreenShare()
+                  .then(() => {
+                    console.log("start screen share")
+                  }).catch(console.warn)
+                }
+              }}
               active={false}
               text={sharing ? 'stop sharing' : ''}
             />
           </> : null }
-        {role === 'student' ?
+        {+role === 2 ?
           <>
             <ControlItem
               name={isHost ? 'hands_up_end' : 'hands_up'}

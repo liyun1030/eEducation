@@ -16,6 +16,7 @@ import MD5 from 'js-md5';
 import { globalStore, roomTypes } from '../stores/global';
 import { t } from '../i18n';
 import GlobalStorage from '../utils/custom-storage';
+import { genUUID } from '../utils/api';
 
 const useStyles = makeStyles ((theme: Theme) => ({
   formControl: {
@@ -40,6 +41,10 @@ const defaultState: SessionInfo = {
 
 function HomePage() {
   document.title = t(`home.short_title.title`)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5.3.0-welfare-develop
   const classes = useStyles();
 
   const history = useHistory();
@@ -82,28 +87,19 @@ function HomePage() {
     
     if (!roomTypes[session.roomType]) return;
     const path = roomTypes[session.roomType].path
-    const payload = {
-      uid: genUid(),
-      rid: `${session.roomType}${MD5(session.roomName)}`,
-      role: session.role,
-      roomName: session.roomName,
-      roomType: session.roomType,
-      video: 1,
-      audio: 1,
-      chat: 1,
-      account: session.yourName,
-      rtmToken: '',
-      boardId: '',
-      linkId: 0,
-      sharedId: 0,
-      lockBoard: 0,
-      grantBoard: 0,
-    }
-    ref.current = true;
     globalStore.showLoading();
-    roomStore.loginAndJoin(payload).then(() => {
-      history.push(`/classroom/${path}`);
+    roomStore.LoginToRoom({
+      userName: session.yourName,
+      roomName: session.roomName,
+      role: session.role === 'teacher' ? 1 : 2,
+      type: session.roomType,
+      uuid: genUUID()
+    }).then(() => {
+      history.push(`/classroom/${path}`)
     }).catch((err: any) => {
+      if (err.hasOwnProperty('api_error')) {
+        return
+      }
       if (err.reason) {
         globalStore.showToast({
           type: 'rtmClient',
@@ -115,11 +111,9 @@ function HomePage() {
           message: t('toast.rtm_login_failed'),
         })
       }
-      console.warn(err);
-    })
-    .finally(() => {
-        ref.current = false;
-        globalStore.stopLoading();
+      console.warn(err)
+    }).finally(() => {
+      globalStore.stopLoading();
     })
   }
 
@@ -136,7 +130,11 @@ function HomePage() {
           <div className="setting-container">
             <Icon className="icon-setting" onClick={handleSetting}/>
             <LangSelect
+<<<<<<< HEAD
             value={GlobalStorage.getLanguage().language.match(/^zh/) ? 0 : 1 }
+=======
+            value={GlobalStorage.getLanguage().language.match(/^zh/) ? 0 : 1}
+>>>>>>> 5.3.0-welfare-develop
             onChange={(evt: any) => {
               const value = evt.target.value;
               if (value === 0) {
