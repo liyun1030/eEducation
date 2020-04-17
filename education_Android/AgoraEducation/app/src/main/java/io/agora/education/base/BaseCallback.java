@@ -53,7 +53,7 @@ public class BaseCallback<T> extends RetrofitManager.Callback<ResponseBody<T>> {
         String message = throwable.getMessage();
         if (throwable instanceof BusinessException) {
             int code = ((BusinessException) throwable).getCode();
-            Map<String, Map<Integer, String>> languages = EduApplication.instance.config.multiLanguage;
+            Map<String, Map<Integer, String>> languages = EduApplication.getMultiLanguage();
             if (languages != null) {
                 Locale locale = Locale.getDefault();
                 if (!Locale.SIMPLIFIED_CHINESE.toString().equals(locale.toString())) {
