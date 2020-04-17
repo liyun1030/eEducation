@@ -4,6 +4,6 @@ public class RoomEntryReq {
 
     public String userName;
     public String password;
-    public String uuid;
+    public String userUuid;
 
 }
