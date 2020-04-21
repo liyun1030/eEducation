@@ -94,28 +94,8 @@ export function RoomPage({ children }: any) {
     }
   }, [location]);
 
-  // useEffect(() => {
-  //   if (location.pathname.match(/big-class/)) {
-  //     if (roomStore.state.applyUser.account) {
-  //       globalStore.showNotice({
-  //         reason: 'peer_hands_up',
-  //         text: t('notice.student_interactive_apply', { reason: `${roomStore.state.applyUser.account}` }),
-  //       });
-  //       return () => {
-  //         globalStore.removeNotice()
-  //       }
-  //     }
-  //   }
-  // }, [roomStore.state.applyUser.account, location])
-  
   const rtc = useRef<boolean>(false);
-
-  // const canPublish = useMemo(() => {
-  //   return !isBigClass ||
-  //     (isBigClass && 
-  //       (me.role === 1 ||
-  //         me.coVideo));
-  // }, [me.uid, me.coVideo, me.role, isBigClass]);
+  
   const canPublish = useMemo(() => {
     return me.coVideo;
   }, [me.coVideo]);

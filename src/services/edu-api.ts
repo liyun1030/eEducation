@@ -2,12 +2,15 @@ import { BUILD_VERSION } from './../i18n';
 import { AgoraFetch } from "../utils/fetch";
 import { ClassState, AgoraUser, Me } from "../stores/room";
 import {Map} from 'immutable'
+import {get} from 'lodash'
 import { getIntlError, setIntlError } from "./intl-error-helper";
 import { globalStore } from "../stores/global";
 import { historyStore } from './../stores/history';
 import OSS from "ali-oss";
 import axios from 'axios';
 import Log from '../utils/LogUploader';
+
+const whiteboardGenerateTokenApiEndpoint = process.env.REACT_APP_YOUR_BACKEND_WHITEBOARD_API as string;
 
 export interface UserAttrsParams {
   userId: string
@@ -20,9 +23,9 @@ export interface UserAttrsParams {
 
 const APP_ID: string = process.env.REACT_APP_AGORA_APP_ID as string;
 const PREFIX: string = process.env.REACT_APP_AGORA_EDU_ENDPOINT_PREFIX as string;
-const AUTHORIZATION: string = process.env.REACT_APP_AGORA_GATEWAY_TOKEN as string;
+const AUTHORIZATION: string = process.env.REACT_APP_AGORA_RESTFULL_TOKEN as string;
 
-const AgoraFetchJson = async ({url, method, data, token}:{url: string, method: string, data?: any, token?: string}) => {  
+const AgoraFetchJson = async ({url, method, data, token, full_url}:{url?: string, method: string, data?: any, token?: string, full_url?: string}) => {  
   const opts: any = {
     method,
     headers: {
@@ -38,8 +41,12 @@ const AgoraFetchJson = async ({url, method, data, token}:{url: string, method: s
     opts.body = JSON.stringify(data);
   }
 
-  let resp = await AgoraFetch(`${PREFIX}${url}`, opts);
-
+  let resp = undefined;
+  if (full_url) {
+    resp = await AgoraFetch(`${full_url}`, opts);
+  } else {
+    resp = await AgoraFetch(`${PREFIX}${url}`, opts);
+  }
   const {code, msg, data: responseData} = resp
 
   if (code !== 0) {
@@ -138,6 +145,7 @@ export class AgoraEduApi {
     }
   }
 
+  // upload log
   async uploadLogFile(
     roomId: string,
     appVersion: string,
@@ -180,6 +188,7 @@ export class AgoraEduApi {
     return res;
   }
 
+  // fetch i18n
   static async fetchI18n() {
     let data = await AgoraFetchJson({
       url: `/v1/multi/language`,
@@ -191,21 +200,21 @@ export class AgoraEduApi {
 
   // app config
   // 配置入口
-  async config() {
-    let data = await AgoraFetchJson({
-      url: `/v1/config?platform=0&device=0&version=5.2.0`,
-      method: 'GET',
-    });
+  // async config() {
+  //   let data = await AgoraFetchJson({
+  //     url: `/v1/config?platform=0&device=0&version=5.2.0`,
+  //     method: 'GET',
+  //   });
 
-    if (data['multiLanguage']) {
-      setIntlError(data['multiLanguage'])
-    }
+  //   if (data['multiLanguage']) {
+  //     setIntlError(data['multiLanguage'])
+  //   }
 
-    return {
-      appId: data.appId,
-      room: data.room,
-    }
-  }
+  //   return {
+  //     appId: data.appId,
+  //     room: data.room,
+  //   }
+  // }
 
   // room entry
   // 房间入口
@@ -310,9 +319,10 @@ export class AgoraEduApi {
     }
   }
 
+  // get whiteboard token
   async getWhiteboardBy(roomId: string): Promise<any> {
     let boardData = await AgoraFetchJson({
-      url: `/v1/apps/${this.appID}/room/${roomId}/board`,
+      full_url: whiteboardGenerateTokenApiEndpoint.replace("%app_id%", this.appID).replace("%room_id%", roomId),
       method: 'GET',
       token: this.userToken,
     })
@@ -487,7 +497,7 @@ export class AgoraEduApi {
     });
 
     const boardData = await this.getWhiteboardBy(roomId);
-    const teacherRecord = data.recordDetails.find((it:any) => it.role === 1)
+    const teacherRecord = get(data, 'recordDetails', []).find((it:any) => it.role === 1)
 
     const recordStatus = [
       'recording',

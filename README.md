@@ -63,21 +63,14 @@ WARN: IF YOU ENABLED APP CERTIFICATE, PLEASE SIGN YOUR TOKEN IN YOUR SERVER SIDE
 REACT_APP_AGORA_APP_ID=Agora APPID
 # true is indicate the agora sdk will enable log
 REACT_APP_AGORA_LOG=true
-# obtain netless whiteboard sdk from herewhite official website
-REACT_APP_NETLESS_APP_TOKEN=SDKTOKEN
-# whiteboard api create room entry and join room end-points
-REACT_APP_NETLESS_APP_API_ENTRY=https://cloudcapiv4.herewhite.com/room?token=
-REACT_APP_NETLESS_APP_JOIN_API=https://cloudcapiv4.herewhite.com/room/join?token=
-# agora recording service end-point
-REACT_APP_AGORA_RECORDING_SERVICE_URL=https://api.agora.io/v1/apps/%s/cloud_recording/
-# oss for cloud recording storage
-REACT_APP_AGORA_RECORDING_OSS_URL=云录制OSS地址
+# agora gateway token generate from (https://docs.agora.io/en/faq/restful_authentication)
+REACT_APP_AGORA_RESTFULL_TOKEN=agora restful endpoint token
 # oss parameters for whiteboard courseware
-REACT_APP_AGORA_OSS_BUCKET_NAME=your_oss_bucket_name
-REACT_APP_AGORA_OSS_BUCKET_FOLDER=your_oss_folder
-REACT_APP_AGORA_OSS_BUCKET_REGION=your_oss_region
-REACT_APP_AGORA_OSS_BUCKET_KEY=your_oss_bucket_ak
-REACT_APP_AGORA_OSS_BUCKET_SECRET=your_oss_bucket_sk
+REACT_APP_YOUR_OWN_OSS_BUCKET_NAME=your_oss_bucket_name
+REACT_APP_YOUR_OWN_OSS_BUCKET_FOLDER=your_oss_folder
+REACT_APP_YOUR_OWN_OSS_BUCKET_REGION=your_oss_region
+REACT_APP_YOUR_OWN_OSS_BUCKET_KEY=your_oss_bucket_ak
+REACT_APP_YOUR_OWN_OSS_BUCKET_SECRET=your_oss_bucket_sk
 ```
 
 # Build Web 

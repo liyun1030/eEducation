@@ -81,21 +81,12 @@ WARN: IF YOU ENABLED APP CERTIFICATE, PLEASE SIGN YOUR TOKEN IN YOUR SERVER SIDE
 REACT_APP_AGORA_APP_ID=Agora APPID
 # true表示开启声网前端日志
 REACT_APP_AGORA_LOG=true
-# 白板的sdktoken 可以通过后台获取
-REACT_APP_NETLESS_APP_TOKEN=SDKTOKEN
-# 白板的api 详情请参考白板官方文档的集成指南
-REACT_APP_NETLESS_APP_API_ENTRY=https://cloudcapiv4.herewhite.com/room?token=
-REACT_APP_NETLESS_APP_JOIN_API=https://cloudcapiv4.herewhite.com/room/join?token=
-# 声网的云录制服务地址 （不推荐在前端或客户端直接集成）
-REACT_APP_AGORA_RECORDING_SERVICE_URL=https://api.agora.io/v1/apps/%s/cloud_recording/
-# 存放云录制OSS的CDN地址
-REACT_APP_AGORA_RECORDING_OSS_URL=云录制OSS地址
 # 下列OSS相关的信息不建议放在前端存储
-REACT_APP_AGORA_OSS_BUCKET_NAME=你的oss名字
-REACT_APP_AGORA_OSS_BUCKET_FOLDER=你的oss存储目录
-REACT_APP_AGORA_OSS_BUCKET_REGION=你的oss存储节点地区
-REACT_APP_AGORA_OSS_BUCKET_KEY=你的oss存储key或者存储id
-REACT_APP_AGORA_OSS_BUCKET_SECRET=你的oss的存储秘钥
+REACT_APP_YOUR_OWN_OSS_BUCKET_NAME=你的oss名字
+REACT_APP_YOUR_OWN_OSS_BUCKET_FOLDER=你的oss存储目录
+REACT_APP_YOUR_OWN_OSS_BUCKET_REGION=你的oss存储节点地区
+REACT_APP_YOUR_OWN_OSS_BUCKET_KEY=你的oss存储key或者存储id
+REACT_APP_YOUR_OWN_OSS_BUCKET_SECRET=你的oss的存储秘钥
 ```
 
 # Web发布和开发操作  

@@ -23,9 +23,6 @@ export interface CustomScene {
   rootPath: string
   file: SceneFile
   type: string
-  current: boolean
-  currentPage: number
-  totalPage: number
 }
 
 export interface SceneResource {
@@ -52,7 +49,7 @@ plugins.setPluginContext("audio", {identity: 'guest'});
 export type WhiteboardState = {
   loading: boolean
   joined: boolean
-  scenes: Map<string, CustomScene>
+  scenes: CustomScene[]
   currentScenePath: string
   currentHeight: number
   currentWidth: number
@@ -64,6 +61,10 @@ export type WhiteboardState = {
   recording: boolean
   startTime: number
   endTime: number
+
+  totalPage: number
+  currentPage: number
+  type: string
   // isWritable: 
 }
 
@@ -83,7 +84,7 @@ class Whiteboard extends EventEmitter {
   public subject: Subject<WhiteboardState> | null;
   public defaultState: WhiteboardState = {
     joined: false,
-    scenes: Map<string, CustomScene>(),
+    scenes: [],
     currentScenePath: '',
     currentHeight: 0,
     currentWidth: 0,
@@ -98,6 +99,9 @@ class Whiteboard extends EventEmitter {
     loading: true,
     // isWritable: false,
     ...GlobalStorage.read('mediaDirs'),
+    totalPage: 0,
+    currentPage: 0,
+    type: 'static'
   }
 
   public readonly client: WhiteWebSdk = new WhiteWebSdk({
@@ -147,8 +151,15 @@ class Whiteboard extends EventEmitter {
     this.commit(this.state);
   }
 
-  updateRoomState(file?: SceneFile) {
+  getNameByScenePath(scenePath: string) {
+    const sceneMap = get(this.state.room, `state.globalState.sceneMap`, {})
+    console.log("sceneMap", sceneMap)
+    return get(sceneMap, scenePath, 'default name')
+  }
+
+  updateRoomState() {
     if (!this.state.room) return;
+    console.log("current room state", this.state.room.state);
     const roomState = this.state.room.state;
 
     const path = roomState.sceneState.scenePath;
@@ -172,34 +183,33 @@ class Whiteboard extends EventEmitter {
       }
     }
 
-    const _dirPath = pathName(path);
-    const dirPath = _dirPath === "" ? "/init" : `/${_dirPath}`;
+    const entrieScenes = this.state.room ? this.state.room.entireScenes() : {};
 
-    const scenes = this.state.scenes.update(dirPath, (value: CustomScene) => {
-      const sceneFile: SceneFile = {
-        name: 'whiteboard',
-        type: 'whiteboard'
-      }
-      if (file && dirPath !== "/init") {
-        sceneFile.name = file.name;
-        sceneFile.type = file.type;
-      }
+    const paths = Object.keys(entrieScenes);
 
-      const result = {
-        ...value,
+    let scenes: CustomScene[] = [];
+    for (let dirPath of paths) {
+      const sceneInfo = {
         path: dirPath,
-        type: type ? type : 'static',
-        currentPage,
-        totalPage,
+        file: {
+          name: this.getNameByScenePath(dirPath),
+          type: 'whiteboard'
+        },
+        type: 'static',
+        rootPath: '',
       }
-      if (!value || isEmpty(value.file)) {
-        result.file = sceneFile;
+      if (entrieScenes[dirPath]) {
+        sceneInfo.rootPath = ['/', '/init'].indexOf(dirPath) !== -1 ? '/init' : `${dirPath}/${entrieScenes[dirPath][0].name}`
+        sceneInfo.type = entrieScenes[dirPath][0].ppt ? 'dynamic' : 'static'
+        if (sceneInfo.type === 'dynamic') {
+          sceneInfo.file.type = 'ppt';
+        }
       }
-      if (!value || isEmpty(value.rootPath)) {
-        result.rootPath = roomState.sceneState.scenePath
-      }
-      return result;
-    });
+      scenes.push(sceneInfo);
+    }
+
+    const _dirPath = pathName(path);
+    const currentScenePath = _dirPath === "" ? "/init" : `/${_dirPath}`;
 
     const _dirs: SceneResource[] = [];
     scenes.forEach((it: CustomScene) => {
@@ -210,14 +220,17 @@ class Whiteboard extends EventEmitter {
       });
     });
 
-    const currentDirIndex = _dirs.findIndex((it: SceneResource) => it.path === dirPath);
+    const currentDirIndex = _dirs.findIndex((it: SceneResource) => it.rootPath === currentScenePath);
 
     this.state = {
       ...this.state,
       scenes: scenes,
-      currentScenePath: dirPath,
+      currentScenePath: currentScenePath,
       dirs: _dirs,
-      activeDir: currentDirIndex !== -1 ? currentDirIndex : 0
+      activeDir: currentDirIndex !== -1 ? currentDirIndex : 0,
+      totalPage,
+      currentPage,
+      type,
     }
     this.commit(this.state);
   }
@@ -234,22 +247,27 @@ class Whiteboard extends EventEmitter {
 
   updateSceneState(sceneState: SceneState) {
     const path = sceneState.scenePath;
+    const ppt = sceneState.scenes[0].ppt;
+    const type = isEmpty(ppt) ? 'static' : 'dynamic';
     const currentPage = sceneState.index;
     const totalPage = sceneState.scenes.length;
-    const _dirPath = pathName(path);
-    const dirPath = _dirPath === "" ? "/init" : `/${_dirPath}`;
+    // const _dirPath = pathName(path);
+    // const dirPath = _dirPath === "" ? "/init" : `/${_dirPath}`;
 
-    const scenes = this.state.scenes.update(dirPath, (value) => {
-      return {
-        ...value,
-        currentPage,
-        totalPage,
-      }
-    });
+    // const scenes = this.state.scenes.update(dirPath, (value) => {
+    //   return {
+    //     ...value,
+    //     currentPage,
+    //     totalPage,
+    //   }
+    // });
 
     this.state = {
       ...this.state,
-      scenes,
+      // scenes,
+      currentPage,
+      totalPage,
+      type,
     }
 
     this.commit(this.state);
@@ -305,10 +323,11 @@ class Whiteboard extends EventEmitter {
         console.log("[White] onPhaseChanged phase : ", phase);
       },
       onRoomStateChanged: state => {
+        console.log("onRoomStateChanged", state)
         if (state.zoomScale) {
           whiteboard.updateScale(state.zoomScale);
         }
-        if (state.sceneState) {
+        if (state.sceneState || state.globalState) {
           whiteboard.updateRoomState();
         }
       },
