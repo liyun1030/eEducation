@@ -164,9 +164,12 @@ class ReplayStore {
     this.commit(this.state);
   }
 
-  
-  async joinRoom(_uuid: string) {
-    return await WhiteboardAPI.joinRoom(_uuid);
+  async joinRoom(roomId: string) {
+    const res = await eduApi.getWhiteboardBy(roomId);
+    return {
+      roomToken: res.boardToken,
+      uuid: res.boardId,
+    }
   }
 }
 
@@ -206,6 +209,7 @@ const ReplayContainer: React.FC<{}> = () => {
         <Progress title={t(`replay.${result?.statusText ? result?.statusText : 'loading'}`)} /> : 
         <NetlessAgoraReplay
           whiteboardUUID={result?.boardId as string}
+          roomId={roomId}
           startTime={result?.startTime as number}
           endTime={result?.endTime as number}
           mediaUrl={result?.url as string} />
@@ -218,6 +222,7 @@ export default ReplayContainer;
 
 export type NetlessAgoraReplayProps = {
   whiteboardUUID: string
+  roomId: string
   startTime: number
   endTime: number
   mediaUrl: string
@@ -225,6 +230,7 @@ export type NetlessAgoraReplayProps = {
 
 export const NetlessAgoraReplay: React.FC<NetlessAgoraReplayProps> = ({
   whiteboardUUID: uuid,
+  roomId,
   startTime,
   endTime,
   mediaUrl
@@ -309,8 +315,8 @@ export const NetlessAgoraReplay: React.FC<NetlessAgoraReplayProps> = ({
   useEffect(() => {
     window.addEventListener('resize', onWindowResize);
     window.addEventListener('keydown', handleSpaceKey);
-    if (uuid && startTime && endTime) {
-        store.joinRoom(uuid).then(({roomToken}) => {
+    if (startTime && endTime) {
+        store.joinRoom(roomId).then(({roomToken, uuid}) => {
           WhiteboardAPI.replayRoom(whiteboard.client,
           {
             beginTimestamp: +startTime,

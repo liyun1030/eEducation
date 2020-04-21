@@ -32,7 +32,7 @@ export interface UserAttrsParams {
 const APP_ID: string = process.env.REACT_APP_AGORA_APP_ID as string;
 const PREFIX: string = process.env.REACT_APP_AGORA_EDU_ENDPOINT_PREFIX as string;
 
-const AgoraFetchJson = async ({url, method, data, token}:{url: string, method: string, data?: any, token?: string}) => {  
+const AgoraFetchJson = async ({url, full_url, method, data, token}:{url?: string, method: string, data?: any, token?: string, full_url?: string}) => {  
   const agoraAuth = readAgoraAuth()
   const opts: any = {
     method,
@@ -59,7 +59,12 @@ const AgoraFetchJson = async ({url, method, data, token}:{url: string, method: s
     opts.body = JSON.stringify(data);
   }
 
-  let resp = await AgoraFetch(`${PREFIX}${url}`, opts);
+  let resp = undefined;
+  if (full_url) {
+    resp = await AgoraFetch(`${full_url}`, opts);
+  } else {
+    resp = await AgoraFetch(`${PREFIX}${url}`, opts);
+  }
 
   const {code, msg, data: responseData} = resp
 

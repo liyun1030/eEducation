@@ -13,17 +13,17 @@ export interface OSSConfig {
 }
 
 export const ossConfig: OSSConfig = {
-  "accessKeyId": process.env.REACT_APP_AGORA_OSS_BUCKET_KEY as string,
-  "accessKeySecret": process.env.REACT_APP_AGORA_OSS_BUCKET_SECRET as string,
-  "bucket": process.env.REACT_APP_AGORA_OSS_BUCKET_NAME as string,
-  // "region": process.env.REACT_APP_AGORA_OSS_BUCKET_REGION as string,
-  "endpoint": process.env.REACT_APP_AGORA_OSS_CDN_ACCELERATE as string,
-  "folder": process.env.REACT_APP_AGORA_OSS_BUCKET_FOLDER as string
+  "accessKeyId": process.env.REACT_APP_YOUR_OWN_OSS_BUCKET_KEY as string,
+  "accessKeySecret": process.env.REACT_APP_YOUR_OWN_OSS_BUCKET_SECRET as string,
+  "bucket": process.env.REACT_APP_YOUR_OWN_OSS_BUCKET_NAME as string,
+  // "region": process.env.REACT_APP_YOUR_OWN_OSS_BUCKET_REGION as string,
+  "endpoint": process.env.REACT_APP_YOUR_OWN_OSS_CDN_ACCELERATE as string,
+  "folder": process.env.REACT_APP_YOUR_OWN_OSS_BUCKET_FOLDER as string
 }
 
 export const ossClient = new OSS(ossConfig);
 
-const OSS_PREFIX = process.env.REACT_APP_AGORA_OSS_CDN_DOMAIN as string;
+const OSS_PREFIX = process.env.REACT_APP_YOUR_OWN_OSS_CDN_DOMAIN as string;
 
 export function getOSSUrl (mediaUrl: string): string {
   const res = `${OSS_PREFIX}/${mediaUrl}`;

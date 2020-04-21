@@ -158,6 +158,7 @@ export class RoomStore {
     rtcToken: '',
     rtmToken: '',
     appID: '',
+    recordLock: false,
     me: {
       account: "",
       uid: "",
