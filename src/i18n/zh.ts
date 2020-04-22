@@ -5,7 +5,8 @@ const zhCN: any = {
   "icon": {
     "setting": "设置",
     "upload-log": "上传日志",
-    "exit-room": "退出教室"
+    "exit-room": "退出教室",
+    "lang-select": "语言切换",
   },
   'doc_center': '文档中心',
   'upload_picture': '上传图片',

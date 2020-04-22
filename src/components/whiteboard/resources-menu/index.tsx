@@ -45,7 +45,7 @@ export const ResourceItem: React.FC<any> = (props: any) => {
           if (
             globalStateLength <= 30 
             && sceneMapLength <= 30
-            && blob.size <= (1024 * 1024)) {
+            && blob.size <= (1000 * 50)) {
             whiteboard.state.room?.setGlobalState({sceneMap: {
               ...sceneMap,
               [`${props.item.path}`]: `${name}`

@@ -27,14 +27,12 @@ export default function Tools (props: ToolsProps) {
   return (
     <div className="menu">
       {props.items.map((item: any, key: number) => (
-        // <Tooltip key={key} title={t(`tool.${item.name}`)}>
-          <ToolItem key={key}
-            name={item.name}
-            onClick={props.handleToolClick}
-            active={props.currentTool === item.name}
-          >
-          </ToolItem>
-        // </Tooltip>
+        <ToolItem key={key}
+          name={item.name}
+          onClick={props.handleToolClick}
+          active={props.currentTool === item.name}
+        >
+        </ToolItem>
       ))}
     </div>
   )

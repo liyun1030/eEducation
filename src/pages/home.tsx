@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Theme, FormControl } from '@material-ui/core';
+import { Theme, FormControl, Tooltip } from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 import Button from '../components/custom-button';
 import RoleRadio from '../components/role-radio';
@@ -141,23 +141,35 @@ function HomePage() {
           </div>
           <div className="setting-container">
             <div className="flex-row">
-              <Icon className={lock ? "icon-loading" : "icon-upload"} onClick={handleUpload}></Icon>
-              <Icon className="icon-setting" onClick={handleSetting}/>
+              <Tooltip title={t("icon.upload-log")} placement="top">
+                <span>
+                  <Icon className={lock ? "icon-loading" : "icon-upload"} onClick={handleUpload}></Icon>
+                </span>
+              </Tooltip>
+              <Tooltip title={t("icon.setting")} placement="top">
+                <span>
+                  <Icon className="icon-setting" onClick={handleSetting}/>
+                </span>
+              </Tooltip>
             </div>
-            <LangSelect
-            value={GlobalStorage.getLanguage().language.match(/^zh/) ? 0 : 1}
-            onChange={(evt: any) => {
-              const value = evt.target.value;
-              if (value === 0) {
-                globalStore.setLanguage('zh-CN');
-              } else {
-                globalStore.setLanguage('en');
-              }
-            }}
-            items={[
-              {text: '中文', name: 'zh-CN'},
-              {text: 'En', name: 'en'}
-            ]}></LangSelect>
+            <Tooltip title={t("icon.lang-select")} placement="top">
+              <span>
+                <LangSelect
+                value={GlobalStorage.getLanguage().language.match(/^zh/) ? 0 : 1}
+                onChange={(evt: any) => {
+                  const value = evt.target.value;
+                  if (value === 0) {
+                    globalStore.setLanguage('zh-CN');
+                  } else {
+                    globalStore.setLanguage('en');
+                  }
+                }}
+                items={[
+                  {text: '中文', name: 'zh-CN'},
+                  {text: 'En', name: 'en'}
+                ]}></LangSelect>
+              </span>
+            </Tooltip>
           </div>
         </div>
       </div>

@@ -5,7 +5,8 @@ const en = {
   "icon": {
     "setting": "Setting",
     "upload-log": "Upload Log",
-    "exit-room": "Exit Room"
+    "exit-room": "Exit Room",
+    "lang-select": "Switch Language",
   },
   'doc_center': 'Course Document Center',
   'upload_picture': 'Upload Picture',

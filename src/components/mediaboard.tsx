@@ -23,6 +23,7 @@ import { platform } from '../utils/platform';
 import "white-web-sdk/style/index.css";
 import { ViewMode } from 'white-web-sdk';
 import { t } from '../i18n';
+import { Collapse, Paper} from '@material-ui/core';
 
 const pathName = (path: string): string => {
   const reg = /\/([^/]*)\//g;
@@ -547,21 +548,25 @@ const items = [
         totalPage={totalPage}
         isHost={studentIsHost}
         onClick={handlePageTool}/> : null }
-        {tool === 'folder' && whiteboardState.room ? 
-          <ResourcesMenu
-            active={whiteboardState.activeDir}
-            items={whiteboardState.dirs}
-            onClick={(rootPath: string) => {
-              if (room) {
-                room.setScenePath(rootPath);
-                room.setSceneIndex(0);
-                whiteboard.updateRoomState();
-              }
-            }}
-            onClose={(evt: any) => {
-              setTool('')
-            }}
-          />
+        {whiteboardState.room ? 
+          <Collapse in={tool === 'folder'}>
+            <Paper elevation={4}>
+              <ResourcesMenu
+                active={whiteboardState.activeDir}
+                items={whiteboardState.dirs}
+                onClick={(rootPath: string) => {
+                  if (room) {
+                    room.setScenePath(rootPath);
+                    room.setSceneIndex(0);
+                    whiteboard.updateRoomState();
+                  }
+                }}
+                onClose={(evt: any) => {
+                  setTool('')
+                }}
+              />
+            </Paper>
+          </Collapse>
         : null}
       <UploadNoticeView />
       <UploadProgressView />
