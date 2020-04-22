@@ -54,7 +54,7 @@ const AgoraFetchJson = async ({url, method, data, token, full_url}:{url?: string
     const isErrorCode = `${error}` === `${code}`
     globalStore.showToast({
       type: 'eduApiError',
-      message: isErrorCode ? `ErrorCode: ${code}` : error
+      message: isErrorCode ? `${msg}` : error
     })
     if (code === 401) {
       historyStore.state.history.goBack()
