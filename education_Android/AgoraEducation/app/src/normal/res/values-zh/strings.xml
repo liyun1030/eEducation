@@ -8,4 +8,7 @@
     <string name="one2one_class">一对一</string>
     <string name="small_class">小班课</string>
     <string name="large_class">大班课</string>
+    <string name="upload_log">上传日志</string>
+    <string name="upload_success">上传成功，请保存日志编号帮助我们排查问题！</string>
+    <string name="clipboard">日志编号已保存到剪切板</string>
 </resources>
