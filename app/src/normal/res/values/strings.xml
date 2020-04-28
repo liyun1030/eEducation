@@ -8,4 +8,7 @@
     <string name="one2one_class">One to One Classroom</string>
     <string name="small_class">Small Classroom</string>
     <string name="large_class">Lecture Hall</string>
+    <string name="upload_log">Upload log</string>
+    <string name="upload_success">Upload success, please save the log number to help our troubleshooting!</string>
+    <string name="clipboard">The log number has been saved to the clipboard</string>
 </resources>
