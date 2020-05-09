@@ -157,7 +157,6 @@ public class MainActivity extends BaseActivity {
             String appId = data.room.appId;
             if (!TextUtils.equals(EduApplication.getAppId(), appId)) {
                 EduApplication.setAppId(appId);
-                EduApplication.setApiHost(BuildConfig.API_BASE_URL);
                 RtcManager.instance().init(getApplicationContext(), appId);
                 RtmManager.instance().init(getApplicationContext(), appId);
             }

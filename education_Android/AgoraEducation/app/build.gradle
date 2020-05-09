@@ -17,7 +17,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField 'String', 'API_BASE_URL', '"https://solutions-api.sh.agoralab.co/"'
+        buildConfigField 'String', 'API_BASE_URL', '"https://api.agora.io"'
         buildConfigField 'String', 'POLICY_URL', '"https://www.agora.io/privacy-policy"'
     }
 
@@ -34,13 +34,18 @@ android {
         debug {
             minifyEnabled false
             applicationIdSuffix ".debug"
-            buildConfigField 'String', 'API_BASE_URL', '"https://api-solutions-dev.sh.agoralab.co/"'
+            buildConfigField 'String', 'API_BASE_URL', '"https://api-solutions-dev.sh.agoralab.co"'
         }
         release {
             minifyEnabled true
             shrinkResources true
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        releasePre {
+            matchingFallbacks = ['release']
+            signingConfig signingConfigs.release
+            buildConfigField 'String', 'API_BASE_URL', '"https://api-test.agora.io"'
         }
     }
 
