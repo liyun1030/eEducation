@@ -11,7 +11,7 @@
 #define HTTP_GET_CONFIG @"%@/edu/v1/app/version"
 
 // http: get app config
-#define HTTP_LOG_PARAMS @"%@/edu/v1/apps/%@/log/params"
+#define HTTP_LOG_PARAMS @"%@/edu/v1/log/params"
 // http: get app config
 #define HTTP_OSS_STS @"%@/edu/v1/log/sts"
 // http: get app config
