@@ -1693,7 +1693,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 5.4.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraEducation;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraEducationGY;
 				PRODUCT_NAME = "声网益课堂";
 				PROVISIONING_PROFILE_SPECIFIER = AgoraAppsDevProfile;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
@@ -1883,7 +1883,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 5.4.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraEducation;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraEducationGY;
 				PRODUCT_NAME = "声网益课堂";
 				PROVISIONING_PROFILE_SPECIFIER = AgoraAppsDevProfile;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
@@ -2005,7 +2005,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 5.4.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraEducationQA;
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.AgoraEducationQAGY;
 				PRODUCT_NAME = "声网益课堂";
 				PROVISIONING_PROFILE_SPECIFIER = AgoraIOTest2019;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
