@@ -466,6 +466,17 @@ export class RoomStore {
     this.commit(this.state);
   }
 
+  updateMediaDevice(state: Pick<MediaDeviceState, 'cameraId' | 'microphoneId'>) {
+    this.state = {
+      ...this.state,
+      mediaDevice: {
+        ...this.state.mediaDevice,
+        ...state
+      }
+    }
+    this.commit(this.state);
+  }
+
   updateDevice(state: MediaDeviceState) {
     this.state = {
       ...this.state,

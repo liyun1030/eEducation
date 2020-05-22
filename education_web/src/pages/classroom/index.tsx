@@ -14,6 +14,7 @@ import { AgoraElectronClient, StreamType } from '../../utils/agora-electron-clie
 import { t } from '../../i18n';
 import { eduApi } from '../../services/edu-api';
 import { genUUID } from '../../utils/api';
+import useSettingControl from '../../hooks/use-setting-control'
 // import { useInterval } from 'react-use';
 
 export const roomTypes = [
@@ -101,14 +102,30 @@ export function RoomPage({ children }: any) {
 
   const publishLock = useRef<boolean>(false);
 
+  const {camera, cameraList, microphone, microphoneList} = useSettingControl(false)
+
   const {rtcJoined, uid, role, mediaDevice} = useMemo(() => {
     return {
       rtcJoined: roomState.rtc.joined,
       uid: roomState.me.uid,
       role: roomState.me.role,
-      mediaDevice: roomState.mediaDevice,
+      mediaDevice: {
+        ...roomState.mediaDevice,
+        cameraId: cameraList[camera] ? cameraList[camera].value : '',
+        microphoneId: microphoneList[microphone] ? microphoneList[microphone].value : '',
+      },
     }
-  }, [roomState]);
+  }, [roomState, camera, cameraList, microphone, microphoneList]);
+
+
+
+  useEffect(() => {
+    console.log(
+      ">>>>>>>>>> device change, MediaDevice cameraId ",
+      mediaDevice.cameraId,
+      mediaDevice.microphoneId
+    )
+  }, [mediaDevice.cameraId, mediaDevice.microphoneId])
 
   useEffect(() => {
     if (!location.pathname.match(/big-class/) || me.role === 1) return
@@ -153,9 +170,10 @@ export function RoomPage({ children }: any) {
           deviceId: mediaDevice.speakerId
         }
       }
-      console.log("canPb>>> ", canPublish, roomStore.state.me.uid);
+      console.log("canPb>>> ", canPublish, roomStore.state.me.uid, streamSpec);
       if (canPublish && !publishLock.current) {
         publishLock.current = true;
+        console.log(">>>>>>>>>>>>> device changed TRY PUBLISH", streamSpec)
         Promise.all([
           webClient
           .publishLocalStream(streamSpec)

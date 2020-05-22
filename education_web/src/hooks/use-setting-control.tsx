@@ -6,8 +6,17 @@ import { AgoraElectronClient } from '../utils/agora-electron-client';
 import VideoPlayer from '../components/video-player';
 import { useRoomState } from '../containers/root-container';
 import { roomStore, MediaDeviceState } from '../stores/room';
+import {debounce} from 'lodash'
 
-export default function useSettingControl () {
+export default function useSettingControl (preview: boolean = true) {
+
+  const ref = useRef<boolean>(false);
+
+  useEffect(() => {
+    return () => {
+      ref.current = true;
+    }
+  }, []);
 
   const [devices, setDevices] = useState<any[]>([]);
 
@@ -59,12 +68,12 @@ export default function useSettingControl () {
           kind: item.kind
         })));
       }
-      window.addEventListener('devicechange', onChange);
+      navigator.mediaDevices.addEventListener('devicechange', debounce(onChange, 1000));
       onChange().then(() => {
       }).catch(console.warn);
       mounted = true;
       return () => {
-        window.removeEventListener('devicechange', onChange);
+        navigator.mediaDevices.removeEventListener('devicechange', onChange);
       }
     }
 
@@ -122,14 +131,6 @@ export default function useSettingControl () {
 
   const [stream, setStream] = useState<any>(null);
 
-  const ref = useRef<boolean>(false);
-
-  useEffect(() => {
-    return () => {
-      ref.current = true;
-    }
-  }, []);
-
   const lock = useRef<boolean>(false);
 
   useEffect(() => {
@@ -143,7 +144,7 @@ export default function useSettingControl () {
     lock.current = true;
     if (platform === 'web') {
       const webClient = rtcClient as AgoraWebClient;
-      !ref.current &&
+      preview && !ref.current &&
       webClient.createPreviewStream({
         cameraId,
         microphoneId,

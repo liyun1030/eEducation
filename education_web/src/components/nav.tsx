@@ -88,13 +88,13 @@ export function Nav ({
         <div className={platform === 'web' ? "btn-group" : 'electron-btn-group' }>
           {platform === 'web' ?
             <>
-            <Tooltip title={t("icon.setting")} placement="bottom">
+            {/* <Tooltip title={t("icon.setting")} placement="bottom">
               <span>
                 <Icon className="icon-setting" onClick={(evt: any) => {
                   handleClick("setting");
                 }}/>
               </span>
-            </Tooltip>
+            </Tooltip> */}
 
             </> : null
           }

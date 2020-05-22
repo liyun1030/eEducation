@@ -182,11 +182,11 @@ export class AgoraRTCClient {
       this._client.unpublish(this._localStream, (err: any) => {
         reject(err);
       })
-      setTimeout(() => {
-        resolve();
-        this.destroyLocalStream();
-        this._published = false;
-      }, 300);
+      // setTimeout(() => {
+      resolve();
+      this.destroyLocalStream();
+      this._published = false;
+      // }, 300);
     })
   }
 
@@ -283,17 +283,31 @@ export class AgoraRTCClient {
     }
   }
 
-  getDevices (): Promise<Device[]> {
+  async getDevices (): Promise<Device[]> {
+    // TODO: 如果遇到拿不到摄像头和麦克风设备的时候 再使用这段注释掉的代码
+    // const tempAudioStream = AgoraRTC.createStream({ audio: true, video: false });
+    // const tempVideoStream = AgoraRTC.createStream({ audio: false, video: true });
+
+    // const audioPermissionOK = new Promise(resolve => {
+    //   tempAudioStream.init(() => resolve(null), (err: any) => resolve(err));
+    // });
+    // const videoPermissionOK = new Promise(resolve => {
+    //   tempVideoStream.init(() => resolve(null), (err: any) => resolve(err));
+    // });
+
+    // await Promise.all([audioPermissionOK, videoPermissionOK])
     return new Promise((resolve, reject) => {
       AgoraRTC.getDevices((devices: any) => {
+        // tempAudioStream.close()
+        // tempVideoStream.close()
         const _devices: any[] = [];
         devices.forEach((item: any) => {
           _devices.push({deviceId: item.deviceId, kind: item.kind, label: item.label});
         })
-        resolve(_devices);
+        resolve(_devices)
       }, (err: any) => {
-        reject(err);
-      });
+        reject(err)
+      })
     })
   }
 }
@@ -404,7 +418,6 @@ export default class AgoraWebClient {
   }
 
   async publishLocalStream(data: AgoraStreamSpec) {
-    console.log(" publish local stream ", this.published);
     if (this.published) {
       await this.unpublishLocalStream();
       console.log("[agora-web] unpublished", this.published);
