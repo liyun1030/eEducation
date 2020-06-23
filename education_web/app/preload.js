@@ -15,6 +15,8 @@ window.path = path;
 
 const AdmZip = require('adm-zip');
 
+window.macCaptureScreen = require('mac-screen-capture-permissions')
+
 window.ipc.on('appPath', (event, args) => {
   const appPath = args[0];
   const logPath = path.join(appPath, `log`, `agora_sdk.log`)
